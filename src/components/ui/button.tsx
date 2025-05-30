@@ -40,17 +40,56 @@ function Button({
   variant,
   size,
   asChild = false,
+  withHoverEffect = false,
+  withRipple = false,
+  onClick,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
+    asChild?: boolean;
+    withHoverEffect?: boolean;
+    withRipple?: boolean;
   }) {
   const Comp = asChild ? Slot : "button"
+  
+  // Add ripple effect on click if withRipple is true
+  const handleClick = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    if (withRipple && e.currentTarget) {
+      const button = e.currentTarget
+      const ripple = document.createElement('span')
+      const rect = button.getBoundingClientRect()
+      
+      const size = Math.max(rect.width, rect.height) * 2
+      const x = e.clientX - rect.left - size / 2
+      const y = e.clientY - rect.top - size / 2
+      
+      ripple.className = 'ripple-element'
+      ripple.style.width = `${size}px`
+      ripple.style.height = `${size}px`
+      ripple.style.left = `${x}px`
+      ripple.style.top = `${y}px`
+      
+      button.appendChild(ripple)
+      
+      setTimeout(() => {
+        ripple.remove()
+      }, 600)
+    }
+    
+    if (onClick) {
+      onClick(e)
+    }
+  }, [withRipple, onClick])
 
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        withHoverEffect && 'button-with-hover',
+        withRipple && 'ripple-effect'
+      )}
+      onClick={handleClick}
       {...props}
     />
   )

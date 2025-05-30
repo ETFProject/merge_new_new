@@ -1,0 +1,581 @@
+/* Animations for UI transitions */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-up {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-down {
+  0% { transform: translateY(-20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-in-right {
+  0% { transform: translateX(20px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slide-in-left {
+  0% { transform: translateX(-20px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes scale {
+  0% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes border-pulse {
+  0%, 100% { border-color: var(--color-primary); }
+  50% { border-color: var(--color-primary-foreground); }
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+/* Component animations */
+.btn-hover {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-hover::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.5s ease, height 0.5s ease;
+  z-index: -1;
+}
+
+.btn-hover:hover::before {
+  width: 300%;
+  height: 300%;
+}
+
+.btn-pulse {
+  animation: pulse 2s infinite ease-in-out;
+}
+
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.card-3d {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  transition: transform 0.5s ease;
+}
+
+.card-3d:hover {
+  transform: rotateX(5deg) rotateY(5deg);
+}
+
+.card-appear {
+  animation: scale 0.3s ease-out;
+}
+
+/* Entry animations */
+.animate-entry {
+  animation: slide-up 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-delay-1 {
+  animation-delay: 0.1s;
+}
+
+.animate-delay-2 {
+  animation-delay: 0.2s;
+}
+
+.animate-delay-3 {
+  animation-delay: 0.3s;
+}
+
+.animate-delay-4 {
+  animation-delay: 0.4s;
+}
+
+/* Staggered animations for children */
+.animate-stagger > * {
+  animation: slide-up 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-stagger > *:nth-child(1) { animation-delay: 0.1s; }
+.animate-stagger > *:nth-child(2) { animation-delay: 0.2s; }
+.animate-stagger > *:nth-child(3) { animation-delay: 0.3s; }
+.animate-stagger > *:nth-child(4) { animation-delay: 0.4s; }
+.animate-stagger > *:nth-child(5) { animation-delay: 0.5s; }
+.animate-stagger > *:nth-child(6) { animation-delay: 0.6s; }
+.animate-stagger > *:nth-child(7) { animation-delay: 0.7s; }
+.animate-stagger > *:nth-child(8) { animation-delay: 0.8s; }
+
+/* Table row hover effect */
+.table-row-hover {
+  transition: background-color 0.2s ease;
+}
+
+.table-row-hover:hover {
+  background-color: var(--color-muted);
+}
+
+/* Token badge animation */
+.token-badge {
+  transition: all 0.2s ease;
+}
+
+.token-badge:hover {
+  transform: scale(1.05);
+}
+
+/* Loading indicator */
+.loading-indicator {
+  animation: rotate 1.5s linear infinite;
+}
+
+/* Modal animations */
+.modal-enter {
+  animation: fade-in 0.3s ease-out;
+}
+
+.modal-content-enter {
+  animation: scale 0.3s ease-out;
+}
+
+/* Animated gradient background */
+.animated-gradient {
+  background-size: 400% 400%;
+  background-image: linear-gradient(
+    -45deg,
+    var(--color-background) 0%,
+    var(--color-muted) 25%,
+    var(--color-background) 50%,
+    var(--color-card) 75%,
+    var(--color-background) 100%
+  );
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Transition effects for tab switching */
+.tab-transition {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tab-hidden {
+  opacity: 0;
+  transform: translateY(10px);
+  position: absolute;
+}
+
+.tab-visible {
+  opacity: 1;
+  transform: translateY(0);
+  position: relative;
+}
+
+/* Portfolio chart animation */
+.chart-line {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: dash 2s ease-in-out forwards;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* 3D card hover effect */
+.card-3d {
+  transition: transform 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.card-3d:hover {
+  transform: perspective(1000px) rotateX(5deg) rotateY(5deg);
+}
+
+/* Data table row hover effect */
+.table-row-hover {
+  transition: background-color 0.2s ease;
+}
+
+.table-row-hover:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* Custom styling for token badges in portfolio view */
+.token-badge {
+  transition: all 0.2s ease;
+}
+
+.token-badge:hover {
+  transform: translateY(-2px);
+}
+
+/* Animations for modal dialogs */
+.modal-enter {
+  animation: fade-in 0.3s ease forwards;
+}
+
+.modal-content-enter {
+  animation: slide-up 0.3s ease forwards;
+}
+
+.modal-exit {
+  animation: fade-out 0.3s ease forwards;
+}
+
+.modal-content-exit {
+  animation: slide-down 0.3s ease forwards;
+}
+
+/* Transition effects for tab switching */
+.tab-transition {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tab-hidden {
+  opacity: 0;
+  transform: translateY(10px);
+  position: absolute;
+}
+
+.tab-visible {
+  opacity: 1;
+  transform: translateY(0);
+  position: relative;
+}
+
+/* Portfolio chart animation */
+.chart-line {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: dash 2s ease-in-out forwards;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Animated gradient background */
+.animated-gradient {
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 3D card hover effect */
+.card-3d {
+  transition: transform 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.card-3d:hover {
+  transform: perspective(1000px) rotateX(5deg) rotateY(5deg);
+}
+
+/* Data table row hover effect */
+.table-row-hover {
+  transition: background-color 0.2s ease;
+}
+
+.table-row-hover:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* Card transitions */
+@keyframes card-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes card-disappear {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+/* Loading indicator */
+@keyframes pulse-loading {
+  0% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+
+/* Shimmer effect for loading states */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.loading-indicator {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-indicator::after {
+  animation: pulse-loading 1.5s infinite;
+  content: "";
+}
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 2s infinite;
+  transform: translateX(-100%);
+}
+
+/* Prevent Flash of Unstyled Content */
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.no-fouc {
+  animation: appear 0.3s ease-in-out;
+}
+
+/* Animated gradient backgrounds */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+/* Button hover effect */
+.button-with-hover {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.button-with-hover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s;
+  z-index: -1;
+}
+
+.button-with-hover:hover::before {
+  left: 100%;
+}
+
+/* Ripple effect animation */
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-element {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  background: rgba(255, 255, 255, 0.7);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+
+@keyframes slide-right-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-right-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
+
+@keyframes slide-left-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-left-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Bridge page token movement animation */
+@keyframes moveToken {
+  0% {
+    left: 70px;
+    top: 80px;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  45% {
+    left: 200px;
+    top: 80px;
+  }
+  55% {
+    left: 200px;
+    top: 80px;
+  }
+  90% {
+    opacity: 1;
+    left: 330px;
+    top: 80px;
+  }
+  100% {
+    left: 330px;
+    top: 80px;
+    opacity: 0;
+  }
+} 

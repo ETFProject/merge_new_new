@@ -25,7 +25,7 @@ export default function Home() {
         
         <div className="container mx-auto relative z-10 px-4 text-center text-white">
           <TransitionWrapper transitionType="slide-up">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white">BAEVE</h1>
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white">BAEVII</h1>
             <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-10">
               Create and manage multi-chain crypto ETFs with AI-powered insights and cross-chain liquidity
             </p>
@@ -45,13 +45,13 @@ export default function Home() {
         </div>
 
         {/* Decorative floating elements */}
-        <div className="absolute bottom-10 left-[10%] w-20 h-20 opacity-60 animate-float" style={{ animationDelay: '0.5s' }}>
+        <div className="absolute bottom-10 left-[10%] w-20 h-20 opacity-60 animate-floating animate-delay-1">
           <Image src="/placeholder.png" alt="Decorative element" width={80} height={80} />
         </div>
-        <div className="absolute top-20 right-[15%] w-16 h-16 opacity-70 animate-float" style={{ animationDelay: '1.2s' }}>
+        <div className="absolute top-20 right-[15%] w-16 h-16 opacity-70 animate-floating animate-delay-3">
           <Image src="/placeholder.png" alt="Decorative element" width={64} height={64} />
         </div>
-        <div className="absolute bottom-32 right-[20%] w-24 h-24 opacity-50 animate-float" style={{ animationDelay: '0.8s' }}>
+        <div className="absolute bottom-32 right-[20%] w-24 h-24 opacity-50 animate-floating animate-delay-2">
           <Image src="/placeholder.png" alt="Decorative element" width={96} height={96} />
         </div>
       </section>
@@ -123,7 +123,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <TransitionWrapper>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">How It Works</h2>
-            <p className="text-center text-muted-foreground max-w-2xl mx-auto mb-16">The BAEVE leverages cutting-edge blockchain technology to provide a seamless multi-chain experience</p>
+            <p className="text-center text-muted-foreground max-w-2xl mx-auto mb-16">The BAEVII leverages cutting-edge blockchain technology to provide a seamless multi-chain experience</p>
           </TransitionWrapper>
           
           <div className="relative max-w-4xl mx-auto">
@@ -134,7 +134,7 @@ export default function Home() {
               <div className="md:text-right md:pr-12">
                 <TransitionWrapper transitionType="slide-up">
                   <div className="bg-card rounded-lg p-6 shadow-md relative">
-                    <div className="absolute right-0 md:left-full top-1/2 -translate-y-1/2 md:translate-x-[-50%] w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold hidden md:flex">1</div>
+                    <div className="absolute right-0 md:left-full top-1/2 -translate-y-1/2 md:translate-x-[-50%] w-10 h-10 rounded-full bg-primary md:flex items-center justify-center text-primary-foreground font-bold hidden">1</div>
                     <h3 className="text-xl font-semibold mb-2">Deposit Assets</h3>
                     <p>Users deposit assets into the ETF vault, receiving ETF shares proportional to their contribution value.</p>
                     <div className="mt-4 flex justify-end">
@@ -151,7 +151,7 @@ export default function Home() {
               <div className="md:pl-12">
                 <TransitionWrapper transitionType="slide-up" className="delay-100">
                   <div className="bg-card rounded-lg p-6 shadow-md relative">
-                    <div className="absolute left-0 md:right-full top-1/2 -translate-y-1/2 md:translate-x-[50%] w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold hidden md:flex">2</div>
+                    <div className="absolute left-0 md:right-full top-1/2 -translate-y-1/2 md:translate-x-[50%] w-10 h-10 rounded-full bg-primary md:flex items-center justify-center text-primary-foreground font-bold hidden">2</div>
                     <h3 className="text-xl font-semibold mb-2">AI Portfolio Management</h3>
                     <p>Our AI agent analyzes market conditions and rebalances your portfolio to maintain optimal allocations.</p>
                     <div className="mt-4 flex justify-start">
@@ -164,7 +164,7 @@ export default function Home() {
               <div className="md:text-right md:pr-12">
                 <TransitionWrapper transitionType="slide-up" className="delay-200">
                   <div className="bg-card rounded-lg p-6 shadow-md relative">
-                    <div className="absolute right-0 md:left-full top-1/2 -translate-y-1/2 md:translate-x-[-50%] w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold hidden md:flex">3</div>
+                    <div className="absolute right-0 md:left-full top-1/2 -translate-y-1/2 md:translate-x-[-50%] w-10 h-10 rounded-full bg-primary md:flex items-center justify-center text-primary-foreground font-bold hidden">3</div>
                     <h3 className="text-xl font-semibold mb-2">Cross-Chain Swaps</h3>
                     <p>Assets are swapped across chains using 1inch Fusion+ for optimal pricing and efficient rebalancing.</p>
                     <div className="mt-4 flex justify-end">
@@ -181,7 +181,7 @@ export default function Home() {
               <div className="md:pl-12">
                 <TransitionWrapper transitionType="slide-up" className="delay-300">
                   <div className="bg-card rounded-lg p-6 shadow-md relative">
-                    <div className="absolute left-0 md:right-full top-1/2 -translate-y-1/2 md:translate-x-[50%] w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold hidden md:flex">4</div>
+                    <div className="absolute left-0 md:right-full top-1/2 -translate-y-1/2 md:translate-x-[50%] w-10 h-10 rounded-full bg-primary md:flex items-center justify-center text-primary-foreground font-bold hidden">4</div>
                     <h3 className="text-xl font-semibold mb-2">Withdraw or Bridge</h3>
                     <p>Redeem your ETF shares for underlying assets or bridge them to other chains for enhanced liquidity.</p>
                     <div className="mt-4 flex justify-start">
@@ -211,7 +211,7 @@ export default function Home() {
           <div className="max-w-3xl mx-auto text-center">
             <TransitionWrapper>
               <h2 className="text-3xl md:text-5xl font-bold mb-6">Ready to Build Your ETF?</h2>
-              <p className="text-xl opacity-90 mb-10">Start creating your diversified cross-chain portfolio today with BAEVE</p>
+              <p className="text-xl opacity-90 mb-10">Start creating your diversified cross-chain portfolio today with BAEVII</p>
               <Link href="/dashboard/create">
                 <Button size="lg" variant="outline" className="px-8 bg-white text-primary hover:bg-white/90 border-white" withHoverEffect withRipple>
                   Get Started Now
