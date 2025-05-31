@@ -2,10 +2,10 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { DashboardLayoutClient } from '@/components/dashboard/dashboard-layout-client';
-import { Button } from '@/components/ui/button';
+import { ClientButton } from '@/components/ui/client-button';
 
 export const metadata: Metadata = {
-  title: 'BAEVE Dashboard',
+  title: 'BAEVII Dashboard',
   description: 'Manage your crypto ETFs with AI-powered insights',
 };
 
@@ -21,20 +21,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex items-center">
             <Link href="/" className="mr-6 flex items-center space-x-2">
               <Image 
-                src="/baeve-logo.png" 
-                alt="BAEVE Logo" 
+                src="/baevii-logo.png" 
+                alt="BAEVII Logo" 
                 width={32} 
                 height={32} 
                 className="h-8 w-auto"
               />
               <span className="font-bold sm:inline-block">
-                BAEVE
+                BAEVII
               </span>
             </Link>
           </div>
           <div className="flex items-center">
             <Link href="/dashboard/create">
-              <Button size="sm">Create ETF</Button>
+              <ClientButton size="sm">Create ETF</ClientButton>
             </Link>
           </div>
         </div>

@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ClientCard } from "@/components/ui/client-card";
 import { Button } from "@/components/ui/button";
 import { useOptimisticMutation } from "@/hooks/use-optimistic-mutation";
 import { TransitionWrapper } from "@/components/ui/transition-wrapper";
@@ -153,7 +154,7 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
       case 11155111: return "Ethereum Sepolia";
       case 84532: return "Base Sepolia";
       case 8453: return "Base";
-      case 137: return "Polygon";
+      case 137: return "Flow";
       default: return `Chain ${chainId}`;
     }
   };
@@ -175,7 +176,7 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
       case 11155111: return "#627EEA"; // Ethereum blue
       case 84532:
       case 8453: return "#0052FF"; // Base blue
-      case 137: return "#8247E5"; // Polygon purple
+      case 137: return "#8247E5"; // Flow purple
       default: return "#CBD5E1"; // Gray
     }
   };
@@ -186,14 +187,14 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
       case 11155111: return "/tornado.png"; // Ethereum
       case 84532:
       case 8453: return "/sandwave.png"; // Base
-      case 137: return "/jellyfish.png"; // Polygon
+      case 137: return "/jellyfish.png"; // Flow
       default: return "/snail.png"; // Default
     }
   };
   
   if (loading) {
     return (
-      <Card appear>
+      <ClientCard appear>
         <CardContent className="pt-6">
           <div className="flex justify-center items-center h-40">
             <div className="loading-indicator">
@@ -204,31 +205,31 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </ClientCard>
     );
   }
   
   if (error) {
     return (
-      <Card appear>
+      <ClientCard appear>
         <CardContent className="pt-6">
           <div className="flex justify-center items-center h-40 text-destructive">
             <p>{error}</p>
           </div>
         </CardContent>
-      </Card>
+      </ClientCard>
     );
   }
   
   if (!portfolio) {
     return (
-      <Card appear>
+      <ClientCard appear>
         <CardContent className="pt-6">
           <div className="flex justify-center items-center h-40">
             <p>No portfolio data available</p>
           </div>
         </CardContent>
-      </Card>
+      </ClientCard>
     );
   }
   
@@ -263,7 +264,7 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
     : portfolio.tokens;
 
   return (
-    <Card hover appear>
+    <ClientCard hover appear>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="animate-entry animate-delay-1">
           <CardTitle>Cross-Chain ETF Portfolio</CardTitle>
@@ -436,13 +437,13 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
               
               <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center z-20 border-2 border-primary/30">
                 <div className="text-center">
-                  <Image src="/whalemusic.png" alt="BAEVE" width={48} height={48} className="mx-auto" />
-                  <p className="text-xs font-semibold mt-1">BAEVE</p>
+                  <Image src="/whalemusic.png" alt="BAEVII" width={48} height={48} className="mx-auto" />
+                  <p className="text-xs font-semibold mt-1">BAEVII</p>
                 </div>
               </div>
               
               <div className="absolute right-0 top-1/2 -translate-y-1/2 w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center z-10">
-                <Image src="/jellyfish.png" alt="Polygon" width={40} height={40} />
+                <Image src="/jellyfish.png" alt="Flow" width={40} height={40} />
               </div>
               
               {/* Connecting lines */}
@@ -592,10 +593,10 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
             <div className="bg-card rounded-xl overflow-hidden shadow-lg border w-full max-w-md modal-content-enter">
               <div className="bg-primary/10 p-4 flex items-center gap-4 border-b">
                 <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary-foreground overflow-hidden">
-                  <Image src="/whalemusic.png" alt="BAEVE AI Agent" width={24} height={24} />
+                  <Image src="/whalemusic.png" alt="BAEVII AI Agent" width={24} height={24} />
                 </div>
                 <div>
-                  <h3 className="font-bold">BAEVE AI Agent</h3>
+                  <h3 className="font-bold">BAEVII AI Agent</h3>
                   <p className="text-sm text-muted-foreground">Cross-Chain Portfolio Assistant</p>
                 </div>
                 <button 
@@ -611,7 +612,7 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
               </div>
               <div className="p-4 h-64 overflow-auto space-y-4">
                 <div className="bg-muted/50 rounded-lg p-3 animate-entry">
-                  <p className="text-sm">I've analyzed your ETF portfolio and found that you could benefit from utilizing the LayerZero ETF bridge to rebalance 15% of your assets to Base Sepolia.</p>
+                  <p className="text-sm">I&apos;ve analyzed your ETF portfolio and found that you could benefit from utilizing the LayerZero ETF bridge to rebalance 15% of your assets to Base Sepolia.</p>
                 </div>
                 <div className="bg-primary/10 rounded-lg p-3 ml-6 animate-entry animate-delay-1">
                   <p className="text-sm">Why should I move assets to Base Sepolia?</p>
@@ -645,6 +646,6 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
           </div>
         )}
       </CardContent>
-    </Card>
+    </ClientCard>
   );
 } 

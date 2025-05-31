@@ -3,7 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ClientCard } from "@/components/ui/client-card";
 import { TransitionWrapper } from "@/components/ui/transition-wrapper";
 
 export default function Home() {
@@ -65,7 +66,7 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <TransitionWrapper transitionType="card-appear" duration={400}>
-              <Card className="card-hover h-full">
+              <ClientCard className="h-full" hover>
                 <CardHeader>
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                     <Image src="/placeholder.png" alt="Cross-chain icon" width={40} height={40} />
@@ -78,11 +79,11 @@ export default function Home() {
                 <CardContent>
                   <p className="text-center">Create a diversified portfolio with assets from Ethereum, Base, Solana, and more—all managed from a single interface.</p>
                 </CardContent>
-              </Card>
+              </ClientCard>
             </TransitionWrapper>
             
             <TransitionWrapper transitionType="card-appear" duration={400} className="delay-100">
-              <Card className="card-hover h-full">
+              <ClientCard className="h-full" hover>
                 <CardHeader>
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                     <Image src="/placeholder.png" alt="AI icon" width={40} height={40} />
@@ -95,11 +96,11 @@ export default function Home() {
                 <CardContent>
                   <p className="text-center">Our Gemini AI agent analyzes market conditions and provides personalized rebalancing strategies to optimize your returns.</p>
                 </CardContent>
-              </Card>
+              </ClientCard>
             </TransitionWrapper>
             
             <TransitionWrapper transitionType="card-appear" duration={400} className="delay-200">
-              <Card className="card-hover h-full">
+              <ClientCard className="h-full" hover>
                 <CardHeader>
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                     <Image src="/placeholder.png" alt="Rebalancing icon" width={40} height={40} />
@@ -112,7 +113,7 @@ export default function Home() {
                 <CardContent>
                   <p className="text-center">Maintain your target allocations with automated rebalancing powered by 1inch Fusion+ and Flare FTSO price feeds.</p>
                 </CardContent>
-              </Card>
+              </ClientCard>
             </TransitionWrapper>
           </div>
         </div>

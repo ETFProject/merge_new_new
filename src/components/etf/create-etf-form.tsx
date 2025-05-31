@@ -1,9 +1,10 @@
 'use client';
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
+import { ClientCard } from "@/components/ui/client-card";
 
 type RiskProfile = 'low' | 'medium' | 'high';
 
@@ -98,10 +99,10 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
   const saveToLocalJson = (data: any) => {
     try {
       // In a browser environment, we can use localStorage
-      const existingData = localStorage.getItem('baeve-etfs') || '[]';
+      const existingData = localStorage.getItem('baevii-etfs') || '[]';
       const etfs = JSON.parse(existingData);
       etfs.push(data);
-      localStorage.setItem('baeve-etfs', JSON.stringify(etfs));
+      localStorage.setItem('baevii-etfs', JSON.stringify(etfs));
       
       // In a real implementation, you might want to sync this with a backend
       console.log("ETF data saved locally:", data);
@@ -196,7 +197,7 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
   }
   
   return (
-    <Card className="w-[600px] mx-auto card-hover appear" effect3d>
+    <ClientCard className="w-[600px] mx-auto" hover appear effect3d>
       <CardHeader>
         <CardTitle className="animate-entry">Create New ETF</CardTitle>
         <CardDescription className="animate-entry animate-delay-1">
@@ -356,6 +357,6 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
           </CardFooter>
         </form>
       </CardContent>
-    </Card>
+    </ClientCard>
   );
 } 

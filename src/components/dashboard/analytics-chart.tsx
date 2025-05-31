@@ -24,7 +24,7 @@ const mockPerformanceData = {
   ],
   chainDistribution: [
     { chain: 'Ethereum', percentage: 45, color: '#627EEA', icon: '/tornado.png' },
-    { chain: 'Polygon', percentage: 25, color: '#8247E5', icon: '/jellyfish.png' },
+    { chain: 'Flow', percentage: 25, color: '#8247E5', icon: '/jellyfish.png' },
     { chain: 'Base', percentage: 15, color: '#0052FF', icon: '/sandwave.png' },
     { chain: 'Avalanche', percentage: 10, color: '#E84142', icon: '/musicrainfdbow.png' },
     { chain: 'Solana', percentage: 5, color: '#00FFA3', icon: '/flower.png' },
@@ -44,7 +44,7 @@ const mockPerformanceData = {
       txHash: '0x1a2b3c4d5e...'
     },
     { 
-      from: { chain: 'Polygon', value: 1.2, icon: '/jellyfish.png' },
+      from: { chain: 'Flow', value: 1.2, icon: '/jellyfish.png' },
       to: { chain: 'Ethereum', value: 1.2, icon: '/tornado.png' },
       timestamp: '2023-04-09T09:45:32Z',
       txHash: '0x6f7e8d9c0b...'
@@ -179,8 +179,8 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w' }
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-32 h-32 rounded-full bg-card flex items-center justify-center border-2 border-primary/20 z-10">
                         <div className="text-center">
-                          <Image src="/whalemusic.png" alt="BAEVE" width={40} height={40} className="mx-auto" />
-                          <p className="text-xs font-medium mt-1">BAEVE</p>
+                          <Image src="/whalemusic.png" alt="BAEVII" width={40} height={40} className="mx-auto" />
+                          <p className="text-xs font-medium mt-1">BAEVII</p>
                         </div>
                       </div>
                       
@@ -280,7 +280,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w' }
                       <Image src="/tornado.png" alt="Ethereum" width={40} height={40} />
                     </div>
                     <div className="absolute left-3/4 top-1/4 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center">
-                      <Image src="/jellyfish.png" alt="Polygon" width={40} height={40} />
+                      <Image src="/jellyfish.png" alt="Flow" width={40} height={40} />
                     </div>
                     <div className="absolute left-1/4 top-3/4 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
                       <Image src="/sandwave.png" alt="Base" width={40} height={40} />

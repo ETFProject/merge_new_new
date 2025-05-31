@@ -67,6 +67,30 @@ const defaultItems = [
   },
 ];
 
+// Add a new item for the Flow ETF Manager to the navigation items array
+const navItems = [
+  {
+    title: "Dashboard",
+    href: "/dashboard",
+    icon: "dashboard",
+  },
+  {
+    title: "Flow ETF Manager",
+    href: "/dashboard/flow-etf",
+    icon: "bolt",
+  },
+  {
+    title: "Analytics",
+    href: "/dashboard/analytics",
+    icon: "analytics",
+  },
+  {
+    title: "Settings",
+    href: "/dashboard/settings",
+    icon: "settings",
+  },
+];
+
 export function ImprovedSidebarNav({ items = defaultItems, className }: ImprovedSidebarNavProps) {
   const { navigateWithTransition, currentPath } = useViewTransitions();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -152,11 +176,11 @@ export function ImprovedSidebarNav({ items = defaultItems, className }: Improved
               <span>Base</span>
             </div>
             <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded-md text-xs">
-              <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-              <span>Polygon</span>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span>Flow</span>
             </div>
             <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded-md text-xs">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <div className="w-3 h-3 rounded-full bg-purple-500"></div>
               <span>Solana</span>
             </div>
           </div>
