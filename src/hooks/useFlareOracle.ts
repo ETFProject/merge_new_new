@@ -3,12 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
 import { 
-  CONTRACT_REGISTRY_ADDRESS,
-  CONTRACT_REGISTRY_ABI,
+  FLARE_CONTRACT_ADDRESS, 
   FLARE_CONTRACT_ABI, 
   FLARE_NETWORK_CONFIG,
-  FEED_IDS,
-  FEED_CONFIGS,
+  FEED_NAMES,
   CATEGORY_MAPPINGS,
   FEED_CATEGORIES,
   FlareOracleFeed 
@@ -19,7 +17,7 @@ interface UseFlareOracleReturn {
   loading: boolean;
   error: string | null;
   refreshFeeds: () => Promise<void>;
-  testFeedIndices: () => Promise<any>;
+  testFeedIndices: () => Promise<void>;
   getTopGainers: (limit?: number) => FlareOracleFeed[];
   getTopLosers: (limit?: number) => FlareOracleFeed[];
   getFeedsByCategory: (category: string) => FlareOracleFeed[];
@@ -41,11 +39,9 @@ export function useFlareOracle(): UseFlareOracleReturn {
     return FEED_CATEGORIES.ALL;
   };
 
-  // Enhanced debug function
-  const testFeedIndices = async () => {
+  // Create provider and contract
+  const getContract = useCallback(() => {
     try {
-      console.log('🔍 Starting comprehensive FTSOv2 test...');
-      
       const provider = new ethers.JsonRpcProvider(FLARE_NETWORK_CONFIG.rpcUrl);
       return new ethers.Contract(FLARE_CONTRACT_ADDRESS, FLARE_CONTRACT_ABI, provider);
     } catch (err) {
@@ -528,22 +524,42 @@ export function useFlareOracle(): UseFlareOracleReturn {
     }
   }, [getContract]);
 
-  // Main function to fetch all feeds using the new FTSOv2 system
+  // Fallback: try batch method first, then individual if it fails
   const fetchFeeds = useCallback(async () => {
-    console.log('🔄 Starting FTSOv2 feed fetch...');
+    console.log('🔄 Starting fetchFeeds function...');
     
     try {
       setLoading(true);
       setError(null);
 
-      const contract = await getFtsoV2Contract();
+      const contract = getContract();
       if (!contract) {
-        throw new Error('Failed to get FTSOv2 contract from registry');
+        throw new Error('Failed to initialize contract');
       }
 
-      console.log('📱 FTSOv2 contract obtained successfully');
+      console.log('📱 Contract initialized successfully:', contract.target);
 
-      const feedsData: FlareOracleFeed[] = [];
+      // Try batch method first (this might fail due to custom feed)
+      try {
+        console.log('🔄 Attempting batch method to fetch oracle feeds...');
+        const [values, decimals, timestamps] = await contract.getFtsoV2CurrentFeedValues();
+        
+        console.log('✅ Batch method succeeded - Raw oracle data:', {
+          totalFeeds: values.length,
+          rawDataSample: {
+            'values[0]': values[0]?.toString(),
+            'values[1]': values[1]?.toString(), 
+            'values[2]': values[2]?.toString(),
+            'values[3]': values[3]?.toString()
+          },
+          sampleRawData: {
+            'BTC (index 2)': { value: values[2]?.toString(), decimals: decimals[2]?.toString(), timestamp: timestamps[2]?.toString() },
+            'ETH (index 3)': { value: values[3]?.toString(), decimals: decimals[3]?.toString(), timestamp: timestamps[3]?.toString() },
+            'SOL (index 5)': { value: values[5]?.toString(), decimals: decimals[5]?.toString(), timestamp: timestamps[5]?.toString() }
+          }
+        });
+        
+        const feedsData: FlareOracleFeed[] = [];
 
         // Process each feed (skip index 0 as it's custom and not supported)
         for (let i = 1; i < FEED_NAMES.length && i < values.length; i++) {
@@ -583,34 +599,45 @@ export function useFlareOracle(): UseFlareOracleReturn {
               console.warn(`Invalid or unrealistic price for feed ${i} (${feedName}): ${price} (original value: ${value})`);
             }
           }
-        } catch (err) {
-          console.warn(`⚠️ Failed to fetch ${feedConfig.name}:`, err);
-          return null;
         }
-      });
 
-      const results = await Promise.allSettled(feedPromises);
-      
-      results.forEach((result) => {
-        if (result.status === 'fulfilled' && result.value) {
-          feedsData.push(result.value);
+        setFeeds(feedsData);
+        console.log(`✅ Loaded ${feedsData.length} oracle feeds from Flare Network (batch method)`);
+        console.log('📊 Final feeds data sample:', {
+          totalFeeds: feedsData.length,
+          firstFewFeeds: feedsData.slice(0, 5).map(feed => ({
+            id: feed.id,
+            name: feed.name,
+            symbol: feed.symbol,
+            price: feed.price,
+            decimals: feed.decimals,
+            timestamp: feed.timestamp,
+            timestampDate: new Date(feed.timestamp * 1000).toLocaleString()
+          })),
+          ethFeed: feedsData.find(feed => feed.symbol === 'ETH')
+        });
+        
+        setLoading(false);
+        
+      } catch (batchError) {
+        console.warn('❌ Batch method failed, falling back to individual feed fetching:', batchError);
+        
+        try {
+          // Fall back to individual feed fetching
+          await fetchIndividualFeeds();
+        } catch (individualError) {
+          console.error('❌ Individual feed fetching also failed:', individualError);
+          setError('Failed to fetch feeds from Flare Oracle');
+          setLoading(false);
         }
-      });
-
-      setFeeds(feedsData);
-      console.log(`✅ Successfully loaded ${feedsData.length} FTSOv2 feeds`, {
-        totalFeeds: feedsData.length,
-        samplePrices: feedsData.slice(0, 3).map(feed => `${feed.symbol}: $${feed.price.toFixed(2)}`),
-        ethPrice: feedsData.find(feed => feed.symbol === 'ETH')?.price
-      });
+      }
       
     } catch (err) {
-      console.error('❌ Error fetching FTSOv2 feeds:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch FTSOv2 feeds');
-    } finally {
+      console.error('❌ Error fetching oracle feeds:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch oracle feeds');
       setLoading(false);
     }
-  }, [getFtsoV2Contract, getFeedCategory]);
+  }, [getContract, fetchIndividualFeeds]);
 
   // Get top gainers
   const getTopGainers = useCallback((limit = 5): FlareOracleFeed[] => {

@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  context: { params: { etfId: string } }
+  { params }: { params: Promise<{ etfId: string }> }
 ) {
   try {
-    const etfId = context.params.etfId;
+    const { etfId } = await params;
     console.log(`📊 Frontend: Getting REAL portfolio for ${etfId}`);
     
     // Call REAL backend server for portfolio data
@@ -40,7 +40,7 @@ export async function GET(
     return NextResponse.json({
       success: true,
       data: {
-        etfId: context.params.etfId,
+        etfId: (await params).etfId,
         totalValueUSD: 10055.0, // Fallback value
         navPerShare: 1.0000,
         totalSupply: '0',
