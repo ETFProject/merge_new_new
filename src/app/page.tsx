@@ -31,13 +31,8 @@ export default function Home() {
               Create and manage multi-chain crypto ETFs with AI-powered insights and cross-chain liquidity
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/dashboard/create">
-                <Button size="lg" className="px-8" withHoverEffect withRipple>
-                  Create Your ETF
-                </Button>
-              </Link>
               <Link href="/dashboard">
-                <Button size="lg" variant="outline" className="px-8 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20" withHoverEffect>
+                <Button size="lg" className="px-8 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20" withHoverEffect>
                   View Dashboard
                 </Button>
               </Link>
@@ -47,13 +42,13 @@ export default function Home() {
 
         {/* Decorative floating elements */}
         <div className="absolute bottom-10 left-[10%] w-20 h-20 opacity-60 animate-floating animate-delay-1">
-          <Image src="/placeholder.png" alt="Decorative element" width={80} height={80} />
+          <Image src="/flower.png" alt="Decorative element" width={80} height={80} />
         </div>
         <div className="absolute top-20 right-[15%] w-16 h-16 opacity-70 animate-floating animate-delay-3">
-          <Image src="/placeholder.png" alt="Decorative element" width={64} height={64} />
+          <Image src="/cactus.png" alt="Decorative element" width={64} height={64} />
         </div>
         <div className="absolute bottom-32 right-[20%] w-24 h-24 opacity-50 animate-floating animate-delay-2">
-          <Image src="/placeholder.png" alt="Decorative element" width={96} height={96} />
+          <Image src="/donut.png" alt="Decorative element" width={96} height={96} />
         </div>
       </section>
 
@@ -69,7 +64,7 @@ export default function Home() {
               <ClientCard className="h-full" hover>
                 <CardHeader>
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Image src="/placeholder.png" alt="Cross-chain icon" width={40} height={40} />
+                    <Image src="/jellyfish.png" alt="Cross-chain icon" width={40} height={40} />
                   </div>
                   <CardTitle className="text-center">Cross-Chain Portfolio</CardTitle>
                   <CardDescription className="text-center">
@@ -86,7 +81,7 @@ export default function Home() {
               <ClientCard className="h-full" hover>
                 <CardHeader>
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Image src="/placeholder.png" alt="AI icon" width={40} height={40} />
+                    <Image src="/chatgpt.png" alt="AI icon" width={40} height={40} />
                   </div>
                   <CardTitle className="text-center">AI-Powered Insights</CardTitle>
                   <CardDescription className="text-center">
@@ -103,7 +98,7 @@ export default function Home() {
               <ClientCard className="h-full" hover>
                 <CardHeader>
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Image src="/placeholder.png" alt="Rebalancing icon" width={40} height={40} />
+                    <Image src="/tornado.png" alt="Rebalancing icon" width={40} height={40} />
                   </div>
                   <CardTitle className="text-center">Automated Rebalancing</CardTitle>
                   <CardDescription className="text-center">
@@ -139,7 +134,7 @@ export default function Home() {
                     <h3 className="text-xl font-semibold mb-2">Deposit Assets</h3>
                     <p>Users deposit assets into the ETF vault, receiving ETF shares proportional to their contribution value.</p>
                     <div className="mt-4 flex justify-end">
-                      <Image src="/1byone5.jpg" alt="Deposit illustration" width={100} height={100} className="rounded-md" />
+                      <Image src="/1byone10.jpg" alt="Deposit illustration" width={100} height={100} className="rounded-md" />
                     </div>
                   </div>
                 </TransitionWrapper>
@@ -156,7 +151,7 @@ export default function Home() {
                     <h3 className="text-xl font-semibold mb-2">AI Portfolio Management</h3>
                     <p>Our AI agent analyzes market conditions and rebalances your portfolio to maintain optimal allocations.</p>
                     <div className="mt-4 flex justify-start">
-                      <Image src="/1byone13.jpg" alt="AI management illustration" width={100} height={100} className="rounded-md" />
+                      <Image src="/chatgpt.png" alt="AI management illustration" width={100} height={100} className="rounded-md" />
                     </div>
                   </div>
                 </TransitionWrapper>
@@ -169,7 +164,7 @@ export default function Home() {
                     <h3 className="text-xl font-semibold mb-2">Cross-Chain Swaps</h3>
                     <p>Assets are swapped across chains using 1inch Fusion+ for optimal pricing and efficient rebalancing.</p>
                     <div className="mt-4 flex justify-end">
-                      <Image src="/1byone19.jpg" alt="Cross-chain illustration" width={100} height={100} className="rounded-md" />
+                      <Image src="/jellyfish.png" alt="Cross-chain illustration" width={100} height={100} className="rounded-md" />
                     </div>
                   </div>
                 </TransitionWrapper>
@@ -186,7 +181,7 @@ export default function Home() {
                     <h3 className="text-xl font-semibold mb-2">Withdraw or Bridge</h3>
                     <p>Redeem your ETF shares for underlying assets or bridge them to other chains for enhanced liquidity.</p>
                     <div className="mt-4 flex justify-start">
-                      <Image src="/1byone24.jpg" alt="Withdraw illustration" width={100} height={100} className="rounded-md" />
+                      <Image src="/tornado.png" alt="Withdraw illustration" width={100} height={100} className="rounded-md" />
                     </div>
                   </div>
                 </TransitionWrapper>
@@ -200,7 +195,7 @@ export default function Home() {
       <section className="py-20 bg-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image 
-            src="/1byone8.jpg" 
+            src="/1byone1.jpg" 
             alt="Abstract background" 
             fill 
             className="object-cover opacity-30 mix-blend-overlay"
