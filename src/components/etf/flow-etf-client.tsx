@@ -5,7 +5,39 @@ import { ethers } from 'ethers';
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ClientCard } from "@/components/ui/client-card";
-import { CONTRACT_ADDRESSES, FLOW_TESTNET } from '@/lib/flow-contracts';
+import { FLOW_TESTNET } from '@/lib/flow-contracts';
+
+// Add proper interface for ETF data
+interface TokenData {
+  chainId: number;
+  tokenAddress: string;
+  tokenSymbol: string;
+  weight: number;
+  amount: string;
+  price: number;
+  logoUrl?: string;
+}
+
+interface ETFPerformance {
+  totalReturn: number;
+  dailyChange: number;
+  weeklyChange: number;
+  monthlyChange: number;
+  volatility: number;
+  lastUpdated: string;
+}
+
+interface ETFData {
+  etfId: string;
+  totalValueUSD: number;
+  navPerShare: number;
+  totalSupply: string;
+  tokens: TokenData[];
+  performance: ETFPerformance;
+  lastRebalance: string;
+  priceSource: string;
+  needsRebalancing: boolean;
+}
 
 interface FlowETFClientProps {
   onSuccess?: () => void;
@@ -15,7 +47,7 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
   const [connected, setConnected] = useState(false);
   const [userAddress, setUserAddress] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [etfData, setEtfData] = useState<any>(null);
+  const [etfData, setEtfData] = useState<ETFData | null>(null);
   const [flowBalance, setFlowBalance] = useState<string>('0');
   const [wflowBalance, setWflowBalance] = useState<string>('0');
   const [etfShareBalance, setEtfShareBalance] = useState<string>('0');
@@ -35,12 +67,12 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
       }
       
       // Request account access
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }) as string[];
       const address = accounts[0];
       setUserAddress(address);
       
       // Check if on the correct network
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string;
       
       if (parseInt(chainId, 16) !== FLOW_TESTNET.chainId) {
         // Ask user to switch to Flow EVM Testnet
@@ -49,9 +81,10 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: `0x${FLOW_TESTNET.chainId.toString(16)}` }],
           });
-        } catch (switchError: any) {
+        } catch (switchError: unknown) {
+          const error = switchError as {code: number};
           // This error code means the chain has not been added to MetaMask
-          if (switchError.code === 4902) {
+          if (error.code === 4902) {
             await window.ethereum.request({
               method: 'wallet_addEthereumChain',
               params: [
@@ -80,13 +113,14 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
       fetchUserBalances(address);
       
       // Subscribe to account changes
-      window.ethereum.on('accountsChanged', (accounts: string[]) => {
-        if (accounts.length === 0) {
+      window.ethereum.on('accountsChanged', (accounts: unknown) => {
+        const addrs = accounts as string[];
+        if (addrs.length === 0) {
           setConnected(false);
           setUserAddress(null);
         } else {
-          setUserAddress(accounts[0]);
-          fetchUserBalances(accounts[0]);
+          setUserAddress(addrs[0]);
+          fetchUserBalances(addrs[0]);
         }
       });
       
@@ -369,7 +403,7 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {etfData.tokens.map((token: any, index: number) => (
+                  {etfData.tokens.map((token, index) => (
                     <tr key={index} className="border-b border-muted/20">
                       <td className="py-2">
                         <div className="flex items-center">

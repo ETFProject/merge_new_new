@@ -30,6 +30,21 @@ const defaultItems = [
     icon: '/whalemusic.png'
   },
   {
+    title: 'Flow ETF Manager',
+    href: '/dashboard/flow-etf',
+    icon: '/musicrainfdbow.png'
+  },
+  {
+    title: 'Agent Monitoring',
+    href: '/dashboard/agent',
+    icon: '/snail.png'
+  },
+  {
+    title: 'Cross-Chain Swap',
+    href: '/dashboard/swap',
+    icon: '/1byone13.jpg'
+  },
+  {
     title: 'Cross-Chain ETFs',
     href: '/dashboard/cross-chain',
     icon: '/jellyfish.png'
@@ -64,30 +79,6 @@ const defaultItems = [
     href: "/dashboard/flow",
     icon: "/1byone10.jpg",
     description: "Visualize the full liquidity and service flow"
-  },
-];
-
-// Add a new item for the Flow ETF Manager to the navigation items array
-const navItems = [
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: "dashboard",
-  },
-  {
-    title: "Flow ETF Manager",
-    href: "/dashboard/flow-etf",
-    icon: "bolt",
-  },
-  {
-    title: "Analytics",
-    href: "/dashboard/analytics",
-    icon: "analytics",
-  },
-  {
-    title: "Settings",
-    href: "/dashboard/settings",
-    icon: "settings",
   },
 ];
 
