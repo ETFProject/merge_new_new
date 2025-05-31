@@ -189,26 +189,239 @@ export default function FlowEtfPage() {
     setIsExecuting(true);
     
     // Simulate AI processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Mock AI responses
-    const responses = [
-      "Analyzed your portfolio. Recommending 5% rebalance from BTC to ETH for optimal growth.",
-      "Market conditions suggest increasing SOL allocation by 3% for better diversification.",
-      "Risk assessment complete. Consider adding more stablecoins for balanced exposure.",
-      "AI optimization suggests rebalancing to capture current momentum opportunities."
-    ];
+    const command = aiCommand.toLowerCase();
+    let response = '';
+    let suggestedStrategy: PortfolioHolding[] | null = null;
     
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-    alert(`AI Response: ${randomResponse}`);
+    // AI Natural Language Processing
+    if (command.includes('conservative') || command.includes('safe') || command.includes('stable')) {
+      response = '🛡️ Based on your request for a conservative approach, I recommend a low-risk portfolio focused on stablecoins and established cryptocurrencies.';
+      suggestedStrategy = generateStrategy('Conservative') || null;
+      
+    } else if (command.includes('aggressive') || command.includes('growth') || command.includes('risky') || command.includes('high return')) {
+      response = '🚀 For aggressive growth, I suggest focusing on emerging assets and top performers with higher volatility but greater upside potential.';
+      suggestedStrategy = generateStrategy('Aggressive') || null;
+      
+    } else if (command.includes('balanced') || command.includes('diversif') || command.includes('mix')) {
+      response = '⚖️ A balanced approach would diversify across major cryptocurrencies while maintaining reasonable risk levels.';
+      suggestedStrategy = generateStrategy('Balanced') || null;
+      
+    } else if (command.includes('ai') || command.includes('tech') || command.includes('future') || command.includes('innovation')) {
+      response = '🤖 For future-focused investments, I recommend AI and technology tokens with strong fundamentals and growth potential.';
+      suggestedStrategy = generateStrategy('AI Focus') || null;
+      
+    } else if (command.includes('rebalance') || command.includes('optimize') || command.includes('improve')) {
+      // Analyze current portfolio and suggest improvements
+      const currentTotal = editedHoldings.reduce((sum, h) => sum + h.allocation, 0);
+      const hasStablecoins = editedHoldings.some(h => h.symbol.includes('USDC') || h.symbol.includes('USDT'));
+      const hasMajorCryptos = editedHoldings.some(h => h.symbol.includes('BTC') || h.symbol.includes('ETH'));
+      
+      if (currentTotal > 105 || currentTotal < 95) {
+        response = '📊 Your current allocations don\'t sum to 100%. I recommend rebalancing to achieve proper allocation percentages.';
+      } else if (!hasStablecoins && !hasMajorCryptos) {
+        response = '🔄 Your portfolio lacks stability anchors. Consider adding some stablecoins or major cryptocurrencies like BTC/ETH.';
+        suggestedStrategy = generateStrategy('Balanced') || null;
+      } else {
+        response = '✨ Your portfolio looks well-structured! Consider minor adjustments based on recent market performance.';
+      }
+      
+    } else if (command.includes('bitcoin') || command.includes('btc')) {
+      response = '₿ Bitcoin allocation recommendation: 20-30% for conservative, 15-25% for balanced, 10-20% for aggressive portfolios.';
+      
+    } else if (command.includes('ethereum') || command.includes('eth')) {
+      response = 'Ξ Ethereum is excellent for DeFi exposure. Recommended allocation: 25-35% depending on your risk tolerance.';
+      
+    } else if (command.includes('stablecoin') || command.includes('stable')) {
+      response = '💲 Stablecoins provide stability and liquidity. Recommended for 20-40% of conservative portfolios, less for aggressive strategies.';
+      
+    } else if (command.includes('defi') || command.includes('yield')) {
+      const defiTokens = feeds.filter(f => ['UNI/USD', 'AAVE/USD', 'LINK/USD', 'JUP/USD'].includes(f.name));
+      response = `🏦 For DeFi exposure, consider tokens like ${defiTokens.map(f => f.symbol).join(', ')}. Allocate 10-20% for moderate DeFi exposure.`;
+      
+    } else {
+      // Generic helpful response
+      response = `🎯 I understand you want to "${aiCommand}". Here are some suggestions:\n\n` +
+                '• Try "make it more conservative" for safer allocations\n' +
+                '• Say "aggressive growth portfolio" for higher risk/reward\n' +
+                '• Ask for "balanced diversification" for mixed strategy\n' +
+                '• Request "AI and tech focus" for future-oriented investments\n' +
+                '• Say "rebalance my portfolio" for optimization suggestions';
+    }
+    
+    // Show response and optionally apply strategy
+    if (suggestedStrategy) {
+      const strategyPreview = suggestedStrategy.map(h => 
+        `• ${h.symbol}: ${h.allocation}% ($${h.value})`
+      ).join('\n');
+      
+      const applyStrategy = confirm(
+        `${response}\n\n` +
+        `Suggested Portfolio:\n${strategyPreview}\n\n` +
+        `Would you like to apply this strategy to your portfolio?`
+      );
+      
+      if (applyStrategy) {
+        setEditedHoldings(suggestedStrategy);
+        alert('✅ AI strategy applied! Click "💾 Save" to confirm changes.');
+      }
+    } else {
+      alert(`🤖 AI Analysis:\n\n${response}`);
+    }
     
     setIsExecuting(false);
     setAiCommand('');
   };
 
-  // Strategy selection (for modal)
-  const applyStrategy = (strategy: string) => {
-    alert(`Applied ${strategy} strategy to your portfolio. Rebalancing in progress...`);
+  // Strategy generation logic
+  const generateStrategy = (strategyType: string): PortfolioHolding[] | undefined => {
+    if (feeds.length === 0) {
+      alert('❌ Cannot generate strategy: No market data available. Please wait for oracle feeds to load.');
+      return undefined;
+    }
+
+    let newHoldings: PortfolioHolding[] = [];
+    
+    switch (strategyType) {
+      case 'Conservative':
+        // Conservative: Focus on stablecoins and major cryptos, lower volatility
+        newHoldings = [
+          { symbol: 'USDC/USD', allocation: 30, value: 3000, units: '3000 USDC' },
+          { symbol: 'USDT/USD', allocation: 25, value: 2500, units: '2500 USDT' },
+          { symbol: 'BTC/USD', allocation: 25, value: 2500, units: '~0.025 BTC' },
+          { symbol: 'ETH/USD', allocation: 20, value: 2000, units: '~0.65 ETH' }
+        ];
+        break;
+        
+      case 'Balanced':
+        // Balanced: Mix of major cryptos with some exposure to emerging assets
+        const balancedAssets = feeds.filter(feed => 
+          ['BTC/USD', 'ETH/USD', 'SOL/USD', 'ADA/USD', 'DOT/USD', 'AVAX/USD', 'LINK/USD', 'UNI/USD'].includes(feed.name)
+        ).slice(0, 6);
+        
+        const balancedAllocations = [35, 25, 15, 10, 10, 5];
+        newHoldings = balancedAssets.map((feed, index) => ({
+          symbol: feed.name,
+          allocation: balancedAllocations[index] || 5,
+          value: (balancedAllocations[index] || 5) * 100,
+          units: `${((balancedAllocations[index] || 5) * 100 / feed.price).toFixed(4)} ${feed.symbol}`
+        }));
+        break;
+        
+      case 'Aggressive':
+        // Aggressive: Higher allocation to growth tokens and emerging assets
+        const topPerformers = feeds
+          .filter(feed => feed.change24h !== undefined && feed.change24h > 0)
+          .sort((a, b) => (b.change24h || 0) - (a.change24h || 0))
+          .slice(0, 3);
+          
+        const emergingAssets = feeds.filter(feed => 
+          ['SOL/USD', 'AVAX/USD', 'NEAR/USD', 'SUI/USD', 'APT/USD', 'ARB/USD', 'OP/USD'].includes(feed.name)
+        ).slice(0, 4);
+        
+        newHoldings = [
+          { symbol: 'BTC/USD', allocation: 20, value: 2000, units: '~0.02 BTC' },
+          { symbol: 'ETH/USD', allocation: 25, value: 2500, units: '~0.8 ETH' },
+          ...topPerformers.slice(0, 2).map((feed, idx) => ({
+            symbol: feed.name,
+            allocation: idx === 0 ? 20 : 15,
+            value: (idx === 0 ? 20 : 15) * 100,
+            units: `${((idx === 0 ? 20 : 15) * 100 / feed.price).toFixed(4)} ${feed.symbol}`
+          })),
+          ...emergingAssets.slice(0, 2).map(feed => ({
+            symbol: feed.name,
+            allocation: 10,
+            value: 1000,
+            units: `${(1000 / feed.price).toFixed(4)} ${feed.symbol}`
+          }))
+        ];
+        break;
+        
+      case 'AI Focus':
+        // AI Focus: AI and tech-related tokens with smart diversification
+        const aiTokens = feeds.filter(feed => 
+          ['RENDER/USD', 'FET/USD', 'TAO/USD', 'OCEAN/USD', 'NEAR/USD'].includes(feed.name)
+        );
+        
+        const techTokens = feeds.filter(feed => 
+          ['ETH/USD', 'SOL/USD', 'LINK/USD', 'UNI/USD', 'AAVE/USD'].includes(feed.name)
+        );
+        
+        newHoldings = [
+          { symbol: 'ETH/USD', allocation: 30, value: 3000, units: '~0.95 ETH' },
+          { symbol: 'BTC/USD', allocation: 20, value: 2000, units: '~0.02 BTC' },
+          ...aiTokens.slice(0, 3).map((feed, index) => ({
+            symbol: feed.name,
+            allocation: index === 0 ? 20 : 15,
+            value: (index === 0 ? 20 : 15) * 100,
+            units: `${((index === 0 ? 20 : 15) * 100 / feed.price).toFixed(4)} ${feed.symbol}`
+          })),
+          ...techTokens.slice(2, 4).map(feed => ({
+            symbol: feed.name,
+            allocation: 10,
+            value: 1000,
+            units: `${(1000 / feed.price).toFixed(4)} ${feed.symbol}`
+          }))
+        ];
+        break;
+        
+      default:
+        return undefined;
+    }
+    
+    // Ensure allocations sum to 100% and adjust if needed
+    const totalAllocation = newHoldings.reduce((sum, h) => sum + h.allocation, 0);
+    if (totalAllocation !== 100) {
+      const adjustmentFactor = 100 / totalAllocation;
+      newHoldings = newHoldings.map(h => ({
+        ...h,
+        allocation: Number((h.allocation * adjustmentFactor).toFixed(1)),
+        value: Number((h.value * adjustmentFactor).toFixed(2))
+      }));
+    }
+    
+    return newHoldings;
+  };
+
+  // Apply strategy with confirmation
+  const applyStrategy = (strategyType: string) => {
+    const newStrategy = generateStrategy(strategyType);
+    
+    if (!newStrategy) return;
+    
+    // Show strategy preview
+    const strategyPreview = newStrategy.map(h => 
+      `• ${h.symbol}: ${h.allocation}% (${h.units})`
+    ).join('\n');
+    
+    const strategyDescriptions = {
+      'Conservative': '🛡️ Low-risk strategy focusing on stablecoins and major cryptocurrencies for capital preservation.',
+      'Balanced': '⚖️ Diversified approach balancing growth potential with stability across established cryptocurrencies.',
+      'Aggressive': '🚀 High-growth strategy targeting emerging assets and top performers for maximum returns.',
+      'AI Focus': '🤖 Technology-focused portfolio emphasizing AI and DeFi tokens with future growth potential.'
+    };
+    
+    const confirmed = confirm(
+      `${strategyDescriptions[strategyType as keyof typeof strategyDescriptions]}\n\n` +
+      `Proposed ${strategyType} Portfolio:\n${strategyPreview}\n\n` +
+      `Total Portfolio Value: $${newStrategy.reduce((sum, h) => sum + h.value, 0).toLocaleString()}\n\n` +
+      `Would you like to apply this ${strategyType.toLowerCase()} strategy to your portfolio?`
+    );
+    
+    if (confirmed) {
+      setEditedHoldings(newStrategy);
+      
+      // Show success message with next steps
+      setTimeout(() => {
+        alert(
+          `✅ ${strategyType} strategy applied successfully!\n\n` +
+          `Your portfolio has been updated with ${newStrategy.length} assets.\n` +
+          `Total allocation: ${newStrategy.reduce((sum, h) => sum + h.allocation, 0)}%\n\n` +
+          `Click "💾 Save" to confirm these changes.`
+        );
+      }, 100);
+    }
   };
 
   // Filter feeds
@@ -523,7 +736,7 @@ export default function FlowEtfPage() {
                             <Input
                               value={aiCommand}
                               onChange={(e) => setAiCommand(e.target.value)}
-                              placeholder="Tell AI how to optimize your portfolio..."
+                              placeholder="e.g., 'Make it more conservative', 'Aggressive growth portfolio', 'Add more DeFi exposure'..."
                             />
                             <Button 
                               onClick={executeAICommand}
