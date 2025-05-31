@@ -1,6 +1,7 @@
 'use client';
 
-import { usePrivy, useWallets, useConnectWallet } from '@privy-io/react-auth';
+import { usePrivy, useConnectWallet } from '@privy-io/react-auth';
+import { usePrivyWallets } from '@/components/PrivyWalletsWrapper';
 import { Button } from '@/components/ui/button';
 import { Wallet, LogOut, User, ChevronDown, Copy, ExternalLink } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
@@ -13,7 +14,7 @@ export function WalletConnectButton() {
     logout 
   } = usePrivy();
   
-  const { wallets } = useWallets();
+  const { wallets } = usePrivyWallets();
   const { connectWallet } = useConnectWallet();
   const [showDetails, setShowDetails] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);

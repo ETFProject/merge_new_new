@@ -24,7 +24,8 @@ import TrumpFlowJSON from '@/lib/abis/TrumpFlow.json';
 import { CONTRACT_ADDRESSES, ASSET_ADDRESSES, NETWORK_CONFIG } from '@/config/contracts';
 
 // Use Privy for wallet management
-import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { usePrivy } from '@privy-io/react-auth';
+import { usePrivyWallets } from '@/components/PrivyWalletsWrapper';
 
 // Ensure correct ABI array format
 const vaultAbi = Array.isArray(ETFVaultJSON) 
@@ -129,7 +130,7 @@ export default function FlowEtfPage() {
 
   // Privy wallet integration
   const { authenticated, ready, login } = usePrivy();
-  const { wallets } = useWallets();
+  const { wallets, hasWallets } = usePrivyWallets();
 
   const [selectedCategory, setSelectedCategory] = useState(FEED_CATEGORIES.ALL);
   const [searchQuery, setSearchQuery] = useState('');
@@ -195,7 +196,7 @@ export default function FlowEtfPage() {
     const setupPrivyWallet = async () => {
       if (!ready) return;
       
-      if (authenticated && wallets.length > 0) {
+      if (authenticated && hasWallets) {
         try {
           const wallet = wallets[0];
           if (wallet && wallet.address) {
@@ -234,40 +235,45 @@ export default function FlowEtfPage() {
     };
 
     setupPrivyWallet();
-  }, [ready, authenticated, wallets]);
+  }, [ready, authenticated, hasWallets]);
 
-  // Fetch ETF contract info when provider is available
+  // Fetch ETF contract basic info
   const fetchEtfInfo = useCallback(async () => {
     if (!provider) return;
     
-    setContractLoading(true);
     try {
+      setContractLoading(true);
       const contract = new ethers.Contract(CONTRACT_ADDRESSES.etfVault, vaultAbi, provider);
-      const [name, symbol, agent, total] = await Promise.all([
-        contract.name(),
-        contract.symbol(),
-        contract.agentWallet(),
-        contract.getTotalValue()
-      ]);
-
+      
+      // Use individual try/catch blocks for each call to handle errors properly
+      const name = await contract.name().catch(() => "Flow Multi-Asset ETF");
+      const symbol = await contract.symbol().catch(() => "FMAF");
+      const agent = await contract.agentWallet().catch(() => CONTRACT_ADDRESSES.agentWallet);
+      const totalValue = await contract.getTotalValue().catch(() => "0");
+      
       setEtfInfo({
         name,
         symbol,
         agent,
-        totalValue: ethers.formatEther(total)
+        totalValue
       });
-
-      // If user is connected, fetch their balance
+      
+      // Update user's ETF share balance
       if (userAddress) {
-        const balance = await contract.balanceOf(userAddress);
-        setUserBalance(ethers.formatEther(balance));
+        try {
+          const balance = await contract.balanceOf(userAddress);
+          setUserBalance(balance.toString());
+        } catch (error) {
+          console.error("Error fetching user balance:", error);
+          setUserBalance("0");
+        }
       }
     } catch (error) {
       console.error("Error fetching ETF info:", error);
     } finally {
       setContractLoading(false);
     }
-  }, [provider, userAddress, CONTRACT_ADDRESSES.etfVault, vaultAbi]);
+  }, [provider, userAddress]);
 
   // Fetch active assets in the ETF
   const fetchActiveAssets = useCallback(async () => {
@@ -276,7 +282,7 @@ export default function FlowEtfPage() {
     setContractLoading(true);
     try {
       const contract = new ethers.Contract(CONTRACT_ADDRESSES.etfVault, vaultAbi, provider);
-      const list = await contract.getActiveAssets();
+      const list = await contract.getActiveAssets().catch(() => []);
       setContractAssets(list);
 
       // Update portfolio holdings based on actual contract data
@@ -290,44 +296,51 @@ export default function FlowEtfPage() {
               ([, addr]) => addr.toLowerCase() === assetAddress.toLowerCase()
             )?.[0] || 'Unknown';
             
-            // Get token contract to fetch name and balance
+            // Get ERC20 token contract to fetch name and decimals
             const tokenContract = new ethers.Contract(
-              assetAddress, 
-              tokenAbis[tokenSymbol as keyof typeof tokenAbis] || tokenAbis.WFLOW, 
+              assetAddress,
+              tokenAbis[tokenSymbol as keyof typeof tokenAbis] || tokenAbis.WFLOW,
               provider
             );
             
-            // Get token data
-            const [name, balance, decimals] = await Promise.all([
-              tokenContract.name().catch(() => tokenSymbol),
-              contract.getAssetBalance(assetAddress),
-              tokenContract.decimals().catch(() => 18)
-            ]);
-            
-            // Get token value in ETF (value = balance * price)
-            const value = await contract.getAssetValue(assetAddress);
-            const totalValue = Number(ethers.formatEther(value));
-            const tokenBalance = ethers.formatUnits(balance, decimals);
-            
-            // Calculate allocation percentage
-            const totalETFValue = Number(etfInfo.totalValue);
-            const allocation = totalETFValue > 0 
-              ? (totalValue / totalETFValue) * 100 
-              : 0;
-            
-            updatedHoldings.push({
-              symbol: `${name}`,
-              allocation: Number(allocation.toFixed(2)),
-              value: totalValue,
-              units: `${tokenBalance} ${tokenSymbol}`,
-              price: `$${(totalValue / Number(tokenBalance)).toFixed(2)}`
-            });
-          } catch (err) {
-            console.error(`Error processing asset ${assetAddress}:`, err);
+            try {
+              // Get token information individually to avoid unused variables
+              // Skip name since we already have the token symbol
+              const assetData = await contract.getAsset(assetAddress).catch(() => ({ balance: 0, targetWeight: 0 }));
+              const decimals = await tokenContract.decimals().catch(() => 18);
+              
+              // Get balance from the asset struct
+              const balance = assetData?.balance || 0;
+              const targetWeight = assetData?.targetWeight || 0;
+              
+              // Calculate allocation based on target weight
+              const allocation = parseInt(targetWeight.toString()) / 100;
+              
+              // Format balance for display using the correct decimals
+              const units = ethers.formatUnits(balance, decimals);
+              const value = 0; // Mock value for now
+              
+              updatedHoldings.push({
+                symbol: tokenSymbol,
+                allocation,
+                value,
+                units
+              });
+            } catch (error) {
+              console.error(`Error fetching details for asset ${tokenSymbol}:`, error);
+              // Add a placeholder in case of error
+              updatedHoldings.push({
+                symbol: tokenSymbol,
+                allocation: 0,
+                value: 0,
+                units: '0'
+              });
+            }
+          } catch (error) {
+            console.error(`Error processing asset ${assetAddress}:`, error);
           }
         }
         
-        // Only update if we got some holdings
         if (updatedHoldings.length > 0) {
           setPortfolioHoldings(updatedHoldings);
         }
@@ -337,7 +350,7 @@ export default function FlowEtfPage() {
     } finally {
       setContractLoading(false);
     }
-  }, [provider, CONTRACT_ADDRESSES.etfVault, ASSET_ADDRESSES, etfInfo.totalValue, tokenAbis, vaultAbi]);
+  }, [provider, CONTRACT_ADDRESSES.etfVault, ASSET_ADDRESSES, vaultAbi]);
 
   // Use both memoized functions in the useEffect
   useEffect(() => {

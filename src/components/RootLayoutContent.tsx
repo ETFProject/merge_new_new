@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,12 @@ interface RootLayoutContentProps {
 }
 
 export function RootLayoutContent({ children }: RootLayoutContentProps) {
-  const pathname = usePathname();
+  const [pathname, setPathname] = useState('');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setPathname(window.location.pathname);
+    }
+  }, []);
   const isDashboardPage = pathname.startsWith('/dashboard');
   
   return (

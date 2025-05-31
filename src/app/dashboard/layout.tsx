@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { DashboardLayoutClient } from '@/components/dashboard/dashboard-layout-client';
 import { ClientButton } from '@/components/ui/client-button';
+import { WalletConnectButton } from '@/components/WalletConnectButton';
 
 export const metadata: Metadata = {
   title: 'BAEVII Dashboard',
@@ -32,7 +33,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </span>
             </Link>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-4">
+            <WalletConnectButton />
             <Link href="/dashboard/create">
               <ClientButton size="sm">Create ETF</ClientButton>
             </Link>

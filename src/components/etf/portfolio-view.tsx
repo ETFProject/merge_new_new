@@ -97,7 +97,7 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
                 logoUrl = "/musicrainfdbow.png";
                 break;
               case "WMATIC":
-                logoUrl = "/whalemusic.png";
+                logoUrl = "/1byone20.jpg";
                 break;
               default:
                 logoUrl = "/sandwave.png";
@@ -274,7 +274,7 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
             onClick={() => setShowAgentModal(true)}
             withHoverEffect
           >
-            <Image src="/whalemusic.png" alt="AI" width={20} height={20} className="mr-2" />
+            <Image src="/1byone20.jpg" alt="AI" width={20} height={20} className="mr-2" />
             Ask Agent
           </Button>
           {rebalancingButton}
@@ -433,7 +433,7 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
               
               <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center z-20 border-2 border-primary/30">
                 <div className="text-center">
-                  <Image src="/whalemusic.png" alt="BAEVII" width={48} height={48} className="mx-auto" />
+                  <Image src="/1byone20.jpg" alt="BAEVII" width={48} height={48} className="mx-auto" />
                   <p className="text-xs font-semibold mt-1">BAEVII</p>
                 </div>
               </div>
@@ -566,7 +566,7 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
             <div className="bg-primary/5 rounded-lg p-4 animate-entry animate-delay-2 flex gap-4">
               <div className="flex-shrink-0">
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary-foreground text-xs">
-                  <Image src="/whalemusic.png" alt="AI" width={32} height={32} />
+                  <Image src="/1byone20.jpg" alt="AI" width={32} height={32} />
                 </div>
               </div>
               <div>
@@ -589,7 +589,7 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
             <div className="bg-card rounded-xl overflow-hidden shadow-lg border w-full max-w-md modal-content-enter">
               <div className="bg-primary/10 p-4 flex items-center gap-4 border-b">
                 <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary-foreground overflow-hidden">
-                  <Image src="/whalemusic.png" alt="BAEVII AI Agent" width={24} height={24} />
+                  <Image src="/1byone20.jpg" alt="BAEVII AI Agent" width={24} height={24} />
                 </div>
                 <div>
                   <h3 className="font-bold">BAEVII AI Agent</h3>

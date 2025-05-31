@@ -1,42 +1,68 @@
 'use client';
 
-import React from 'react';
+import { useEffect, useState } from 'react';
 
-export function HydrationFix(): React.JSX.Element {
-  return (
-    <script
-      id="hydration-fix"
-      dangerouslySetInnerHTML={{
-        __html: `
-          // Remove attributes added by browser extensions before hydration
-          if (document.body.hasAttribute('cz-shortcut-listen')) {
-            document.body.removeAttribute('cz-shortcut-listen');
+export function HydrationFix() {
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    // Mark as hydrated once component mounts on client
+    setHydrated(true);
+    
+    // Fix for hydration mismatches in Dialog components by handling aria-controls
+    const fixDialogAttributes = () => {
+      try {
+        // First pass: collect all current aria-controls values
+        const allButtons = document.querySelectorAll('button[aria-controls]');
+        const currentAttributes = new Map();
+        const idRegex = /radix-«([^»]+)»/;
+        
+        allButtons.forEach(button => {
+          const ariaControls = button.getAttribute('aria-controls');
+          if (ariaControls && idRegex.test(ariaControls)) {
+            // Store the original element for later reference
+            currentAttributes.set(button, ariaControls);
           }
-          if (document.body.hasAttribute('wotdisconnected')) {
-            document.body.removeAttribute('wotdisconnected');
-          }
-          
-          // Watch for attribute changes and remove them
-          if (!window.hydrationFixObserver) {
-            window.hydrationFixObserver = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-              if (
-                mutation.type === 'attributes' &&
-                (mutation.attributeName === 'cz-shortcut-listen' || 
-                 mutation.attributeName === 'wotdisconnected')
-              ) {
-                document.body.removeAttribute(mutation.attributeName);
-              }
-            });
+        });
+        
+        // If we found attributes with the radix pattern, remove them to prevent hydration issues
+        if (currentAttributes.size > 0) {
+          currentAttributes.forEach((value, button) => {
+            button.removeAttribute('aria-controls');
           });
           
-            window.hydrationFixObserver.observe(document.body, {
-              attributes: true,
-              attributeFilter: ['cz-shortcut-listen', 'wotdisconnected']
+          // After React has reconciled the tree, restore functional aria attributes
+          // with client-generated values (but don't restore the exact same values
+          // which caused the hydration mismatch)
+          setTimeout(() => {
+            currentAttributes.forEach((_, button) => {
+              if (!button.getAttribute('aria-controls') && button.getAttribute('data-state')) {
+                // Let Radix UI regenerate the aria attributes naturally
+                // by triggering a small UI update
+                const currentState = button.getAttribute('data-state');
+                button.setAttribute('data-state', currentState === 'open' ? 'closed' : 'open');
+                setTimeout(() => {
+                  button.setAttribute('data-state', currentState);
+                }, 0);
+              }
             });
-          }
-        `,
-      }}
-    />
-  );
+          }, 50);
+        }
+      } catch (e) {
+        console.warn('Hydration fix for aria-controls failed:', e);
+      }
+    };
+    
+    // Run the fix after initial render and again after any dynamic content loads
+    setTimeout(fixDialogAttributes, 100);
+    setTimeout(fixDialogAttributes, 500);
+  }, []);
+
+  // Add a class to the document if we're hydrated
+  if (hydrated && typeof document !== 'undefined') {
+    document.documentElement.classList.add('hydrated');
+  }
+
+  // This component doesn't render anything visually
+  return null;
 } 

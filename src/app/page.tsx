@@ -1,11 +1,51 @@
 'use client';
 
 import Link from "next/link";
-import Image from "next/image";
+import Image from "next/image"; // ImageProps can be useful for custom components
 import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ClientCard } from "@/components/ui/client-card";
-import { TransitionWrapper } from "@/components/ui/transition-wrapper";
+import { TransitionWrapper } from "@/components/ui/transition-wrapper"; // Ensure this component is robust
+
+// Define a type for your step items for better type safety
+interface HowItWorksStep {
+  id: number;
+  title: string;
+  description: string;
+  imageSrc: string; // Or StaticImageData if using local import
+  alt: string;
+}
+
+const howItWorksSteps: HowItWorksStep[] = [
+  {
+    id: 1,
+    title: "Deposit Assets",
+    description: "Users deposit assets into the ETF vault, receiving ETF shares proportional to their contribution value.",
+    imageSrc: "/how-it-works-deposit.png", // IMPORTANT: Ensure this image exists and is optimized
+    alt: "Illustration of depositing assets",
+  },
+  {
+    id: 2,
+    title: "AI Portfolio Management",
+    description: "Our AI agent analyzes market conditions and rebalances your portfolio to maintain optimal allocations.",
+    imageSrc: "/baevii-logo.png", // IMPORTANT: Ensure this image exists and is optimized
+    alt: "Illustration of AI portfolio management",
+  },
+  {
+    id: 3,
+    title: "Cross-Chain Swaps",
+    description: "Assets are swapped across chains using 1inch Fusion+ for optimal pricing and efficient rebalancing.",
+    imageSrc: "/how-it-works-crosschain.png", // IMPORTANT: Ensure this image exists and is optimized
+    alt: "Illustration of cross-chain swaps",
+  },
+  {
+    id: 4,
+    title: "Withdraw or Bridge",
+    description: "Redeem your ETF shares for underlying assets or bridge them to other chains for the optimal liquidity.",
+    imageSrc: "/how-it-works-withdraw.png", // IMPORTANT: Ensure this image exists and is optimized
+    alt: "Illustration of withdrawing or bridging assets",
+  },
+];
 
 export default function Home() {
   return (
@@ -13,17 +53,17 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image 
-            src="/1byone1.jpg" 
-            alt="Abstract financial visualization" 
-            fill 
-            priority
+          <Image
+            src="/1byone1.jpg" // Ensure this image is optimized (e.g., WebP, proper compression)
+            alt="Abstract financial visualization"
+            fill
+            priority // Good for LCP
             className="object-cover opacity-75"
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-primary/20 mix-blend-multiply" />
         </div>
-        
+
         <div className="container mx-auto relative z-10 px-4 text-center text-white">
           <TransitionWrapper transitionType="slide-up">
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white">BAEVII</h1>
@@ -40,15 +80,18 @@ export default function Home() {
           </TransitionWrapper>
         </div>
 
-        {/* Decorative floating elements */}
+        {/* Decorative floating elements - ensure images are small and optimized */}
         <div className="absolute bottom-10 left-[10%] w-20 h-20 opacity-60 animate-floating animate-delay-1">
-          <Image src="/flower.png" alt="Decorative element" width={80} height={80} />
+          <Image src="/1byone12.jpg" alt="Decorative element" width={80} height={80} />
         </div>
         <div className="absolute top-20 right-[15%] w-16 h-16 opacity-70 animate-floating animate-delay-3">
-          <Image src="/cactus.png" alt="Decorative element" width={64} height={64} />
+          <Image src="/1byone13.jpg" alt="Decorative element" width={64} height={64} />
         </div>
         <div className="absolute bottom-32 right-[20%] w-24 h-24 opacity-50 animate-floating animate-delay-2">
-          <Image src="/donut.png" alt="Decorative element" width={96} height={96} />
+          <Image src="/1byone14.jpg" alt="Decorative element" width={96} height={96} />
+        </div>
+        <div className="absolute top-32 left-[20%] w-24 h-24 opacity-50 animate-floating animate-delay-2">
+          <Image src="/1byone11.jpg" alt="Decorative element" width={96} height={96} />
         </div>
       </section>
 
@@ -58,8 +101,9 @@ export default function Home() {
           <TransitionWrapper>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Multi-Chain ETF Experience</h2>
           </TransitionWrapper>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Feature Card 1 */}
             <TransitionWrapper transitionType="card-appear" duration={400}>
               <ClientCard className="h-full" hover>
                 <CardHeader>
@@ -76,8 +120,9 @@ export default function Home() {
                 </CardContent>
               </ClientCard>
             </TransitionWrapper>
-            
-            <TransitionWrapper transitionType="card-appear" duration={400} className="delay-100">
+
+            {/* Feature Card 2 */}
+            <TransitionWrapper transitionType="card-appear" duration={400} className="delay-100"> {/* Ensure 'delay-100' class correctly applies animation/transition delay */}
               <ClientCard className="h-full" hover>
                 <CardHeader>
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
@@ -93,8 +138,9 @@ export default function Home() {
                 </CardContent>
               </ClientCard>
             </TransitionWrapper>
-            
-            <TransitionWrapper transitionType="card-appear" duration={400} className="delay-200">
+
+            {/* Feature Card 3 */}
+            <TransitionWrapper transitionType="card-appear" duration={400} className="delay-200"> {/* Ensure 'delay-200' class correctly applies animation/transition delay */}
               <ClientCard className="h-full" hover>
                 <CardHeader>
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
@@ -113,96 +159,83 @@ export default function Home() {
           </div>
         </div>
       </section>
-      
-      {/* How It Works Section */}
+
+      {/* Updated How It Works Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <TransitionWrapper>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">How It Works</h2>
-            <p className="text-center text-muted-foreground max-w-2xl mx-auto mb-16">The BAEVII leverages cutting-edge blockchain technology to provide a seamless multi-chain experience</p>
+            <p className="text-center text-muted-foreground max-w-2xl mx-auto mb-16">
+              The BAEVII leverages cutting-edge blockchain technology to provide a seamless multi-chain experience
+            </p>
           </TransitionWrapper>
-          
-          <div className="relative max-w-4xl mx-auto">
-            {/* Flow diagram with icons */}
-            <div className="hidden md:block absolute left-1/2 top-8 bottom-8 w-1 bg-primary/30 -translate-x-1/2 z-0"></div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-              <div className="md:text-right md:pr-12">
-                <TransitionWrapper transitionType="slide-up">
-                  <div className="bg-card rounded-lg p-6 shadow-md relative">
-                    <div className="absolute right-0 md:left-full top-1/2 -translate-y-1/2 md:translate-x-[-50%] w-10 h-10 rounded-full bg-primary md:flex items-center justify-center text-primary-foreground font-bold hidden">1</div>
-                    <h3 className="text-xl font-semibold mb-2">Deposit Assets</h3>
-                    <p>Users deposit assets into the ETF vault, receiving ETF shares proportional to their contribution value.</p>
-                    <div className="mt-4 flex justify-end">
-                      <Image src="/1byone10.jpg" alt="Deposit illustration" width={100} height={100} className="rounded-md" />
+
+          <div className="max-w-3xl mx-auto">
+            <div className="space-y-12 md:space-y-16">
+              {howItWorksSteps.map((step, index) => (
+                <TransitionWrapper
+                  key={step.id}
+                  transitionType="slide-up" // This should trigger an animation that starts with opacity: 0 / off-screen
+                  duration={300}
+                  // For staggering: style={{ animationDelay: ... }} is for CSS animations.
+                  // If TransitionWrapper uses CSS transitions, you'd need transitionDelay.
+                  // If TransitionWrapper has a `delay` prop, prefer that: e.g., delay={index * 150}
+                  style={{ animationDelay: `${index * 150}ms` }}
+                  // REMOVED: className="opacity-0 animate-fill-forwards"
+                  // The TransitionWrapper itself should handle becoming visible.
+                >
+                  <div className="flex items-stretch">
+                    {/* Timeline Column (Number and Line) */}
+                    <div className="flex flex-col items-center w-16 md:w-20 mr-4 md:mr-6 flex-shrink-0">
+                      <div className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg md:text-xl font-bold z-10 shadow-lg`}>
+                        {step.id}
+                      </div>
+                      {index < howItWorksSteps.length - 1 && (
+                        <div className="mt-2 w-1 flex-grow bg-primary/30 rounded-full"></div>
+                      )}
+                    </div>
+
+                    {/* Content Card Column */}
+                    <div className="flex-grow">
+                      <div className="bg-card rounded-xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 ease-out flex flex-col lg:flex-row items-center lg:items-start">
+                        <div className="lg:flex-1 text-left mb-6 lg:mb-0 lg:pr-8">
+                          <h3 className="text-2xl font-semibold mb-3 text-foreground">{step.title}</h3>
+                          <p className="text-muted-foreground leading-relaxed">{step.description}</p>
+                        </div>
+                        <div className="w-full lg:w-auto lg:max-w-[200px] flex justify-center lg:justify-end">
+                          <Image
+                            src={step.imageSrc}
+                            alt={step.alt}
+                            width={200}
+                            height={180}
+                            className="rounded-lg object-contain shadow-md aspect-[4/3]"
+                            // Consider adding `loading="lazy"` explicitly if not default and below the fold,
+                            // though next/image does this by default for non-priority images.
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </TransitionWrapper>
-              </div>
-              
-              <div className="md:pl-12"></div>
-              
-              <div className="md:text-right md:pr-12"></div>
-              
-              <div className="md:pl-12">
-                <TransitionWrapper transitionType="slide-up" className="delay-100">
-                  <div className="bg-card rounded-lg p-6 shadow-md relative">
-                    <div className="absolute left-0 md:right-full top-1/2 -translate-y-1/2 md:translate-x-[50%] w-10 h-10 rounded-full bg-primary md:flex items-center justify-center text-primary-foreground font-bold hidden">2</div>
-                    <h3 className="text-xl font-semibold mb-2">AI Portfolio Management</h3>
-                    <p>Our AI agent analyzes market conditions and rebalances your portfolio to maintain optimal allocations.</p>
-                    <div className="mt-4 flex justify-start">
-                      <Image src="/chatgpt.png" alt="AI management illustration" width={100} height={100} className="rounded-md" />
-                    </div>
-                  </div>
-                </TransitionWrapper>
-              </div>
-              
-              <div className="md:text-right md:pr-12">
-                <TransitionWrapper transitionType="slide-up" className="delay-200">
-                  <div className="bg-card rounded-lg p-6 shadow-md relative">
-                    <div className="absolute right-0 md:left-full top-1/2 -translate-y-1/2 md:translate-x-[-50%] w-10 h-10 rounded-full bg-primary md:flex items-center justify-center text-primary-foreground font-bold hidden">3</div>
-                    <h3 className="text-xl font-semibold mb-2">Cross-Chain Swaps</h3>
-                    <p>Assets are swapped across chains using 1inch Fusion+ for optimal pricing and efficient rebalancing.</p>
-                    <div className="mt-4 flex justify-end">
-                      <Image src="/jellyfish.png" alt="Cross-chain illustration" width={100} height={100} className="rounded-md" />
-                    </div>
-                  </div>
-                </TransitionWrapper>
-              </div>
-              
-              <div className="md:pl-12"></div>
-              
-              <div className="md:text-right md:pr-12"></div>
-              
-              <div className="md:pl-12">
-                <TransitionWrapper transitionType="slide-up" className="delay-300">
-                  <div className="bg-card rounded-lg p-6 shadow-md relative">
-                    <div className="absolute left-0 md:right-full top-1/2 -translate-y-1/2 md:translate-x-[50%] w-10 h-10 rounded-full bg-primary md:flex items-center justify-center text-primary-foreground font-bold hidden">4</div>
-                    <h3 className="text-xl font-semibold mb-2">Withdraw or Bridge</h3>
-                    <p>Redeem your ETF shares for underlying assets or bridge them to other chains for enhanced liquidity.</p>
-                    <div className="mt-4 flex justify-start">
-                      <Image src="/tornado.png" alt="Withdraw illustration" width={100} height={100} className="rounded-md" />
-                    </div>
-                  </div>
-                </TransitionWrapper>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
-      
+
       {/* CTA Section */}
       <section className="py-20 bg-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image 
-            src="/1byone1.jpg" 
-            alt="Abstract background" 
-            fill 
+          <Image
+            src="/1byone1.jpg" // Ensure this image is also optimized
+            alt="Abstract background"
+            fill
             className="object-cover opacity-30 mix-blend-overlay"
             sizes="100vw"
+            loading="lazy" // This image is likely below the fold, lazy loading can help
           />
         </div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <TransitionWrapper>

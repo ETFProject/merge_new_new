@@ -30,7 +30,7 @@ const mockPerformanceData = {
     { chain: 'Solana', percentage: 5, color: '#00FFA3', icon: '/flower.png' },
   ],
   assetAllocation: [
-    { category: 'DeFi', percentage: 35, icon: '/whalemusic.png' },
+    { category: 'DeFi', percentage: 35, icon: '/1byone20.jpg' },
     { category: 'Layer 1', percentage: 25, icon: '/tornado.png' },
     { category: 'NFT & Gaming', percentage: 15, icon: '/cactus.png' },
     { category: 'Infrastructure', percentage: 15, icon: '/jellowchurch.png' },
@@ -179,7 +179,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w' }
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-32 h-32 rounded-full bg-card flex items-center justify-center border-2 border-primary/20 z-10">
                         <div className="text-center">
-                          <Image src="/whalemusic.png" alt="BAEVII" width={40} height={40} className="mx-auto" />
+                          <Image src="/1byone20.jpg" alt="BAEVII" width={40} height={40} className="mx-auto" />
                           <p className="text-xs font-medium mt-1">BAEVII</p>
                         </div>
                       </div>
@@ -301,7 +301,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w' }
                     
                     {/* Center node */}
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center z-10">
-                      <Image src="/whalemusic.png" alt="ETF Hub" width={40} height={40} />
+                      <Image src="/1byone20.jpg" alt="ETF Hub" width={40} height={40} />
                     </div>
                   </div>
                 </div>
@@ -467,7 +467,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w' }
             <div className="flex gap-3">
               <div className="flex-shrink-0">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
-                  <Image src="/whalemusic.png" alt="AI Insight" width={24} height={24} />
+                  <Image src="/1byone20.jpg" alt="AI Insight" width={24} height={24} />
                 </div>
               </div>
               <div>

@@ -27,7 +27,7 @@ const defaultItems = [
   {
     title: 'Analytics',
     href: '/dashboard/analytics',
-    icon: '/whalemusic.png'
+    icon: '/1byone20.jpg'
   },
   {
     title: 'Flow ETF Manager',

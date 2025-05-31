@@ -9,12 +9,14 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin',
+            value: 'same-origin-allow-popups',
           },
         ],
       },
     ];
   },
+  // Disable server components cache for development
+  serverComponentsHmrCache: false,
 };
 
 export default nextConfig;

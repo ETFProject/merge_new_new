@@ -48,6 +48,21 @@ const TOKENS = {
   }
 };
 
+// Define interfaces for types
+interface QuoteData {
+  srcAmount: string;
+  dstAmount: string;
+  fee?: string;
+  estimatedTime?: number;
+}
+
+interface Order {
+  orderHash: string;
+  srcChainId: number;
+  dstChainId: number;
+  status?: string;
+}
+
 interface CrossChainSwapProps {
   onSuccess?: () => void;
 }
@@ -61,11 +76,11 @@ export function CrossChainSwap({ onSuccess }: CrossChainSwapProps) {
   const [sourceChain, setSourceChain] = useState(NETWORKS.BASE);
   const [destChain, setDestChain] = useState(NETWORKS.ARBITRUM);
   const [amount, setAmount] = useState('0.0001');
-  const [quote, setQuote] = useState<any>(null);
+  const [quote, setQuote] = useState<QuoteData | null>(null);
   const [swapStatus, setSwapStatus] = useState<'idle' | 'quoted' | 'processing' | 'complete' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [orderHash, setOrderHash] = useState<string | null>(null);
-  const [activeOrders, setActiveOrders] = useState<any[]>([]);
+  const [activeOrders, setActiveOrders] = useState<Order[]>([]);
 
   // Connect wallet function
   const connectWallet = async () => {
@@ -381,12 +396,16 @@ export function CrossChainSwap({ onSuccess }: CrossChainSwapProps) {
               {/* Network Selection */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Source Chain</label>
+                  <label className="block text-sm font-medium mb-1" htmlFor="sourceChain">Source Chain</label>
                   <select 
+                    id="sourceChain"
+                    name="sourceChain"
                     className="w-full px-3 py-2 border rounded-md"
                     value={sourceChain.id}
                     onChange={(e) => handleSourceChainChange(parseInt(e.target.value))}
                     disabled={loading || quoteLoading || swapStatus === 'processing'}
+                    aria-label="Select source blockchain"
+                    title="Source blockchain network"
                   >
                     <option value={NETWORKS.BASE.id}>Base</option>
                     <option value={NETWORKS.ETHEREUM.id}>Ethereum</option>
@@ -396,12 +415,16 @@ export function CrossChainSwap({ onSuccess }: CrossChainSwapProps) {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-1">Destination Chain</label>
+                  <label className="block text-sm font-medium mb-1" htmlFor="destChain">Destination Chain</label>
                   <select 
+                    id="destChain"
+                    name="destChain"
                     className="w-full px-3 py-2 border rounded-md"
                     value={destChain.id}
                     onChange={(e) => setDestChain(Object.values(NETWORKS).find(n => n.id === parseInt(e.target.value)) || NETWORKS.ARBITRUM)}
                     disabled={loading || quoteLoading || swapStatus === 'processing'}
+                    aria-label="Select destination blockchain"
+                    title="Destination blockchain network"
                   >
                     <option value={NETWORKS.ARBITRUM.id}>Arbitrum</option>
                     <option value={NETWORKS.OPTIMISM.id}>Optimism</option>
@@ -561,7 +584,7 @@ export function CrossChainSwap({ onSuccess }: CrossChainSwapProps) {
             It uses a unique hashlock mechanism to ensure secure swaps without requiring trust between parties.
           </p>
           <p>
-            This demo allows you to swap ETH from Base to Arbitrum and vice versa, using 1inch's powerful cross-chain infrastructure.
+            This demo allows you to swap ETH from Base to Arbitrum and vice versa, using 1inch&apos;s powerful cross-chain infrastructure.
           </p>
         </div>
       </CardContent>

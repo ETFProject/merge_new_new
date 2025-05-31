@@ -110,7 +110,7 @@ export function getTokenLogo(address: string): string {
   // Map token names to logo paths
   const logoMap: Record<string, string> = {
     'WFLOW': '/tornado.png',
-    'TRUMP': '/whalemusic.png',
+    'TRUMP': '/1byone20.jpg',
     'ankrFLOW': '/jellyfish.png',
     'USDC': '/flower.png',
     'WETH': '/sandwave.png',
