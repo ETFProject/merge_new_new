@@ -583,55 +583,67 @@ export default function FlowEtfPage() {
                   testFeedIndices();
                   
                   // Test direct contract call to verify raw data
-                  console.log('🔗 Testing direct contract calls...');
+                  console.log('🔗 Testing direct ContractRegistry and FTSOv2 calls...');
                   const testDirectContract = async () => {
                     try {
                       const testProvider = new ethers.JsonRpcProvider('https://coston2-api.flare.network/ext/C/rpc');
+                      
+                      // Test ContractRegistry first
+                      const registry = new ethers.Contract(
+                        '0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019', // ContractRegistry address
+                        ["function getContractAddressByName(string memory name) external view returns(address)"],
+                        testProvider
+                      );
+                      
+                      console.log('📍 Getting FTSOv2 address from registry...');
+                      const ftsoV2Address = await registry.getContractAddressByName("TestFtsoV2");
+                      console.log('✅ FTSOv2 address:', ftsoV2Address);
+                      
+                      // Test FTSOv2 contract
                       const testContractInstance = new ethers.Contract(
-                        '0x93420cD7639AEe3dFc7AA18aDe7955Cfef4b44b1',
+                        ftsoV2Address,
                         [
-                          "function getFeedById(uint256 feedIndex) view returns (uint256 value, uint8 decimals, uint256 timestamp)",
-                          "function getFtsoV2CurrentFeedValues() view returns (uint256[] memory values, uint8[] memory decimals, uint256[] memory timestamps)"
+                          "function getFeedById(bytes21 feedId) view returns (uint256 value, int8 decimals, uint64 timestamp)",
+                          "function getFeedsById(bytes21[] feedIds) view returns (uint256[] values, int8[] decimals, uint64 timestamp)"
                         ],
                         testProvider
                       );
                       
-                      // Test ETH at index 3
-                      console.log('📡 Testing ETH/USD at index 3...');
-                      const [ethValue, ethDecimals, ethTimestamp] = await testContractInstance.getFeedById(3);
+                      // Test ETH/USD with correct feed ID
+                      console.log('📡 Testing ETH/USD with feed ID...');
+                      const ethFeedId = "0x014554482f55534400000000000000000000000000"; // ETH/USD
+                      const [ethValue, ethDecimals, ethTimestamp] = await testContractInstance.getFeedById(ethFeedId);
                       const ethPrice = Number(ethValue) / Math.pow(10, Number(ethDecimals));
                       
-                      console.log('🔍 RAW ETH DATA:', {
-                        index: 3,
-                        expectedSymbol: 'ETH/USD',
+                      console.log('✅ ETH/USD Direct Test:', {
+                        feedId: ethFeedId,
                         rawValue: ethValue.toString(),
                         decimals: Number(ethDecimals),
                         calculatedPrice: ethPrice,
                         timestamp: Number(ethTimestamp),
                         timestampDate: new Date(Number(ethTimestamp) * 1000).toLocaleString(),
-                        dataAge: Math.round((Date.now() - Number(ethTimestamp) * 1000) / 1000 / 60) + ' minutes',
                         isRealistic: ethPrice > 1000 && ethPrice < 10000
                       });
                       
-                      // Test BTC at index 2
-                      console.log('📡 Testing BTC/USD at index 2...');
-                      const [btcValue, btcDecimals, btcTimestamp] = await testContractInstance.getFeedById(2);
+                      // Test BTC/USD
+                      console.log('📡 Testing BTC/USD with feed ID...');
+                      const btcFeedId = "0x014254432f55534400000000000000000000000000"; // BTC/USD
+                      const [btcValue, btcDecimals, btcTimestamp] = await testContractInstance.getFeedById(btcFeedId);
                       const btcPrice = Number(btcValue) / Math.pow(10, Number(btcDecimals));
                       
-                      console.log('🔍 RAW BTC DATA:', {
-                        index: 2,
-                        expectedSymbol: 'BTC/USD',
+                      console.log('✅ BTC/USD Direct Test:', {
+                        feedId: btcFeedId,
                         rawValue: btcValue.toString(),
                         decimals: Number(btcDecimals),
                         calculatedPrice: btcPrice,
                         timestamp: Number(btcTimestamp),
                         timestampDate: new Date(Number(btcTimestamp) * 1000).toLocaleString(),
-                        dataAge: Math.round((Date.now() - Number(btcTimestamp) * 1000) / 1000 / 60) + ' minutes',
                         isRealistic: btcPrice > 30000 && btcPrice < 200000
                       });
                       
-                    } catch (err) {
-                      console.error('❌ Direct contract test failed:', err);
+                    } catch (error: unknown) {
+                      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                      console.error('❌ Direct contract test failed:', errorMessage, error);
                     }
                   };
                   
