@@ -17,6 +17,7 @@ interface UseFlareOracleReturn {
   loading: boolean;
   error: string | null;
   refreshFeeds: () => Promise<void>;
+  testFeedIndices: () => Promise<void>;
   getTopGainers: (limit?: number) => FlareOracleFeed[];
   getTopLosers: (limit?: number) => FlareOracleFeed[];
   getFeedsByCategory: (category: string) => FlareOracleFeed[];
@@ -48,6 +49,40 @@ export function useFlareOracle(): UseFlareOracleReturn {
       return null;
     }
   }, []);
+
+  // Test individual feeds to validate indices (for debugging)
+  const testFeedIndices = useCallback(async () => {
+    console.log('🔍 Testing individual feed indices...');
+    const contract = getContract();
+    if (!contract) return;
+
+    const testFeeds = [
+      { index: 1, expected: 'DOGE/USD' },
+      { index: 2, expected: 'BTC/USD' },
+      { index: 3, expected: 'ETH/USD' },
+      { index: 4, expected: 'BNB/USD' },
+      { index: 5, expected: 'SOL/USD' }
+    ];
+
+    for (const { index, expected } of testFeeds) {
+      try {
+        const [value, decimals, timestamp] = await contract.getFeedById(index);
+        const price = Number(value) / Math.pow(10, Number(decimals));
+        
+        console.log(`Feed ${index} (expected ${expected}):`, {
+          value: value.toString(),
+          decimals: Number(decimals),
+          price: price,
+          timestamp: Number(timestamp),
+          timestampDate: new Date(Number(timestamp) * 1000).toLocaleString(),
+          configuredName: FEED_NAMES[index],
+          matches: FEED_NAMES[index] === expected
+        });
+      } catch (err) {
+        console.error(`Failed to fetch feed ${index}:`, err);
+      }
+    }
+  }, [getContract]);
 
   // Fetch individual feed by ID (skipping custom feed at index 0)
   const fetchIndividualFeeds = useCallback(async () => {
@@ -86,10 +121,17 @@ export function useFlareOracle(): UseFlareOracleReturn {
           const { index, feedName, value, decimals, timestamp } = result.value;
           
           if (value && decimals !== undefined) {
-            const price = Number(value) / Math.pow(10, Number(decimals));
+            // Convert the oracle value to actual price
+            // Oracle returns the value as a signed integer (int256)
+            const valueStr = value.toString();
+            const isNegative = valueStr.startsWith('-');
+            const absoluteValueStr = isNegative ? valueStr.slice(1) : valueStr;
             
-            // Only include feeds with valid prices
-            if (price > 0) {
+            // Convert to actual price using decimals
+            const price = Number(absoluteValueStr) / Math.pow(10, Number(decimals));
+            
+            // Only include feeds with valid positive prices
+            if (price > 0 && !isNegative) {
               feedsData.push({
                 id: index,
                 name: feedName,
@@ -98,9 +140,11 @@ export function useFlareOracle(): UseFlareOracleReturn {
                 decimals: Number(decimals),
                 timestamp: Number(timestamp),
                 category: getFeedCategory(feedName),
-                // Mock 24h change for demo (in real implementation, you'd track historical data)
-                change24h: (Math.random() - 0.5) * 20 // Random between -10% and +10%
+                // Generate realistic mock 24h change for demo (in real implementation, you'd track historical data)
+                change24h: (Math.random() - 0.5) * 10 // Random between -5% and +5%
               });
+            } else {
+              console.warn(`Invalid price for feed ${index} (${feedName}): ${price} (original value: ${value})`);
             }
           }
         }
@@ -119,6 +163,8 @@ export function useFlareOracle(): UseFlareOracleReturn {
 
   // Fallback: try batch method first, then individual if it fails
   const fetchFeeds = useCallback(async () => {
+    console.log('🔄 Starting fetchFeeds function...');
+    
     try {
       setLoading(true);
       setError(null);
@@ -128,9 +174,27 @@ export function useFlareOracle(): UseFlareOracleReturn {
         throw new Error('Failed to initialize contract');
       }
 
+      console.log('📱 Contract initialized successfully:', contract.target);
+
       // Try batch method first (this might fail due to custom feed)
       try {
+        console.log('🔄 Attempting batch method to fetch oracle feeds...');
         const [values, decimals, timestamps] = await contract.getFtsoV2CurrentFeedValues();
+        
+        console.log('✅ Batch method succeeded - Raw oracle data:', {
+          totalFeeds: values.length,
+          rawDataSample: {
+            'values[0]': values[0]?.toString(),
+            'values[1]': values[1]?.toString(), 
+            'values[2]': values[2]?.toString(),
+            'values[3]': values[3]?.toString()
+          },
+          sampleRawData: {
+            'BTC (index 2)': { value: values[2]?.toString(), decimals: decimals[2]?.toString(), timestamp: timestamps[2]?.toString() },
+            'ETH (index 3)': { value: values[3]?.toString(), decimals: decimals[3]?.toString(), timestamp: timestamps[3]?.toString() },
+            'SOL (index 5)': { value: values[5]?.toString(), decimals: decimals[5]?.toString(), timestamp: timestamps[5]?.toString() }
+          }
+        });
         
         const feedsData: FlareOracleFeed[] = [];
 
@@ -142,10 +206,47 @@ export function useFlareOracle(): UseFlareOracleReturn {
           const timestamp = timestamps[i];
 
           if (value && decimal !== undefined) {
-            const price = Number(value) / Math.pow(10, Number(decimal));
+            // Convert the oracle value to actual price - same logic as individual feeds
+            const valueStr = value.toString();
+            const isNegative = valueStr.startsWith('-');
+            const absoluteValueStr = isNegative ? valueStr.slice(1) : valueStr;
             
-            // Only include feeds with valid prices
-            if (price > 0) {
+            // Convert to actual price using decimals
+            const price = Number(absoluteValueStr) / Math.pow(10, Number(decimal));
+            
+            // Debug log for ETH specifically
+            if (feedName === 'ETH/USD') {
+              console.log('🔍 ETH Price Calculation:', {
+                feedName,
+                rawValue: valueStr,
+                decimals: Number(decimal),
+                calculatedPrice: price,
+                divisor: Math.pow(10, Number(decimal)),
+                timestamp: Number(timestamp),
+                timestampDate: new Date(Number(timestamp) * 1000).toLocaleString(),
+                dataAge: `${Math.round((Date.now() - Number(timestamp) * 1000) / 1000 / 60)} minutes old`,
+                isRealisticPrice: price > 1000 && price < 10000 // ETH should be between $1000-$10000
+              });
+            }
+            
+            // Additional validation for all major cryptos
+            const isRealistic = (feedName.includes('BTC') && price > 30000 && price < 200000) ||
+                              (feedName.includes('ETH') && price > 1000 && price < 10000) ||
+                              (feedName.includes('SOL') && price > 10 && price < 1000) ||
+                              (!feedName.includes('BTC') && !feedName.includes('ETH') && !feedName.includes('SOL'));
+            
+            if (!isRealistic) {
+              console.warn('🚨 Potentially unrealistic price for:', {
+                feedName,
+                price,
+                rawValue: valueStr,
+                decimals: Number(decimal),
+                timestamp: new Date(Number(timestamp) * 1000).toLocaleString()
+              });
+            }
+            
+            // Only include feeds with valid positive prices
+            if (price > 0 && !isNegative) {
               feedsData.push({
                 id: i,
                 name: feedName,
@@ -154,20 +255,44 @@ export function useFlareOracle(): UseFlareOracleReturn {
                 decimals: Number(decimal),
                 timestamp: Number(timestamp),
                 category: getFeedCategory(feedName),
-                // Mock 24h change for demo
-                change24h: (Math.random() - 0.5) * 20
+                // Generate realistic mock 24h change for demo
+                change24h: (Math.random() - 0.5) * 10 // Random between -5% and +5%
               });
+            } else {
+              console.warn(`Invalid price for feed ${i} (${feedName}): ${price} (original value: ${value})`);
             }
           }
         }
 
         setFeeds(feedsData);
         console.log(`✅ Loaded ${feedsData.length} oracle feeds from Flare Network (batch method)`);
+        console.log('📊 Final feeds data sample:', {
+          totalFeeds: feedsData.length,
+          firstFewFeeds: feedsData.slice(0, 5).map(feed => ({
+            id: feed.id,
+            name: feed.name,
+            symbol: feed.symbol,
+            price: feed.price,
+            decimals: feed.decimals,
+            timestamp: feed.timestamp,
+            timestampDate: new Date(feed.timestamp * 1000).toLocaleString()
+          })),
+          ethFeed: feedsData.find(feed => feed.symbol === 'ETH')
+        });
+        
+        setLoading(false);
         
       } catch (batchError) {
-        console.warn('Batch method failed, falling back to individual feed fetching:', batchError);
-        // Fall back to individual feed fetching
-        await fetchIndividualFeeds();
+        console.warn('❌ Batch method failed, falling back to individual feed fetching:', batchError);
+        
+        try {
+          // Fall back to individual feed fetching
+          await fetchIndividualFeeds();
+        } catch (individualError) {
+          console.error('❌ Individual feed fetching also failed:', individualError);
+          setError('Failed to fetch feeds from Flare Oracle');
+          setLoading(false);
+        }
       }
       
     } catch (err) {
@@ -227,6 +352,7 @@ export function useFlareOracle(): UseFlareOracleReturn {
     loading,
     error,
     refreshFeeds: fetchFeeds,
+    testFeedIndices,
     getTopGainers,
     getTopLosers,
     getFeedsByCategory,
