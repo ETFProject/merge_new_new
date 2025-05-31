@@ -1,15 +1,41 @@
 'use client';
 
 import { AgentMonitoringClient } from "@/components/etf/agent-monitoring-client";
+import { Button } from "@/components/ui/button";
+import { useFlareOracle } from "@/hooks";
+import { toast } from "sonner";
 
 export default function AgentMonitoringPage() {
+  const { testFeedIndices } = useFlareOracle();
+  
+  const handleDebugOracle = async () => {
+    toast.info("Running oracle diagnostic test...", {
+      description: "Check browser console for detailed output"
+    });
+    
+    await testFeedIndices();
+    
+    toast.success("Oracle test complete", {
+      description: "Detailed results available in browser console"
+    });
+  };
+  
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Agent Monitoring</h2>
-        <p className="text-muted-foreground">
-          Monitor and manage ETF agent operations on the Flow EVM Testnet
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Agent Monitoring</h2>
+          <p className="text-muted-foreground">
+            Monitor and manage ETF agent operations on the Flow EVM Testnet
+          </p>
+        </div>
+        <Button 
+          variant="outline" 
+          onClick={handleDebugOracle}
+          className="gap-2"
+        >
+          🔍 Debug Oracle
+        </Button>
       </div>
       
       <AgentMonitoringClient onSuccess={() => console.log('Agent operation completed successfully')} />

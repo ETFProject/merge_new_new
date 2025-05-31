@@ -2,15 +2,16 @@
 
 import { ethers } from 'ethers';
 
-// Contract addresses - Flow EVM Testnet
+// Contract addresses - Flow EVM Testnet (ACTIVE DEPLOYMENT)
+// These should match the centralized config in /config/contracts.ts
 export const CONTRACT_ADDRESSES = {
-  assetFactory: '0x2a78CF76ec1b5F349b96E70B38360e21323Fd2d1',
-  wflow: '0x65604A8Cfbaa318C8EDa47fcF8352EB77BDAA15E',
-  trump: '0x97f8C96569E89A92Ce88d8c460cB37264788F9f8',
-  ankrFlow: '0x4F3824C4b8e435A924B09D41E19D576dB3C50165',
-  usdc: '0xF881dE8e7D55dbaE312b464c1b1316AF96C71aFa',
-  weth: '0x26256c749f3D24F1Ff0344522819fC7cD608846c',
-  etfVault: '0x8Cdb066f5190efF591f65C8dedA667D8e45665B3'
+  assetFactory: '0x00908d528c53ca7d802ddc91e3b38b9a6095c680',
+  wflow: '0x9a7623494c986b443a26f79bf3e715bb1763f610',
+  trump: '0xb664eab8e811b3a4af872d01b75ccbdc4d28fd2d',
+  ankrFlow: '0xda54ac65cf7d1d51bfefc2f7c1c881b86010b168',
+  usdc: '0x4608acb5aef179f2d89d2643368e6cd16a0761c0',
+  weth: '0xf5935f7557f82ea203228947bb574a64393a72ed',
+  etfVault: '0xb41Eebc041d8eFDB38dB7e5a6f1b1CC295702C2b'
 };
 
 // Flow EVM Testnet Info

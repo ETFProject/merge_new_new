@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { PrivyProvider } from '@privy-io/react-auth';
 
 interface PrivyWalletProviderProps {
@@ -9,10 +9,23 @@ interface PrivyWalletProviderProps {
 
 export function PrivyWalletProvider({ children }: PrivyWalletProviderProps) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
+  const [appUrl, setAppUrl] = useState<string>('');
+
+  // Get the current URL for WalletConnect metadata
+  useEffect(() => {
+    // Get the base URL (protocol + hostname)
+    const baseUrl = window.location.origin;
+    setAppUrl(baseUrl);
+  }, []);
 
   if (!appId) {
     console.warn('NEXT_PUBLIC_PRIVY_APP_ID is not set. Please add it to your .env.local file.');
     // Return children without Privy provider if no app ID is set
+    return <>{children}</>;
+  }
+
+  // Only render the provider once we have the URL
+  if (!appUrl && typeof window !== 'undefined') {
     return <>{children}</>;
   }
 
@@ -33,6 +46,8 @@ export function PrivyWalletProvider({ children }: PrivyWalletProviderProps) {
         embeddedWallets: {
           createOnLogin: 'users-without-wallets', // Create embedded wallet for users without external wallet
         },
+        // WalletConnect project ID
+        walletConnectCloudProjectId: '34357d3c125c2bcf2ce2bc3309d98715',
         // Default chain configuration for Base Sepolia
         defaultChain: {
           id: 84532,
@@ -82,6 +97,32 @@ export function PrivyWalletProvider({ children }: PrivyWalletProviderProps) {
               default: {
                 name: 'Blockscout',
                 url: 'https://base-sepolia.blockscout.com',
+              },
+            },
+            testnet: true,
+          },
+          // Flow EVM Testnet Chain (add to supported chains)
+          {
+            id: 545,
+            name: 'Flow EVM Testnet',
+            network: 'flow-evm-testnet',
+            nativeCurrency: {
+              decimals: 18,
+              name: 'Flow',
+              symbol: 'FLOW',
+            },
+            rpcUrls: {
+              default: {
+                http: ['https://testnet.evm.nodes.onflow.org'],
+              },
+              public: {
+                http: ['https://testnet.evm.nodes.onflow.org'],
+              },
+            },
+            blockExplorers: {
+              default: {
+                name: 'Flowscan',
+                url: 'https://evm-testnet.flowscan.io',
               },
             },
             testnet: true,

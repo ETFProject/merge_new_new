@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Mock ETF creation data to simulate backend response
 interface ETFData {
@@ -13,9 +13,9 @@ interface ETFData {
 }
 
 // Store ETFs in memory for demo purposes
-let etfs: ETFData[] = [];
+const etfs: ETFData[] = [];
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
     
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
 }
 
 // GET handler to retrieve ETFs (for testing/debugging)
-export async function GET() {
+export async function GET(_request: NextRequest) {
   return NextResponse.json({
     success: true,
     data: etfs,

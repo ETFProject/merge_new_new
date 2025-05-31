@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { etfId: string } }
+  request: NextRequest,
+  context: { params: { etfId: string } }
 ) {
   try {
-    const etfId = params.etfId;
+    const etfId = context.params.etfId;
     console.log(`📊 Frontend: Getting REAL portfolio for ${etfId}`);
     
     // Call REAL backend server for portfolio data
@@ -40,7 +40,7 @@ export async function GET(
     return NextResponse.json({
       success: true,
       data: {
-        etfId: params.etfId,
+        etfId: context.params.etfId,
         totalValueUSD: 10055.0, // Fallback value
         navPerShare: 1.0000,
         totalSupply: '0',
@@ -51,8 +51,8 @@ export async function GET(
             amount: 10000.0,
             valueUSD: 10000.0,
             priceUSD: 1.0,
-            chainId: 84532,
-            tokenAddress: process.env.NEXT_PUBLIC_USDC_ADDRESS || '0x036CbD53842c5426634e7929541eC2318f3dCF7e'
+            chainId: 545,
+            tokenAddress: process.env.NEXT_PUBLIC_USDC_ADDRESS || '0x59B9F8DE8B243cdF985E43E06b1e47063B89a320'
           },
           {
             symbol: 'WETH',
@@ -60,8 +60,8 @@ export async function GET(
             amount: 5.0,
             valueUSD: 5.0,
             priceUSD: 1.0,
-            chainId: 84532,
-            tokenAddress: process.env.NEXT_PUBLIC_WETH_ADDRESS || '0x4200000000000000000000000000000000000006'
+            chainId: 545,
+            tokenAddress: process.env.NEXT_PUBLIC_WETH_ADDRESS || '0xe4B4c3B27f2E54bB4101a546bEA0B481eB5e407f'
           },
 
         ],

@@ -285,6 +285,23 @@ export function OracleDiagnostic() {
             <li>• Check browser console for additional error details</li>
           </ul>
         </div>
+
+        <div className="p-4 rounded-lg border bg-muted/30 text-sm mt-6">
+          <h3 className="font-medium mb-2">About Flare Oracle Data</h3>
+          <p className="mb-2">
+            The Flare Network Oracle provides real-time price data for various cryptocurrencies through its FTSO (Flare Time Series Oracle) system.
+          </p>
+          <p className="mb-2">
+            <strong>Note:</strong> We&apos;ve applied price corrections to ensure accuracy with market rates. Raw oracle data may require adjustments 
+            to match current market prices from sources like CoinMarketCap.
+          </p>
+          <p>
+            For more information about the Flare Network Oracle, visit the 
+            <a href="https://docs.flare.network/apis/ftso/" target="_blank" rel="noopener noreferrer" className="underline">
+              Flare documentation
+            </a>.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

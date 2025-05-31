@@ -1,20 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // API constants
-const FUSION_PLUS_API_BASE_URL = 'https://api.1inch.dev/fusion-plus';
-
-// Network IDs based on 1inch NetworkEnum
-const NETWORKS = {
-  ETHEREUM: 1,
-  OPTIMISM: 10,
-  BSC: 56,
-  POLYGON: 137,
-  ARBITRUM: 42161,
-  AVALANCHE: 43114,
-  GNOSIS: 100,
-  BASE: 8453,
-  ZKSYNC: 324
-};
+const FUSION_PLUS_API_BASE_URL = 'https://api.1inch.dev/fusion-plus/v1.0';
 
 // Handle GET requests for quote
 export async function GET(request: NextRequest) {
@@ -40,8 +27,15 @@ export async function GET(request: NextRequest) {
       }, { status: 400 });
     }
     
-    // Get the quote from 1inch API
-    const apiUrl = `${FUSION_PLUS_API_BASE_URL}/quote`;
+    // Build external quote URL with query params
+    const quoteUrl = new URL(`${FUSION_PLUS_API_BASE_URL}/quote`);
+    quoteUrl.searchParams.set('srcChainId', srcChainId);
+    quoteUrl.searchParams.set('dstChainId', dstChainId);
+    quoteUrl.searchParams.set('srcTokenAddress', srcTokenAddress);
+    quoteUrl.searchParams.set('dstTokenAddress', dstTokenAddress);
+    quoteUrl.searchParams.set('amount', amount);
+    quoteUrl.searchParams.set('walletAddress', walletAddress);
+    quoteUrl.searchParams.set('enableEstimate', enableEstimate);
     const apiKey = process.env.ONEINCH_API_KEY;
     
     if (!apiKey) {
@@ -52,21 +46,10 @@ export async function GET(request: NextRequest) {
       }, { status: 500 });
     }
     
-    const response = await fetch(apiUrl, {
-      method: 'POST',
+    const response = await fetch(quoteUrl.toString(), {
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        srcChainId: parseInt(srcChainId),
-        dstChainId: parseInt(dstChainId),
-        srcTokenAddress,
-        dstTokenAddress,
-        amount,
-        walletAddress,
-        enableEstimate: enableEstimate === 'true'
-      })
+      }
     });
     
     if (!response.ok) {

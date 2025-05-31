@@ -17,7 +17,8 @@ export function HydrationFix(): React.JSX.Element {
           }
           
           // Watch for attribute changes and remove them
-          const observer = new MutationObserver((mutations) => {
+          if (!window.hydrationFixObserver) {
+            window.hydrationFixObserver = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
               if (
                 mutation.type === 'attributes' &&
@@ -29,10 +30,11 @@ export function HydrationFix(): React.JSX.Element {
             });
           });
           
-          observer.observe(document.body, {
-            attributes: true,
-            attributeFilter: ['cz-shortcut-listen', 'wotdisconnected']
-          });
+            window.hydrationFixObserver.observe(document.body, {
+              attributes: true,
+              attributeFilter: ['cz-shortcut-listen', 'wotdisconnected']
+            });
+          }
         `,
       }}
     />

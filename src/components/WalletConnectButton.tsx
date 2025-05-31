@@ -75,7 +75,7 @@ export function WalletConnectButton() {
 
   const openBlockExplorer = () => {
     if (primaryWallet?.address) {
-      const explorerUrl = `https://base-sepolia.blockscout.com/address/${primaryWallet.address}`;
+      const explorerUrl = `https://evm-testnet.flowscan.io/address/${primaryWallet.address}`;
       window.open(explorerUrl, '_blank');
     }
   };

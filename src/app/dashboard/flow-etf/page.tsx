@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,11 +8,36 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useFlareOracle } from '@/hooks/useFlareOracle';
+import { useFlareOracle } from '@/hooks';
 import { FEED_CATEGORIES } from '@/app/config/flare-contract';
-import { Search, RefreshCw, TrendingUp, TrendingDown, Edit, Network, Zap, Plus, Trash2, Bot, BarChart3, Shield } from 'lucide-react';
+import { Search, RefreshCw, TrendingUp, TrendingDown, Edit, Network, Zap, Plus, Trash2, Bot, BarChart3, Shield, Wallet } from 'lucide-react';
 import { OracleDiagnostic } from '@/components/etf/oracle-diagnostic';
 import { ethers } from 'ethers';
+import ETFVaultJSON from '@/lib/abis/FlowETFVault.json';
+import WrappedFlowJSON from '@/lib/abis/WrappedFlow.json';
+import FlowUSDCJSON from '@/lib/abis/FlowUSDC.json';
+import FlowWETHJSON from '@/lib/abis/FlowWETH.json';
+import AnkrFlowJSON from '@/lib/abis/AnkrFlow.json';
+import TrumpFlowJSON from '@/lib/abis/TrumpFlow.json';
+
+// Import centralized contract addresses
+import { CONTRACT_ADDRESSES, ASSET_ADDRESSES, NETWORK_CONFIG } from '@/config/contracts';
+
+// Use Privy for wallet management
+import { usePrivy, useWallets } from '@privy-io/react-auth';
+
+// Ensure correct ABI array format
+const vaultAbi = Array.isArray(ETFVaultJSON) 
+  ? ETFVaultJSON 
+  : ETFVaultJSON.abi;
+
+const tokenAbis = {
+  WFLOW: Array.isArray(WrappedFlowJSON) ? WrappedFlowJSON : WrappedFlowJSON.abi,
+  USDC: Array.isArray(FlowUSDCJSON) ? FlowUSDCJSON : FlowUSDCJSON.abi,
+  WETH: Array.isArray(FlowWETHJSON) ? FlowWETHJSON : FlowWETHJSON.abi,
+  ankrFLOW: Array.isArray(AnkrFlowJSON) ? AnkrFlowJSON : AnkrFlowJSON.abi,
+  TRUMP: Array.isArray(TrumpFlowJSON) ? TrumpFlowJSON : TrumpFlowJSON.abi
+};
 
 // Token logo mapping
 const getTokenLogo = (symbol: string) => {
@@ -102,6 +127,10 @@ export default function FlowEtfPage() {
     searchFeeds 
   } = useFlareOracle();
 
+  // Privy wallet integration
+  const { authenticated, ready, login } = usePrivy();
+  const { wallets } = useWallets();
+
   const [selectedCategory, setSelectedCategory] = useState(FEED_CATEGORIES.ALL);
   const [searchQuery, setSearchQuery] = useState('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -109,6 +138,19 @@ export default function FlowEtfPage() {
   // AI Assistant states (for modal only)
   const [aiCommand, setAiCommand] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
+
+  // ETF contract state
+  const [provider, setProvider] = useState<ethers.Provider | null>(null);
+  const [signer, setSigner] = useState<ethers.Signer | null>(null);
+  const [userAddress, setUserAddress] = useState("");
+  const [etfInfo, setEtfInfo] = useState({ name: "", symbol: "", agent: "", totalValue: "0" });
+  const [contractAssets, setContractAssets] = useState<string[]>([]);
+  const [userBalance, setUserBalance] = useState("0");
+  const [contractLoading, setContractLoading] = useState(false);
+  const [depositAmount, setDepositAmount] = useState("");
+  const [depositToken, setDepositToken] = useState<keyof typeof ASSET_ADDRESSES>("WFLOW");
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [withdrawToken, setWithdrawToken] = useState<keyof typeof ASSET_ADDRESSES>("WFLOW");
 
   // Portfolio holdings state
   const [portfolioHoldings, setPortfolioHoldings] = useState<PortfolioHolding[]>([
@@ -121,7 +163,257 @@ export default function FlowEtfPage() {
 
   const [editedHoldings, setEditedHoldings] = useState<PortfolioHolding[]>([]);
 
-  const portfolioValue = 10000;
+  // Initialize provider to Flow EVM Testnet RPC and setup Privy wallet integration
+  useEffect(() => {
+    // Configure Flow EVM Testnet provider
+    const rpcProvider = new ethers.JsonRpcProvider(
+      NETWORK_CONFIG.rpcUrls[0],
+      {
+        // Use a simpler network config that matches the Networkish type
+        name: NETWORK_CONFIG.name,
+        chainId: NETWORK_CONFIG.chainId
+      },
+      {
+        polling: true,
+        pollingInterval: 5000,
+        batchMaxCount: 1, // Reduce batch size for better compatibility
+      }
+    );
+    
+    // Test provider connectivity
+    rpcProvider.getNetwork().then((network) => {
+      console.log('✅ Flow EVM Testnet provider connected:', network);
+      setProvider(rpcProvider);
+    }).catch((error) => {
+      console.error('❌ Flow EVM provider connection failed:', error);
+      // Fallback to basic provider
+      const fallbackProvider = new ethers.JsonRpcProvider(NETWORK_CONFIG.rpcUrls[0]);
+      setProvider(fallbackProvider);
+    });
+
+    // Setup Privy wallet integration
+    const setupPrivyWallet = async () => {
+      if (!ready) return;
+      
+      if (authenticated && wallets.length > 0) {
+        try {
+          const wallet = wallets[0];
+          if (wallet && wallet.address) {
+            setUserAddress(wallet.address);
+            
+            // Create ethers provider/signer from Privy wallet
+            // Use walletClientType instead of walletClient according to the Privy type definitions
+            if (wallet.walletClientType === 'privy') {
+              // For Privy embedded wallets, use the provider from window.ethereum
+              if (window.ethereum) {
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                setProvider(provider);
+                const signer = await provider.getSigner();
+                setSigner(signer);
+              }
+            } else {
+              // For other wallet types, use a direct connection to the wallet's RPC
+              try {
+                const provider = new ethers.JsonRpcProvider(NETWORK_CONFIG.rpcUrls[0]);
+                setProvider(provider);
+              } catch (error) {
+                console.error("Failed to create provider for wallet:", error);
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error setting up Privy wallet:", error);
+        }
+      } else {
+        // Reset wallet state if not authenticated
+        setUserAddress("");
+        setSigner(null);
+        // Keep RPC provider for read-only operations
+        setProvider(rpcProvider);
+      }
+    };
+
+    setupPrivyWallet();
+  }, [ready, authenticated, wallets]);
+
+  // Fetch ETF contract info when provider is available
+  const fetchEtfInfo = useCallback(async () => {
+    if (!provider) return;
+    
+    setContractLoading(true);
+    try {
+      const contract = new ethers.Contract(CONTRACT_ADDRESSES.etfVault, vaultAbi, provider);
+      const [name, symbol, agent, total] = await Promise.all([
+        contract.name(),
+        contract.symbol(),
+        contract.agentWallet(),
+        contract.getTotalValue()
+      ]);
+
+      setEtfInfo({
+        name,
+        symbol,
+        agent,
+        totalValue: ethers.formatEther(total)
+      });
+
+      // If user is connected, fetch their balance
+      if (userAddress) {
+        const balance = await contract.balanceOf(userAddress);
+        setUserBalance(ethers.formatEther(balance));
+      }
+    } catch (error) {
+      console.error("Error fetching ETF info:", error);
+    } finally {
+      setContractLoading(false);
+    }
+  }, [provider, userAddress, CONTRACT_ADDRESSES.etfVault, vaultAbi]);
+
+  // Fetch active assets in the ETF
+  const fetchActiveAssets = useCallback(async () => {
+    if (!provider) return;
+    
+    setContractLoading(true);
+    try {
+      const contract = new ethers.Contract(CONTRACT_ADDRESSES.etfVault, vaultAbi, provider);
+      const list = await contract.getActiveAssets();
+      setContractAssets(list);
+
+      // Update portfolio holdings based on actual contract data
+      if (list.length > 0) {
+        const updatedHoldings: PortfolioHolding[] = [];
+        
+        for (const assetAddress of list) {
+          try {
+            // Find the token symbol based on address
+            const tokenSymbol = Object.entries(ASSET_ADDRESSES).find(
+              ([, addr]) => addr.toLowerCase() === assetAddress.toLowerCase()
+            )?.[0] || 'Unknown';
+            
+            // Get token contract to fetch name and balance
+            const tokenContract = new ethers.Contract(
+              assetAddress, 
+              tokenAbis[tokenSymbol as keyof typeof tokenAbis] || tokenAbis.WFLOW, 
+              provider
+            );
+            
+            // Get token data
+            const [name, balance, decimals] = await Promise.all([
+              tokenContract.name().catch(() => tokenSymbol),
+              contract.getAssetBalance(assetAddress),
+              tokenContract.decimals().catch(() => 18)
+            ]);
+            
+            // Get token value in ETF (value = balance * price)
+            const value = await contract.getAssetValue(assetAddress);
+            const totalValue = Number(ethers.formatEther(value));
+            const tokenBalance = ethers.formatUnits(balance, decimals);
+            
+            // Calculate allocation percentage
+            const totalETFValue = Number(etfInfo.totalValue);
+            const allocation = totalETFValue > 0 
+              ? (totalValue / totalETFValue) * 100 
+              : 0;
+            
+            updatedHoldings.push({
+              symbol: `${name}`,
+              allocation: Number(allocation.toFixed(2)),
+              value: totalValue,
+              units: `${tokenBalance} ${tokenSymbol}`,
+              price: `$${(totalValue / Number(tokenBalance)).toFixed(2)}`
+            });
+          } catch (err) {
+            console.error(`Error processing asset ${assetAddress}:`, err);
+          }
+        }
+        
+        // Only update if we got some holdings
+        if (updatedHoldings.length > 0) {
+          setPortfolioHoldings(updatedHoldings);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching active assets:", error);
+    } finally {
+      setContractLoading(false);
+    }
+  }, [provider, CONTRACT_ADDRESSES.etfVault, ASSET_ADDRESSES, etfInfo.totalValue, tokenAbis, vaultAbi]);
+
+  // Use both memoized functions in the useEffect
+  useEffect(() => {
+    if (provider) {
+      fetchEtfInfo();
+      fetchActiveAssets();
+    }
+  }, [provider, userAddress, fetchEtfInfo, fetchActiveAssets]);
+
+  // Handle deposit to ETF
+  const handleDeposit = async () => {
+    if (!signer || !depositAmount) return;
+    
+    setContractLoading(true);
+    try {
+      const tokenAddress = ASSET_ADDRESSES[depositToken];
+      const amount = ethers.parseEther(depositAmount);
+      
+      // First approve the token transfer
+      const tokenContract = new ethers.Contract(tokenAddress, tokenAbis[depositToken], signer);
+      const approveTx = await tokenContract.approve(CONTRACT_ADDRESSES.etfVault, amount);
+      await approveTx.wait();
+      
+      // Then deposit to the ETF
+      const vaultContract = new ethers.Contract(CONTRACT_ADDRESSES.etfVault, vaultAbi, signer);
+      const depositTx = await vaultContract.deposit(tokenAddress, amount);
+      await depositTx.wait();
+      
+      // Refresh data
+      await fetchEtfInfo();
+      await fetchActiveAssets();
+      
+      // Reset input
+      setDepositAmount("");
+      
+      alert("Deposit successful!");
+    } catch (error) {
+      console.error("Error depositing to ETF:", error);
+      alert("Failed to deposit. See console for details.");
+    } finally {
+      setContractLoading(false);
+    }
+  };
+  
+  // Handle withdraw from ETF
+  const handleWithdraw = async () => {
+    if (!signer || !withdrawAmount) return;
+    
+    setContractLoading(true);
+    try {
+      const shares = ethers.parseEther(withdrawAmount);
+      const tokenAddress = ASSET_ADDRESSES[withdrawToken];
+      // Set minAmountOut to 0 for simplicity - in production, this should be calculated
+      const minAmountOut = 0;
+      
+      const vaultContract = new ethers.Contract(CONTRACT_ADDRESSES.etfVault, vaultAbi, signer);
+      const withdrawTx = await vaultContract.withdraw(shares, tokenAddress, minAmountOut);
+      await withdrawTx.wait();
+      
+      // Refresh data
+      await fetchEtfInfo();
+      await fetchActiveAssets();
+      
+      // Reset input
+      setWithdrawAmount("");
+      
+      alert("Withdrawal successful!");
+    } catch (error) {
+      console.error("Error withdrawing from ETF:", error);
+      alert("Failed to withdraw. See console for details.");
+    } finally {
+      setContractLoading(false);
+    }
+  };
+
+  // Portfolio assets count
   const portfolioAssets = portfolioHoldings.length;
 
   // Available symbols from feeds
@@ -462,29 +754,170 @@ export default function FlowEtfPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <span className="text-white text-lg">🚀</span>
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">ETF Manager</h1>
-            <p className="text-muted-foreground text-sm">Powered by Flare Network Oracle Feeds</p>
-          </div>
+      {/* ETF Header Section with Integrated Privy Wallet */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Flow ETF Manager</h1>
+          <p className="text-muted-foreground">Manage your ETF portfolio powered by Flare Oracle</p>
         </div>
-        <div className="text-right">
-          <div className="text-3xl font-bold text-green-600">${portfolioValue.toLocaleString()}</div>
-          <p className="text-muted-foreground text-sm">Portfolio Value</p>
+        <div className="flex gap-2">
+          {!ready ? (
+            <div className="flex items-center gap-2 text-sm bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+              <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+              <span className="font-medium">Loading wallet...</span>
+            </div>
+          ) : authenticated && userAddress ? (
+            <div className="flex items-center gap-2 text-sm bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="font-medium">Connected: {userAddress.substring(0, 6)}...{userAddress.substring(38)}</span>
+              <span className="text-xs text-green-600">({wallets[0]?.walletClientType || 'Wallet'})</span>
+            </div>
+          ) : (
+            <Button onClick={login} className="gap-2">
+              <Wallet className="w-4 h-4" />
+              Connect Wallet
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Stats Row */}
+      {/* ETF Vault Info */}
+      {(etfInfo.name || contractLoading) && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-primary">🔒</span>
+                ETF Contract Information
+              </CardTitle>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    fetchEtfInfo();
+                    fetchActiveAssets();
+                  }}
+                  variant="outline"
+                  size="sm"
+                  disabled={contractLoading}
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${contractLoading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+                <Badge variant="outline" className="text-xs">
+                  Chain ID: {NETWORK_CONFIG.chainId}
+                </Badge>
+              </div>
+            </div>
+            {etfInfo.name && (
+              <CardDescription>
+                {etfInfo.name} ({etfInfo.symbol}) - Flow Multi-Asset ETF
+                <br />
+                <span className="text-xs font-mono">Contract: {CONTRACT_ADDRESSES.etfVault}</span>
+              </CardDescription>
+            )}
+          </CardHeader>
+          <CardContent>
+            {contractLoading ? (
+              <div className="space-y-2">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-6 bg-muted animate-pulse rounded" />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="space-y-1">
+                  <div className="text-muted-foreground text-sm">Total Value</div>
+                  <div className="text-xl font-bold">{parseFloat(etfInfo.totalValue).toLocaleString()} ETH</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-muted-foreground text-sm">Your Balance</div>
+                  <div className="text-xl font-bold">{parseFloat(userBalance).toLocaleString()} {etfInfo.symbol}</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-muted-foreground text-sm">Assets</div>
+                  <div className="text-xl font-bold">{contractAssets.length}</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-muted-foreground text-sm">Agent Wallet</div>
+                  <div className="text-sm font-mono text-muted-foreground">{etfInfo.agent.substring(0, 10)}...{etfInfo.agent.substring(36)}</div>
+                </div>
+                
+                {authenticated && userAddress && signer && (
+                  <div className="col-span-1 md:col-span-2 lg:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <Card className="bg-muted/30">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-base">Deposit to ETF</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <div className="flex gap-2">
+                          <Select value={depositToken} onValueChange={(v) => setDepositToken(v as keyof typeof ASSET_ADDRESSES)}>
+                            <SelectTrigger className="w-[180px]">
+                              <SelectValue placeholder="Select token" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Object.keys(ASSET_ADDRESSES).map((token) => (
+                                <SelectItem key={token} value={token}>{token}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            type="number"
+                            placeholder="Amount"
+                            value={depositAmount}
+                            onChange={(e) => setDepositAmount(e.target.value)}
+                          />
+                          <Button onClick={handleDeposit} disabled={contractLoading || !depositAmount}>
+                            Deposit
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="bg-muted/30">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-base">Withdraw from ETF</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <div className="flex gap-2">
+                          <Select value={withdrawToken} onValueChange={(v) => setWithdrawToken(v as keyof typeof ASSET_ADDRESSES)}>
+                            <SelectTrigger className="w-[180px]">
+                              <SelectValue placeholder="Select token" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Object.keys(ASSET_ADDRESSES).map((token) => (
+                                <SelectItem key={token} value={token}>{token}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            type="number"
+                            placeholder="Shares to withdraw"
+                            value={withdrawAmount}
+                            onChange={(e) => setWithdrawAmount(e.target.value)}
+                          />
+                          <Button onClick={handleWithdraw} disabled={contractLoading || !withdrawAmount}>
+                            Withdraw
+                          </Button>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Your balance: {parseFloat(userBalance).toLocaleString()} {etfInfo.symbol} shares
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+      
+      {/* Stats Cards */}
       <div className="grid grid-cols-5 gap-4">
         <Card className="text-center">
           <CardContent className="pt-4 pb-4">
-            <div className="text-2xl font-bold">{feeds.length}</div>
-            <div className="text-muted-foreground text-sm">Active Feeds</div>
+            <div className="text-2xl font-bold">${parseFloat(etfInfo.totalValue).toLocaleString()}</div>
+            <div className="text-muted-foreground text-sm">ETF Value</div>
           </CardContent>
         </Card>
         <Card className="text-center">
@@ -495,7 +928,7 @@ export default function FlowEtfPage() {
         </Card>
         <Card className="text-center">
           <CardContent className="pt-4 pb-4">
-            <div className="text-xs font-mono">0x93420...f4b2</div>
+            <div className="text-xs font-mono">{CONTRACT_ADDRESSES.etfVault.substring(0, 8)}...{CONTRACT_ADDRESSES.etfVault.substring(38)}</div>
             <div className="text-muted-foreground text-sm">Contract</div>
           </CardContent>
         </Card>
@@ -582,61 +1015,6 @@ export default function FlowEtfPage() {
                   console.log('🧪 Testing individual feed indices...');
                   testFeedIndices();
                   
-                  // Test direct contract call to verify raw data
-                  console.log('🔗 Testing direct contract calls...');
-                  const testDirectContract = async () => {
-                    try {
-                      const testProvider = new ethers.JsonRpcProvider('https://coston2-api.flare.network/ext/C/rpc');
-                      const testContractInstance = new ethers.Contract(
-                        '0x93420cD7639AEe3dFc7AA18aDe7955Cfef4b44b1',
-                        [
-                          "function getFeedById(uint256 feedIndex) view returns (uint256 value, uint8 decimals, uint256 timestamp)",
-                          "function getFtsoV2CurrentFeedValues() view returns (uint256[] memory values, uint8[] memory decimals, uint256[] memory timestamps)"
-                        ],
-                        testProvider
-                      );
-                      
-                      // Test ETH at index 3
-                      console.log('📡 Testing ETH/USD at index 3...');
-                      const [ethValue, ethDecimals, ethTimestamp] = await testContractInstance.getFeedById(3);
-                      const ethPrice = Number(ethValue) / Math.pow(10, Number(ethDecimals));
-                      
-                      console.log('🔍 RAW ETH DATA:', {
-                        index: 3,
-                        expectedSymbol: 'ETH/USD',
-                        rawValue: ethValue.toString(),
-                        decimals: Number(ethDecimals),
-                        calculatedPrice: ethPrice,
-                        timestamp: Number(ethTimestamp),
-                        timestampDate: new Date(Number(ethTimestamp) * 1000).toLocaleString(),
-                        dataAge: Math.round((Date.now() - Number(ethTimestamp) * 1000) / 1000 / 60) + ' minutes',
-                        isRealistic: ethPrice > 1000 && ethPrice < 10000
-                      });
-                      
-                      // Test BTC at index 2
-                      console.log('📡 Testing BTC/USD at index 2...');
-                      const [btcValue, btcDecimals, btcTimestamp] = await testContractInstance.getFeedById(2);
-                      const btcPrice = Number(btcValue) / Math.pow(10, Number(btcDecimals));
-                      
-                      console.log('🔍 RAW BTC DATA:', {
-                        index: 2,
-                        expectedSymbol: 'BTC/USD',
-                        rawValue: btcValue.toString(),
-                        decimals: Number(btcDecimals),
-                        calculatedPrice: btcPrice,
-                        timestamp: Number(btcTimestamp),
-                        timestampDate: new Date(Number(btcTimestamp) * 1000).toLocaleString(),
-                        dataAge: Math.round((Date.now() - Number(btcTimestamp) * 1000) / 1000 / 60) + ' minutes',
-                        isRealistic: btcPrice > 30000 && btcPrice < 200000
-                      });
-                      
-                    } catch (err) {
-                      console.error('❌ Direct contract test failed:', err);
-                    }
-                  };
-                  
-                  testDirectContract();
-                  
                   // Refresh feeds after testing
                   console.log('🔄 Refreshing feeds...');
                   refreshFeeds();
@@ -651,6 +1029,27 @@ export default function FlowEtfPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Wallet Status Alert */}
+      {!authenticated && ready && (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardHeader>
+            <CardTitle className="text-orange-800 flex items-center gap-2">
+              <Wallet className="w-5 h-5" />
+              Wallet Connection Required
+            </CardTitle>
+            <CardDescription className="text-orange-600">
+              Please connect your wallet to interact with the ETF contract and perform deposits/withdrawals.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={login} className="gap-2">
+              <Wallet className="w-4 h-4" />
+              Connect Wallet with Privy
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Error Handling */}
       {error && (
@@ -1167,38 +1566,38 @@ export default function FlowEtfPage() {
       <Card>
         <CardHeader>
           <CardTitle>Technical Information</CardTitle>
-          <CardDescription>Flare Network Oracle Integration Details</CardDescription>
+          <CardDescription>Flow EVM & Flare Network Integration Details</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h4 className="font-medium mb-3 flex items-center gap-2">
                 <Network className="w-4 h-4" />
-                Network Configuration
+                Flow EVM Configuration
               </h4>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Chain ID:</dt>
-                  <dd className="font-mono">114</dd>
+                  <dd className="font-mono">{NETWORK_CONFIG.chainId}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Network:</dt>
-                  <dd>Flare Coston2 Testnet</dd>
+                  <dd>{NETWORK_CONFIG.name}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">RPC URL:</dt>
-                  <dd className="font-mono text-xs">coston2-api.flare.network</dd>
+                  <dd className="font-mono text-xs">{NETWORK_CONFIG.rpcUrls[0].replace('https://', '')}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Native Currency:</dt>
-                  <dd>C2FLR</dd>
+                  <dd>{NETWORK_CONFIG.nativeCurrency.symbol}</dd>
                 </div>
               </dl>
             </div>
             <div>
               <h4 className="font-medium mb-3 flex items-center gap-2">
                 <Zap className="w-4 h-4" />
-                Oracle Details
+                Oracle Details (Flare)
               </h4>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">

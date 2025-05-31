@@ -20,7 +20,7 @@ const NETWORKS = {
   ZKSYNC: { id: 324, name: 'zkSync', icon: '/jellyfish.png' }
 };
 
-// Token definitions (simplified for demo)
+// Token definitions
 const TOKENS = {
   ETH: { 
     address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
@@ -152,7 +152,7 @@ export function CrossChainSwap({ onSuccess }: CrossChainSwapProps) {
       const amountWei = ethers.parseEther(amount).toString();
       
       // Get the quote from our API route
-      const response = await fetch(`/api/1inch/fusion-plus?srcChainId=${sourceChain.id}&dstChainId=${destChain.id}&srcTokenAddress=${TOKENS.ETH.address}&dstTokenAddress=${TOKENS.ETH.address}&amount=${amountWei}&walletAddress=${userAddress}`);
+      const response = await fetch(`/api/1inch/fusion-plus?srcChainId=${sourceChain.id}&dstChainId=${destChain.id}&srcTokenAddress=${TOKENS.ETH.address}&dstTokenAddress=${TOKENS.ETH.address}&amount=${amountWei}&walletAddress=${userAddress}&enableEstimate=true`);
       
       if (!response.ok) {
         const errorData = await response.json();

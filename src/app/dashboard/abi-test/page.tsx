@@ -8,6 +8,8 @@ import type { JsonFragment } from 'ethers';
 import ETFVaultJSON from '@/lib/abis/FlowETFVault.json';
 import WrappedFlowJSON from '@/lib/abis/WrappedFlow.json';
 import type { ChangeEvent } from 'react';
+import { WalletConnectButton } from '@/components/WalletConnectButton';
+import { toast } from 'sonner';
 
 const addresses = {
   etfVault: "0xb41Eebc041d8eFDB38dB7e5a6f1b1CC295702C2b",
@@ -23,13 +25,42 @@ const assets = {
   TRUMP:    "0xb664eab8e811b3a4af872d01b75ccbdc4d28fd2d"
 };
 
-// Ensure correct ABI array
-const vaultAbi: JsonFragment[] = Array.isArray(ETFVaultJSON)
-  ? (ETFVaultJSON as unknown as JsonFragment[])
-  : (ETFVaultJSON as { abi: JsonFragment[] }).abi;
-const tokenAbi: JsonFragment[] = Array.isArray(WrappedFlowJSON)
-  ? (WrappedFlowJSON as unknown as JsonFragment[])
-  : (WrappedFlowJSON as { abi: JsonFragment[] }).abi;
+// Define a type for various ABI JSON formats
+type AbiJsonFormat = 
+  | JsonFragment[] 
+  | { abi: JsonFragment[] } 
+  | { result: JsonFragment[] } 
+  | Record<string, unknown>;
+
+// Safely extract ABI from JSON structure
+const extractAbi = (abiJson: AbiJsonFormat): JsonFragment[] => {
+  try {
+    // If it's already an array, assume it's the ABI
+    if (Array.isArray(abiJson)) {
+      return abiJson as JsonFragment[];
+    }
+    
+    // If it has an abi property, use that
+    if (abiJson && typeof abiJson === 'object' && 'abi' in abiJson) {
+      return (abiJson as { abi: JsonFragment[] }).abi;
+    }
+    
+    // For backward compatibility with some ABI formats
+    if (abiJson && typeof abiJson === 'object' && 'result' in abiJson) {
+      return (abiJson as { result: JsonFragment[] }).result;
+    }
+    
+    console.error("Could not extract ABI from JSON:", abiJson);
+    return [];
+  } catch (error) {
+    console.error("Error extracting ABI:", error);
+    return [];
+  }
+};
+
+// Ensure correct ABI arrays
+const vaultAbi = extractAbi(ETFVaultJSON as AbiJsonFormat);
+const tokenAbi = extractAbi(WrappedFlowJSON as AbiJsonFormat);
 
 export default function AbiTestPage() {
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
@@ -55,78 +86,131 @@ export default function AbiTestPage() {
     );
   }, []);
 
-  const connect = async () => {
-    if (!provider) return;
-    await provider.send("eth_requestAccounts", []);
-    const signer = await provider.getSigner();
-    setSigner(signer);
-    const address = await signer.getAddress();
-    setUserAddress(address);
-  };
-
   const fetchEtfInfo = async () => {
     if (!provider) return;
-    const contract = new ethers.Contract(addresses.etfVault, vaultAbi, provider);
-    const [name, symbol, agent, total] = await Promise.all([
-      contract.name(),
-      contract.symbol(),
-      contract.agentWallet(),
-      contract.getTotalValue()
-    ]);
-    setEtfInfo({ name, symbol, agent, totalValue: ethers.formatEther(total) });
+    
+    try {
+      const contract = new ethers.Contract(addresses.etfVault, vaultAbi, provider);
+      
+      // Check if ABIs are correctly loaded
+      if (vaultAbi.length === 0) {
+        toast.error("ETF Vault ABI is empty or invalid");
+        return;
+      }
+      
+      // Execute contract calls safely with error handling
+      const results = await Promise.allSettled([
+        contract.name().catch((e: Error) => {
+          console.error("Error calling name():", e);
+          return "Error fetching name";
+        }),
+        contract.symbol().catch((e: Error) => {
+          console.error("Error calling symbol():", e);
+          return "Error fetching symbol";
+        }),
+        contract.agentWallet().catch((e: Error) => {
+          console.error("Error calling agentWallet():", e);
+          return "Error fetching agent";
+        }),
+        contract.getTotalValue().catch((e: Error) => {
+          console.error("Error calling getTotalValue():", e);
+          return ethers.parseEther("0");
+        })
+      ]);
+      
+      setEtfInfo({ 
+        name: results[0].status === 'fulfilled' ? results[0].value : "Error fetching name",
+        symbol: results[1].status === 'fulfilled' ? results[1].value : "Error fetching symbol",
+        agent: results[2].status === 'fulfilled' ? results[2].value : "Error fetching agent",
+        totalValue: results[3].status === 'fulfilled' ? ethers.formatEther(results[3].value) : "0"
+      });
+    } catch (error) {
+      console.error("Error fetching ETF info:", error);
+      toast.error("Failed to fetch ETF information");
+    }
   };
 
   const fetchActiveAssets = async () => {
     if (!provider) return;
-    const contract = new ethers.Contract(addresses.etfVault, vaultAbi, provider);
-    const list = await contract.getActiveAssets();
-    setActiveAssets(list);
+    try {
+      const contract = new ethers.Contract(addresses.etfVault, vaultAbi, provider);
+      const list = await contract.getActiveAssets();
+      setActiveAssets(list);
+    } catch (error) {
+      console.error("Error fetching active assets:", error);
+      toast.error("Failed to fetch active assets");
+    }
   };
 
   const fetchTokenBalance = async () => {
     if (!provider || !userAddress) return;
-    const tokenAddress = assets[selectedToken];
-    const contract = new ethers.Contract(tokenAddress, tokenAbi, provider);
-    const bal = await contract.balanceOf(userAddress);
-    setTokenBalance(ethers.formatEther(bal));
+    try {
+      const tokenAddress = assets[selectedToken];
+      const contract = new ethers.Contract(tokenAddress, tokenAbi, provider);
+      const bal = await contract.balanceOf(userAddress);
+      setTokenBalance(ethers.formatEther(bal));
+    } catch (error) {
+      console.error("Error fetching token balance:", error);
+      toast.error("Failed to fetch token balance");
+    }
   };
 
   const faucetToken = async () => {
     if (!signer) return;
     setLoading(true);
-    const tokenAddress = assets[selectedToken];
-    const contract = new ethers.Contract(tokenAddress, tokenAbi, signer);
-    await (await contract.faucet()).wait();
-    await fetchTokenBalance();
-    setLoading(false);
+    try {
+      const tokenAddress = assets[selectedToken];
+      const contract = new ethers.Contract(tokenAddress, tokenAbi, signer);
+      await (await contract.faucet()).wait();
+      await fetchTokenBalance();
+      toast.success(`${selectedToken} tokens claimed from faucet`);
+    } catch (error) {
+      console.error("Error using faucet:", error);
+      toast.error("Failed to get tokens from faucet");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDeposit = async () => {
     if (!signer) return;
     setLoading(true);
-    const tokenAddress = assets[depositToken];
-    const amt = ethers.parseEther(depositAmount);
-    const tokenC = new ethers.Contract(tokenAddress, tokenAbi, signer);
-    await (await tokenC.approve(addresses.etfVault, amt)).wait();
-    const vaultC = new ethers.Contract(addresses.etfVault, vaultAbi, signer);
-    await (await vaultC.deposit(tokenAddress, amt)).wait();
-    setLoading(false);
+    try {
+      const tokenAddress = assets[depositToken];
+      const amt = ethers.parseEther(depositAmount);
+      const tokenC = new ethers.Contract(tokenAddress, tokenAbi, signer);
+      await (await tokenC.approve(addresses.etfVault, amt)).wait();
+      const vaultC = new ethers.Contract(addresses.etfVault, vaultAbi, signer);
+      await (await vaultC.deposit(tokenAddress, amt)).wait();
+      toast.success(`Deposited ${depositAmount} ${depositToken} to ETF`);
+    } catch (error) {
+      console.error("Error depositing:", error);
+      toast.error("Failed to deposit to ETF");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleWithdraw = async () => {
     if (!signer) return;
     setLoading(true);
-    const shares = ethers.parseEther(withdrawShares);
-    const minOut = ethers.parseEther(withdrawMin);
-    const vaultC = new ethers.Contract(addresses.etfVault, vaultAbi, signer);
-    await (await vaultC.withdraw(shares, assets[withdrawToken], minOut)).wait();
-    setLoading(false);
+    try {
+      const shares = ethers.parseEther(withdrawShares);
+      const minOut = ethers.parseEther(withdrawMin);
+      const vaultC = new ethers.Contract(addresses.etfVault, vaultAbi, signer);
+      await (await vaultC.withdraw(shares, assets[withdrawToken], minOut)).wait();
+      toast.success(`Withdrawn ${withdrawShares} shares from ETF`);
+    } catch (error) {
+      console.error("Error withdrawing:", error);
+      toast.error("Failed to withdraw from ETF");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="space-y-6">
-      <Button onClick={connect} disabled={!!userAddress}>{userAddress ? 'Connected' : 'Connect Wallet'}</Button>
-
+      <WalletConnectButton />
       <Card>
         <CardHeader><CardTitle>ETF Vault Info</CardTitle></CardHeader>
         <CardContent className="space-y-2">

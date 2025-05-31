@@ -38,13 +38,7 @@ export function RootLayoutContent({ children }: RootLayoutContentProps) {
                   <span className="font-semibold text-lg">BAEVII</span>
                 </Link>
               </div>
-              {/* <nav className="hidden md:flex items-center gap-6">
-                <Link href="/" className="text-sm font-medium hover:text-primary transition-colors duration-200">Home</Link>
-                <Link href="/dashboard" className="text-sm font-medium hover:text-primary transition-colors duration-200">Dashboard</Link>
-                <Link href="/dashboard/analytics" className="text-sm font-medium hover:text-primary transition-colors duration-200">Analytics</Link>
-                <Link href="/dashboard/create" className="text-sm font-medium hover:text-primary transition-colors duration-200">Create ETF</Link>
-                <Link href="/etf-test" className="text-sm font-medium hover:text-primary transition-colors duration-200">Demo</Link>
-              </nav> */}
+
               <div className="flex items-center gap-4">
                 <WalletConnectButton />
                 <Link href="/dashboard">

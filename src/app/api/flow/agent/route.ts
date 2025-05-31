@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { 
   getServerProvider, 
   getContracts,
   formatAmount
 } from '@/lib/flow-contracts';
 
-export async function GET() {
+export async function GET(_request: NextRequest) {
   try {
     console.log('📊 Getting Flow ETF agent data');
     
@@ -87,7 +87,7 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { action, agent, authorized } = await request.json();
     

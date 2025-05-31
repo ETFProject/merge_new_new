@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ClientCard } from "@/components/ui/client-card";
 import { FLOW_TESTNET } from '@/lib/flow-contracts';
+import { WalletConnectButton } from '@/components/WalletConnectButton';
+
 
 // Interface for agent data
 interface AgentData {
@@ -40,67 +42,67 @@ export function AgentMonitoringClient({ onSuccess }: AgentMonitoringClientProps)
   const [newAgentAddress, setNewAgentAddress] = useState('');
 
   // Connect to Ethereum provider
-  const connectWallet = async () => {
-    try {
-      setLoading(true);
+  // const connectWallet = async () => {
+  //   try {
+  //     setLoading(true);
       
-      // Check if MetaMask is installed
-      if (!window.ethereum) {
-        alert('Please install MetaMask to interact with Flow ETFs');
-        return;
-      }
+  //     // Check if MetaMask is installed
+  //     if (!window.ethereum) {
+  //       alert('Please install MetaMask to interact with Flow ETFs');
+  //       return;
+  //     }
       
-      // Request account access
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }) as string[];
-      const address = accounts[0];
-      setUserAddress(address);
+  //     // Request account access
+  //     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }) as string[];
+  //     const address = accounts[0];
+  //     setUserAddress(address);
       
-      // Check if on the correct network
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string;
+  //     // Check if on the correct network
+  //     const chainId = await window.ethereum.request({ method: 'eth_chainId' }) as string;
       
-      if (parseInt(chainId, 16) !== FLOW_TESTNET.chainId) {
-        // Ask user to switch to Flow EVM Testnet
-        try {
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: `0x${FLOW_TESTNET.chainId.toString(16)}` }],
-          });
-        } catch (switchError: unknown) {
-          const error = switchError as {code: number};
-          if (error.code === 4902) {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [
-                {
-                  chainId: `0x${FLOW_TESTNET.chainId.toString(16)}`,
-                  chainName: FLOW_TESTNET.name,
-                  nativeCurrency: {
-                    name: 'FLOW',
-                    symbol: 'FLOW',
-                    decimals: 18
-                  },
-                  rpcUrls: [FLOW_TESTNET.rpcUrl],
-                  blockExplorerUrls: [FLOW_TESTNET.blockExplorer]
-                },
-              ],
-            });
-          } else {
-            throw switchError;
-          }
-        }
-      }
+  //     if (parseInt(chainId, 16) !== FLOW_TESTNET.chainId) {
+  //       // Ask user to switch to Flow EVM Testnet
+  //       try {
+  //         await window.ethereum.request({
+  //           method: 'wallet_switchEthereumChain',
+  //           params: [{ chainId: `0x${FLOW_TESTNET.chainId.toString(16)}` }],
+  //         });
+  //       } catch (switchError: unknown) {
+  //         const error = switchError as {code: number};
+  //         if (error.code === 4902) {
+  //           await window.ethereum.request({
+  //             method: 'wallet_addEthereumChain',
+  //             params: [
+  //               {
+  //                 chainId: `0x${FLOW_TESTNET.chainId.toString(16)}`,
+  //                 chainName: FLOW_TESTNET.name,
+  //                 nativeCurrency: {
+  //                   name: 'FLOW',
+  //                   symbol: 'FLOW',
+  //                   decimals: 18
+  //                 },
+  //                 rpcUrls: [FLOW_TESTNET.rpcUrl],
+  //                 blockExplorerUrls: [FLOW_TESTNET.blockExplorer]
+  //               },
+  //             ],
+  //           });
+  //         } else {
+  //           throw switchError;
+  //         }
+  //       }
+  //     }
       
-      setConnected(true);
-      fetchAgentData();
-      fetchRecentOperations();
+  //     setConnected(true);
+  //     fetchAgentData();
+  //     fetchRecentOperations();
       
-    } catch (error) {
-      console.error('Error connecting wallet:', error);
-      alert('Failed to connect wallet');
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   } catch (error) {
+  //     console.error('Error connecting wallet:', error);
+  //     alert('Failed to connect wallet');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   
   // Fetch agent data
   const fetchAgentData = async () => {
@@ -313,17 +315,20 @@ export function AgentMonitoringClient({ onSuccess }: AgentMonitoringClientProps)
                 <p className="font-mono text-sm truncate">{userAddress}</p>
               </div>
               <div>
-                <Button variant="outline" size="sm" onClick={connectWallet} disabled={loading}>
+                {/* <Button variant="outline" size="sm" onClick={connectWallet} disabled={loading}>
                   Refresh
-                </Button>
+                </Button> */}
+                <WalletConnectButton />
               </div>
             </div>
           ) : (
             <div className="flex flex-col items-center md:flex-row md:justify-between gap-4">
               <p className="text-muted-foreground">Not connected to Flow EVM</p>
-              <Button onClick={connectWallet} disabled={loading}>
+              {/* <Button onClick={connectWallet} disabled={loading}>
                 Connect Wallet
-              </Button>
+              </Button> */}
+                              <WalletConnectButton />
+
             </div>
           )}
         </div>

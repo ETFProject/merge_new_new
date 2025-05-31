@@ -152,9 +152,8 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
     switch(chainId) {
       case 1: return "Ethereum";
       case 11155111: return "Ethereum Sepolia";
-      case 84532: return "Base Sepolia";
-      case 8453: return "Base";
-      case 137: return "Flow";
+      case 545: return "Flow EVM Testnet";
+      case 137: return "Polygon";
       default: return `Chain ${chainId}`;
     }
   };
@@ -163,9 +162,8 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
     switch(chainId) {
       case 1: 
       case 11155111: return "bg-blue-100 text-blue-800";
-      case 84532:
-      case 8453: return "bg-blue-500/20 text-blue-700";
-      case 137: return "bg-purple-100 text-purple-800";
+      case 545: return "bg-purple-100 text-purple-800";
+      case 137: return "bg-purple-500/20 text-purple-700";
       default: return "bg-gray-100 text-gray-800";
     }
   };
@@ -174,9 +172,8 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
     switch(chainId) {
       case 1: 
       case 11155111: return "#627EEA"; // Ethereum blue
-      case 84532:
-      case 8453: return "#0052FF"; // Base blue
-      case 137: return "#8247E5"; // Flow purple
+      case 545: return "#8247E5"; // Flow purple
+      case 137: return "#8A2BE2"; // Polygon purple
       default: return "#CBD5E1"; // Gray
     }
   };
@@ -185,9 +182,8 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
     switch(chainId) {
       case 1: 
       case 11155111: return "/tornado.png"; // Ethereum
-      case 84532:
-      case 8453: return "/sandwave.png"; // Base
-      case 137: return "/jellyfish.png"; // Flow
+      case 545: return "/jellyfish.png"; // Flow
+      case 137: return "/sandwave.png"; // Polygon
       default: return "/snail.png"; // Default
     }
   };
@@ -576,7 +572,7 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
               <div>
                 <p className="font-medium text-sm mb-2">Agent Recommendation</p>
                 <p className="text-sm mb-3">
-                  Based on current market conditions, consider moving 10% of your ETH from Ethereum Sepolia to Base Sepolia for higher yields through the LayerZero ETF bridge.
+                  Based on current market conditions, consider optimizing your ETF allocation by moving 10% of your ETH to Flow EVM Testnet for enhanced cross-chain capabilities.
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Button size="sm" variant="outline" className="text-xs" withHoverEffect>View Details</Button>
@@ -612,19 +608,19 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
               </div>
               <div className="p-4 h-64 overflow-auto space-y-4">
                 <div className="bg-muted/50 rounded-lg p-3 animate-entry">
-                  <p className="text-sm">I&apos;ve analyzed your ETF portfolio and found that you could benefit from utilizing the LayerZero ETF bridge to rebalance 15% of your assets to Base Sepolia.</p>
+                  <p className="text-sm">I&apos;ve analyzed your ETF portfolio and found that you could benefit from utilizing cross-chain bridges to rebalance 15% of your assets to Flow EVM Testnet.</p>
                 </div>
                 <div className="bg-primary/10 rounded-lg p-3 ml-6 animate-entry animate-delay-1">
-                  <p className="text-sm">Why should I move assets to Base Sepolia?</p>
+                  <p className="text-sm">Why should I move assets to Flow EVM Testnet?</p>
                 </div>
                 <div className="bg-muted/50 rounded-lg p-3 animate-entry animate-delay-2">
-                  <p className="text-sm">Base Sepolia currently offers 2.8% higher yields for your assets due to lower gas fees and higher liquidity incentives. I can facilitate this bridge operation through the LayerZero ETF bridge contract deployed at 0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9.</p>
+                  <p className="text-sm">Flow EVM Testnet currently offers optimized performance for your ETF assets with enhanced cross-chain capabilities. I can facilitate this bridge operation through our integrated ETF bridge contracts.</p>
                 </div>
                 <div className="bg-primary/10 rounded-lg p-3 ml-6 animate-entry animate-delay-3">
                   <p className="text-sm">How does the cross-chain rebalancing work?</p>
                 </div>
                 <div className="bg-muted/50 rounded-lg p-3 animate-entry animate-delay-4">
-                  <p className="text-sm">The ETFVault contract on Ethereum will approve your tokens to the 1inch aggregator, which will handle the complex cross-chain routing through LayerZero. The funds will be bridged to Base Sepolia and deposited into your ETF there, all while maintaining your overall portfolio allocations.</p>
+                  <p className="text-sm">The ETFVault contract will approve your tokens to cross-chain aggregators, which will handle the complex routing between chains. The funds will be bridged to Flow EVM Testnet and deposited into your ETF there, all while maintaining your overall portfolio allocations.</p>
                 </div>
               </div>
               <div className="p-4 border-t bg-card">
