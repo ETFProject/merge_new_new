@@ -28,6 +28,9 @@ A modern UI for managing multi-chain crypto ETFs with AI-powered insights and cr
    # Contract addresses
    NEXT_PUBLIC_USDC_ADDRESS=0xF881dE8e7D55dbaE312b464c1b1316AF96C71aFa
    NEXT_PUBLIC_WETH_ADDRESS=0x26256c749f3D24F1Ff0344522819fC7cD608846c
+
+   # Privy AppId
+   NEXT_PUBLIC_PRIVY_APP_ID=cmbaupqw600bgl10mf40l0cm6
    ```
 4. Start the development server:
    ```
