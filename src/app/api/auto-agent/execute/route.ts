@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createPrivyServerAgent } from '@/lib/auto-agent/privy-server';
+import { createEnhancedPrivyServerAgent } from '@/lib/auto-agent/privy-server-enhanced';
 import { ActionExecutor } from '@/lib/auto-agent/executor';
 import { AgentPlan } from '@/lib/auto-agent/gemini';
 
@@ -14,10 +14,17 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    if (!privyConfig?.appId || !privyConfig?.appSecret) {
+    // Use environment variables for Privy config if available, otherwise use the client-provided config
+    const serverPrivyConfig = {
+      appId: process.env.PRIVY_APP_ID || privyConfig?.appId,
+      appSecret: process.env.PRIVY_APP_SECRET || privyConfig?.appSecret,
+      authPrivateKey: process.env.PRIVY_AUTH_KEY || privyConfig?.authPrivateKey
+    };
+
+    if (!serverPrivyConfig.appId || !serverPrivyConfig.appSecret) {
       return NextResponse.json({
         success: false,
-        error: 'Privy configuration is required'
+        error: 'Privy configuration is required and not found in environment variables'
       }, { status: 400 });
     }
 
@@ -29,8 +36,8 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
 
-    // Create Privy server agent
-    const privyAgent = createPrivyServerAgent(privyConfig);
+    // Create Enhanced Privy server agent with environment variables
+    const privyAgent = createEnhancedPrivyServerAgent(serverPrivyConfig, 'http://localhost:3012');
 
     // Verify wallet exists
     try {

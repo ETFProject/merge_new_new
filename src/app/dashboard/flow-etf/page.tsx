@@ -954,7 +954,7 @@ export default function FlowEtfPage() {
         <Card className="text-center">
           <CardContent className="pt-4 pb-4">
             <div className="space-y-2">
-              <Button 
+              {/* <Button 
                 onClick={refreshFeeds} 
                 className="w-full"
                 size="sm"
@@ -1037,7 +1037,7 @@ export default function FlowEtfPage() {
                 className="w-full text-xs"
               >
                 🔍 Debug Oracle
-              </Button>
+              </Button> */}
             </div>
           </CardContent>
         </Card>

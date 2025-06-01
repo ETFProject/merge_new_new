@@ -1,7 +1,6 @@
 'use client';
 
 import { AgentMonitoringClient } from "@/components/etf/agent-monitoring-client";
-import { Button } from "@/components/ui/button";
 import { useFlareOracle } from "@/hooks";
 import { toast } from "sonner";
 
@@ -29,13 +28,13 @@ export default function AgentMonitoringPage() {
             Monitor and manage ETF agent operations on the Flow EVM Testnet
           </p>
         </div>
-        <Button 
+        {/* <Button 
           variant="outline" 
           onClick={handleDebugOracle}
           className="gap-2"
         >
           🔍 Debug Oracle
-        </Button>
+        </Button> */}
       </div>
       
       <AgentMonitoringClient onSuccess={() => console.log('Agent operation completed successfully')} />

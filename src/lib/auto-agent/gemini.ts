@@ -14,6 +14,8 @@ export interface AgentAction {
   timestamp: number;
   chainId?: string;
   txHash?: string;
+  estimatedDuration?: number; // in milliseconds
+  priority?: 'low' | 'medium' | 'high';
 }
 
 export interface AgentPlan {

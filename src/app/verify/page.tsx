@@ -127,12 +127,20 @@ export default function VerifyPage() {
         })
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to initiate verification');
+        const errorText = await response.text();
+        let errorMessage;
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || 'Failed to initiate verification';
+        } catch {
+          // If response is not valid JSON
+          errorMessage = errorText || 'Failed to initiate verification';
+        }
+        throw new Error(errorMessage);
       }
-
+      
+      const data = await response.json();
       setVerificationCode(data.verificationCode);
       setVerificationStatus("initiated");
       toast({
@@ -175,12 +183,20 @@ export default function VerifyPage() {
         })
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to complete verification');
+        const errorText = await response.text();
+        let errorMessage;
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || 'Failed to complete verification';
+        } catch {
+          // If response is not valid JSON
+          errorMessage = errorText || 'Failed to complete verification';
+        }
+        throw new Error(errorMessage);
       }
-
+      
+      const data = await response.json();
       setVerificationResult(data.verification);
       setVerificationStatus("complete");
       toast({
@@ -253,12 +269,20 @@ export default function VerifyPage() {
         })
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to verify via tweet');
+        const errorText = await response.text();
+        let errorMessage;
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || 'Failed to verify via tweet';
+        } catch {
+          // If response is not valid JSON
+          errorMessage = errorText || 'Failed to verify via tweet';
+        }
+        throw new Error(errorMessage);
       }
-
+      
+      const data = await response.json();
       setVerificationResult(data.verification);
       setVerificationStatus("complete");
       toast({
@@ -291,8 +315,21 @@ export default function VerifyPage() {
 
       setLoading(true);
       const response = await fetch(`/api/verification/status/${walletToCheck}${MOCK_API_ENABLED ? '?mock=true' : ''}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage;
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || 'Failed to check verification status';
+        } catch {
+          // If response is not valid JSON
+          errorMessage = errorText || 'Failed to check verification status';
+        }
+        throw new Error(errorMessage);
+      }
+      
       const data = await response.json();
-
       if (data.verified) {
         setVerificationResult(data);
         setVerificationStatus("complete");
@@ -364,7 +401,13 @@ export default function VerifyPage() {
     switch (verificationStatus) {
       case "idle":
         return (
-          <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs 
+            defaultValue={activeTab} 
+            onValueChange={setActiveTab} 
+            className="w-full"
+            // Add a stable key to prevent hydration mismatch
+            key="verification-tabs"
+          >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="bio">Bio Verification</TabsTrigger>
               <TabsTrigger value="tweet">Tweet Verification</TabsTrigger>
@@ -488,7 +531,7 @@ export default function VerifyPage() {
           <div className="space-y-4">
             <div className={verificationStyles.infoBox}>
               <h3 className="text-lg font-semibold mb-2">Add This Code to Your Twitter Bio</h3>
-              <p>Please add the following verification code to your Twitter bio, then click "Complete Verification".</p>
+              <p>Please add the following verification code to your Twitter bio, then click &quot;Complete Verification&quot;.</p>
               <div className={verificationStyles.verificationCode}>
                 {verificationCode}
               </div>

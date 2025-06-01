@@ -149,32 +149,32 @@ export function useFlareOracle(): UseFlareOracleReturn {
   }, [getContract]);
 
   // Add debug button utility (defined after testFeedIndices to avoid race condition)
-  const addDebugButton = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      // Only add the button once
-      if (!document.getElementById('oracle-debug-btn')) {
-        const button = document.createElement('button');
-        button.id = 'oracle-debug-btn';
-        button.innerText = '🔍 Debug Oracle';
-        button.style.cssText = `
-          position: fixed;
-          top: 10px;
-          right: 10px;
-          z-index: 9999;
-          background: #ff6b6b;
-          color: white;
-          border: none;
-          padding: 8px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 12px;
-          font-family: monospace;
-        `;
-        button.onclick = testFeedIndices;
-        document.body.appendChild(button);
-      }
-    }
-  }, [testFeedIndices]);
+  // const addDebugButton = useCallback(() => {
+  //   if (typeof window !== 'undefined') {
+  //     // Only add the button once
+  //     if (!document.getElementById('oracle-debug-btn')) {
+  //       const button = document.createElement('button');
+  //       button.id = 'oracle-debug-btn';
+  //       button.innerText = '🔍 Debug Oracle';
+  //       button.style.cssText = `
+  //         position: fixed;
+  //         top: 10px;
+  //         right: 10px;
+  //         z-index: 9999;
+  //         background: #ff6b6b;
+  //         color: white;
+  //         border: none;
+  //         padding: 8px 12px;
+  //         border-radius: 4px;
+  //         cursor: pointer;
+  //         font-size: 12px;
+  //         font-family: monospace;
+  //       `;
+  //       button.onclick = testFeedIndices;
+  //       document.body.appendChild(button);
+  //     }
+  //   }
+  // }, [testFeedIndices]);
 
   // Manual price corrections for testnet - ensures all prices are in realistic ranges
   const calculateCorrectPrice = (feedName: string, rawPrice: number, rawValue: string, decimals: number): number => {
@@ -679,13 +679,13 @@ export function useFlareOracle(): UseFlareOracleReturn {
     fetchFeeds();
     
     // Add debug button for testnet debugging
-    addDebugButton();
+    // addDebugButton();
     
     // Auto-refresh every 30 seconds (Flare updates every ~1.8s but we don't need that frequent UI updates)
     const interval = setInterval(fetchFeeds, 30000);
     
     return () => clearInterval(interval);
-  }, [fetchFeeds, addDebugButton]);
+  }, [fetchFeeds]);
 
   return {
     feeds,

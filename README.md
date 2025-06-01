@@ -5,9 +5,9 @@ A modern UI for managing multi-chain crypto ETFs with AI-powered insights and cr
 ## Features
 
 - Create and manage multi-chain ETFs
-- AI-powered rebalancing and portfolio optimization
+- AI-powered rebalancing and portfolio optimization with Google Gemini
 - Cross-chain swaps using 1inch Fusion+
-- Agent monitoring for automated operations
+- Autonomous blockchain agent for automated operations
 - Flow Network EVM integration
 
 ## Setup
@@ -31,6 +31,16 @@ A modern UI for managing multi-chain crypto ETFs with AI-powered insights and cr
 
    # Privy AppId
    NEXT_PUBLIC_PRIVY_APP_ID=cmbaupqw600bgl10mf40l0cm6
+   
+   # Auto-Agent Configuration
+   GEMINI_API_KEY=your_gemini_api_key_here
+   PRIVY_APP_ID=your_privy_app_id_here
+   PRIVY_APP_SECRET=your_privy_app_secret_here
+   PRIVY_AUTH_KEY=your_privy_auth_key_here
+   
+   # Chain configuration
+   FLOW_EVM_RPC_URL=https://evm-dev.flow.com/
+   BASE_RPC_URL=https://mainnet.base.org
    ```
 4. Start the development server:
    ```
@@ -51,6 +61,20 @@ The integration supports cross-chain swaps between:
 - Ethereum
 - Optimism
 
+## AI-Powered Auto-Agent
+
+The application includes an autonomous blockchain agent powered by Google Gemini AI:
+
+1. Get a Gemini API key from [Google AI Studio](https://ai.google.dev/)
+2. Add your API key to the `.env.local` file as `GEMINI_API_KEY`
+3. Access the agent interface at `/dashboard/auto-agent`
+
+The auto-agent can:
+- Bridge assets between chains
+- Deposit and withdraw from ETF vaults
+- Rebalance portfolios
+- Analyze market conditions and provide recommendations
+
 ## Development
 
 This project uses:
@@ -58,6 +82,8 @@ This project uses:
 - Tailwind CSS
 - Bun as the package manager and runtime
 - Ethers.js for blockchain interactions
+- Google Gemini for AI capabilities
+- Privy for secure wallet management
 
 ## Testing
 

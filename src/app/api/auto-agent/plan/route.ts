@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createGeminiAgent } from '@/lib/auto-agent/gemini';
+import { createEnhancedGeminiAgent } from '@/lib/auto-agent/gemini-enhanced';
+import { AgentContext } from '@/lib/auto-agent/gemini';
 
 export async function POST(request: NextRequest) {
   try {
-    const { goal, context, apiKey } = await request.json();
+    const { goal, context } = await request.json();
 
     if (!goal) {
       return NextResponse.json({
@@ -12,11 +13,14 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // Get API key from environment variable
+    const apiKey = process.env.GEMINI_API_KEY;
+
     if (!apiKey) {
       return NextResponse.json({
         success: false,
-        error: 'Gemini API key is required'
-      }, { status: 400 });
+        error: 'Gemini API key is not configured on the server'
+      }, { status: 500 });
     }
 
     console.log('🤖 Creating auto-agent plan:', {
@@ -25,11 +29,15 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
 
-    // Create Gemini agent with provided API key
-    const agent = createGeminiAgent(apiKey);
+    // Create Enhanced Gemini agent with environment variable API key
+    const agent = createEnhancedGeminiAgent(apiKey, {
+      model: 'gemini-2.0-flash',
+      temperature: 0.3,
+      maxTokens: 8192
+    });
     
-    // Create execution plan
-    const plan = await agent.createPlan(goal, context || {});
+    // Create execution plan using advanced planning
+    const plan = await agent.createAdvancedPlan(goal, context as AgentContext || {});
     
     console.log('✅ Plan created successfully:', {
       planId: plan.id,
