@@ -399,7 +399,7 @@ function AutoAgentContent() {
     userAddress,
     chainId: '545', // Flow EVM Testnet
     userId: user?.id,
-    walletId: primaryWallet?.id,
+    walletId: primaryWallet?.address || '', // Use address as ID since id property doesn't exist
     currentBalance: {
       FLOW: '10.5',
       WFLOW: '25.0',

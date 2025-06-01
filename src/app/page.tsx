@@ -175,14 +175,9 @@ export default function Home() {
               {howItWorksSteps.map((step, index) => (
                 <TransitionWrapper
                   key={step.id}
-                  transitionType="slide-up" // This should trigger an animation that starts with opacity: 0 / off-screen
+                  transitionType="slide-up"
                   duration={300}
-                  // For staggering: style={{ animationDelay: ... }} is for CSS animations.
-                  // If TransitionWrapper uses CSS transitions, you'd need transitionDelay.
-                  // If TransitionWrapper has a `delay` prop, prefer that: e.g., delay={index * 150}
-                  style={{ animationDelay: `${index * 150}ms` }}
-                  // REMOVED: className="opacity-0 animate-fill-forwards"
-                  // The TransitionWrapper itself should handle becoming visible.
+                  delay={index * 150}
                 >
                   <div className="flex items-stretch">
                     {/* Timeline Column (Number and Line) */}

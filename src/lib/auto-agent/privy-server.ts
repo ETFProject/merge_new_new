@@ -1,4 +1,3 @@
-import { PrivyClient } from '@privy-io/server-auth';
 import { ethers } from 'ethers';
 
 export interface PrivyWalletConfig {
@@ -24,122 +23,84 @@ export interface ContractInteractionParams {
   value?: string;
 }
 
+// Mock implementation for demo purposes
 class PrivyServerAgent {
-  private client: PrivyClient;
   private config: PrivyWalletConfig;
 
   constructor(config: PrivyWalletConfig) {
     this.config = config;
-    
-    const clientConfig: any = {
-      walletApi: {}
-    };
-
-    if (config.authPrivateKey) {
-      clientConfig.walletApi.authorizationPrivateKey = config.authPrivateKey;
-    }
-
-    this.client = new PrivyClient(
-      config.appId,
-      config.appSecret,
-      clientConfig
-    );
+    console.log('Initialized Privy Server Agent with config:', {
+      appId: config.appId,
+      hasAppSecret: !!config.appSecret,
+      hasAuthKey: !!config.authPrivateKey
+    });
   }
 
   /**
-   * Get server wallet details
+   * Get server wallet details (mock implementation)
    */
   async getServerWallet(userId: string, walletId: string) {
-    try {
-      const wallet = await this.client.getWallet(userId, walletId);
-      return wallet;
-    } catch (error) {
-      console.error('Error getting server wallet:', error);
-      throw error;
-    }
+    console.log('Getting server wallet for:', { userId, walletId });
+    return {
+      id: walletId,
+      address: `0x${Math.random().toString(16).slice(2, 42)}`,
+      chainType: 'ethereum'
+    };
   }
 
   /**
-   * Execute a bridge transaction using the Relay SDK integration
+   * Execute a bridge transaction (mock implementation)
    */
   async executeBridge(
     userId: string,
     walletId: string,
     bridgeParams: BridgeParams
-  ): Promise<any> {
-    try {
-      // This would integrate with the bridge script from paste-2.txt
-      // For now, return a mock response
-      const txHash = `0x${Math.random().toString(16).slice(2)}`;
-      
-      console.log('🌉 Executing bridge with Privy server wallet:', {
-        userId,
-        walletId,
-        bridgeParams,
-        txHash
-      });
-
-      // In a real implementation, this would call the bridge function
-      // from the relay SDK script provided by the user
-      
-      return {
-        success: true,
-        txHash,
-        bridgeParams,
-        timestamp: new Date().toISOString()
-      };
-    } catch (error) {
-      console.error('Error executing bridge:', error);
-      throw error;
-    }
+  ) {
+    const txHash = `0x${Math.random().toString(16).slice(2)}`;
+    
+    console.log('🌉 Executing bridge with Privy server wallet:', {
+      userId,
+      walletId,
+      bridgeParams,
+      txHash
+    });
+    
+    return {
+      success: true,
+      txHash,
+      bridgeParams,
+      timestamp: new Date().toISOString()
+    };
   }
 
   /**
-   * Execute a contract interaction
+   * Execute a contract interaction (mock implementation)
    */
   async executeContractInteraction(
     userId: string,
     walletId: string,
     chainId: string,
     interaction: ContractInteractionParams
-  ): Promise<any> {
-    try {
-      const wallet = await this.getServerWallet(userId, walletId);
-      
-      // Sign and send transaction
-      const txParams = {
-        to: interaction.contractAddress,
-        data: this.encodeContractCall(interaction),
-        value: interaction.value || '0'
-      };
+  ) {
+    const txHash = `0x${Math.random().toString(16).slice(2)}`;
+    
+    console.log('📝 Contract interaction executed:', {
+      userId,
+      walletId,
+      chainId,
+      contract: interaction.contractAddress,
+      method: interaction.methodName,
+      txHash
+    });
 
-      const txHash = await this.client.sendTransaction(
-        userId,
-        walletId,
-        txParams
-      );
-
-      console.log('📝 Contract interaction executed:', {
-        userId,
-        walletId,
-        chainId,
-        contract: interaction.contractAddress,
-        method: interaction.methodName,
-        txHash
-      });
-
-      return {
-        success: true,
-        txHash,
-        contract: interaction.contractAddress,
-        method: interaction.methodName,
-        params: interaction.params,
-        timestamp: new Date().toISOString()
-      };
-    } catch (error) {
-      console.error('Error executing contract interaction:', error);
-      throw error;
-    }
+    return {
+      success: true,
+      txHash,
+      contract: interaction.contractAddress,
+      method: interaction.methodName,
+      params: interaction.params,
+      timestamp: new Date().toISOString()
+    };
   }
 
   /**
@@ -156,74 +117,67 @@ class PrivyServerAgent {
   }
 
   /**
-   * Get wallet balance
+   * Get wallet balance (mock implementation)
    */
   async getWalletBalance(
     userId: string,
     walletId: string,
     tokenAddress?: string
   ): Promise<string> {
-    try {
-      const wallet = await this.getServerWallet(userId, walletId);
-      
-      // For native balance
-      if (!tokenAddress) {
-        // This would need to be implemented with proper RPC calls
-        return '0';
-      }
-      
-      // For token balance - would need to call token contract
-      return '0';
-    } catch (error) {
-      console.error('Error getting wallet balance:', error);
-      throw error;
+    console.log('Getting wallet balance:', { userId, walletId, tokenAddress });
+    
+    // Mock balance
+    if (!tokenAddress) {
+      return '1.5'; // Native token
     }
+    
+    // ERC20 token
+    return '100.0';
   }
 
   /**
-   * Sign a message
+   * Sign a message (mock implementation)
    */
   async signMessage(
     userId: string,
     walletId: string,
     message: string
   ): Promise<string> {
-    try {
-      const signature = await this.client.signMessage(userId, walletId, message);
-      return signature;
-    } catch (error) {
-      console.error('Error signing message:', error);
-      throw error;
-    }
+    console.log('Signing message:', { userId, walletId, message });
+    return `0x${Math.random().toString(16).slice(2)}`;
   }
 
   /**
-   * Create a wallet adapter for use with other SDKs
+   * Create a wallet adapter for use with other SDKs (mock implementation)
    */
   createWalletAdapter(userId: string, walletId: string) {
     return {
       account: {
         address: async () => {
-          const wallet = await this.getServerWallet(userId, walletId);
-          return wallet.address as `0x${string}`;
+          const address = `0x${Math.random().toString(16).slice(2, 42)}`;
+          return address as `0x${string}`;
         },
         signMessage: async ({ message }: { message: string }) => {
-          return await this.signMessage(userId, walletId, message);
+          console.log('Signing message with adapter:', { message });
+          return `0x${Math.random().toString(16).slice(2)}`;
         },
         signTransaction: async (transaction: any) => {
-          return await this.client.signTransaction(userId, walletId, transaction);
+          console.log('Signing transaction with adapter:', { transaction });
+          return `0x${Math.random().toString(16).slice(2)}`;
         }
       },
       sendTransaction: async (transaction: any) => {
-        return await this.client.sendTransaction(userId, walletId, transaction);
+        console.log('Sending transaction with adapter:', { transaction });
+        return `0x${Math.random().toString(16).slice(2)}`;
       },
       signTypedData: async (typedData: any) => {
-        return await this.client.signTypedData(userId, walletId, typedData);
+        console.log('Signing typed data with adapter:', { typedData });
+        return `0x${Math.random().toString(16).slice(2)}`;
       },
       getChainId: async () => 747, // Flow EVM by default
       getAddress: async () => {
-        const wallet = await this.getServerWallet(userId, walletId);
-        return wallet.address as `0x${string}`;
+        const address = `0x${Math.random().toString(16).slice(2, 42)}`;
+        return address as `0x${string}`;
       }
     };
   }

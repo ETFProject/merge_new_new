@@ -94,7 +94,7 @@ Please create a step-by-step execution plan to achieve this goal. Consider the c
         }
       });
 
-      const text = response.text;
+      const text = response.text || '';
       
       // Try to extract JSON from the response
       let actions: AgentAction[] = [];
@@ -267,7 +267,7 @@ Please provide a brief analysis and any recommendations.`,
         }
       });
 
-      return response.text;
+      return response.text || '';
     } catch (error) {
       console.error('Error analyzing market conditions:', error);
       return 'Unable to analyze market conditions at this time.';
@@ -298,10 +298,10 @@ Please explain what this does and why someone might want to do it.`,
         }
       });
 
-      return response.text;
+      return response.text || '';
     } catch (error) {
       console.error('Error explaining action:', error);
-      return `This action will ${action.description}. ${JSON.stringify(action.parameters)}`;
+      return 'No explanation available at this time.';
     }
   }
 
@@ -327,10 +327,10 @@ Provide a brief summary of what these actions accomplish together.`,
         }
       });
 
-      return response.text;
+      return response.text || '';
     } catch (error) {
       console.error('Error generating action summary:', error);
-      return `Executing ${actions.length} actions to achieve the specified goal.`;
+      return 'Summary unavailable at this time.';
     }
   }
 }
