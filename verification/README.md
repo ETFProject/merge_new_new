@@ -1,6 +1,57 @@
-# Twitter Verification System for AI ETF Platform
+# Twitter Verification Integration
 
-A complete, production-ready Twitter verification system that integrates with Flare blockchain for trustless verification. The system automatically switches between mock services (for development) and real blockchain/API integrations (for production) based on API key configuration.
+This module provides social verification functionality for the ETF Manager platform, allowing users to verify their identity by connecting their Twitter/X account.
+
+## Features
+
+- **Tweet Verification**: Users can post a tweet containing their wallet address and verification hashtags
+- **Bio Verification**: Users can add a temporary verification code to their Twitter bio
+- **OAuth Verification**: Users can connect directly with Twitter OAuth for a seamless experience
+- **Blockchain Attestation**: All verifications are recorded on the Flare blockchain
+
+## Running with Bun
+
+This module is designed to run with [Bun](https://bun.sh), a fast JavaScript runtime. To run the verification server:
+
+```bash
+# Start the development server
+./start-dev.sh
+
+# Test the verification APIs
+./test-verification.sh
+```
+
+## Mock Mode
+
+The verification API supports both mock mode and real API mode. In mock mode, all API calls are simulated with dummy data for testing.
+
+To toggle between mock and real mode:
+- In the UI: Use the "Mock API Mode" toggle switch in the verification page
+- In API requests: Add `?mock=true` or `?mock=false` to the API endpoints
+
+## API Endpoints
+
+- **GET** `/api/verification/status/[walletAddress]` - Check if a wallet is verified
+- **POST** `/api/verify-twitter` - Verify via tweet
+- **POST** `/api/verify-twitter/bio/initiate` - Start bio verification
+- **POST** `/api/verify-twitter/bio/complete` - Complete bio verification
+- **POST** `/api/verify-twitter/oauth/initiate` - Start OAuth verification
+- **GET** `/api/verify-twitter/oauth/callback` - OAuth callback handler
+
+## Verification Process
+
+1. User selects a verification method
+2. User provides their wallet address and Twitter handle
+3. User completes verification steps (post tweet, update bio, or OAuth)
+4. System validates the verification
+5. Verification record is created with Flare blockchain attestation
+6. User receives verification confirmation
+
+## Technical Notes
+
+- All verification data is stored in-memory for demo purposes; a real implementation would use a database
+- The OAuth flow is simulated in the mock mode
+- For production, real Twitter API integration would replace the mock implementation
 
 ## 🚀 Features
 

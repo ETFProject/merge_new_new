@@ -31,6 +31,7 @@ const generateVerificationCode = (): string => {
 export async function POST(request: NextRequest) {
   try {
     const { walletAddress, twitterHandle } = await request.json();
+    const mockMode = request.nextUrl.searchParams.get('mock') !== 'false';
     
     // Validation
     if (!walletAddress || !twitterHandle) {

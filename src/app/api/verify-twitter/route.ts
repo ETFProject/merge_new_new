@@ -77,6 +77,7 @@ const mockFlareAttestation = async (attestationData: Record<string, unknown>) =>
 export async function POST(request: NextRequest) {
   try {
     const { walletAddress, twitterHandle, tweetId: rawTweetId } = await request.json();
+    const mockMode = request.nextUrl.searchParams.get('mock') !== 'false';
     
     // Validation
     if (!walletAddress || !twitterHandle || !rawTweetId) {
@@ -120,6 +121,16 @@ export async function POST(request: NextRequest) {
     }
     
     console.log(`Starting verification for wallet: ${normalizedWallet}, handle: @${normalizedHandle}, tweet: ${tweetId}`);
+    
+    // If mock mode is disabled and we're in production, use real API
+    if (!mockMode && process.env.NODE_ENV === 'production') {
+      // In a real implementation, this would call the real Twitter API
+      // For now, return an error
+      return NextResponse.json(
+        { error: 'Real API mode not implemented yet' },
+        { status: 501 }
+      );
+    }
     
     // Fetch tweet data (mocked)
     const tweetData = await mockGetTweetData(tweetId);

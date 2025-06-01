@@ -16,6 +16,7 @@ export async function GET(
 ) {
   try {
     const walletAddress = params.walletAddress.toLowerCase();
+    const mockMode = request.nextUrl.searchParams.get('mock') !== 'false';
     
     // Validate wallet address format
     if (!validateWalletAddress(params.walletAddress)) {
@@ -25,9 +26,19 @@ export async function GET(
       );
     }
     
-    console.log('Checking verification status for wallet:', walletAddress);
+    console.log('Checking verification status for wallet:', walletAddress, { mockMode });
     
-    // In a production environment, this would query a database
+    // If mock mode is disabled and we're in production, use real API
+    if (!mockMode && process.env.NODE_ENV === 'production') {
+      // In a real implementation, this would call the real verification API
+      // For now, we just return not verified
+      return NextResponse.json({
+        verified: false,
+        message: 'Real API mode: No verification found for this wallet address'
+      });
+    }
+    
+    // In mock mode or development, use in-memory storage
     const verification = verifications.get(walletAddress);
     
     if (!verification) {

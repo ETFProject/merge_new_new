@@ -8,6 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+
+// Configuration 
+const MOCK_API_ENABLED = true; // Set to false when real API is available
 
 interface VerificationMethod {
   id: string;
@@ -26,6 +30,22 @@ interface VerificationState {
   verificationMethod?: string;
 }
 
+interface TwitterUserData {
+  id: string;
+  screen_name?: string;
+  username?: string;
+  name: string;
+  description: string;
+  verified: boolean;
+  followers_count?: number;
+  following_count?: number;
+  location?: string;
+  public_metrics?: {
+    followers_count: number;
+    following_count: number;
+  };
+}
+
 interface VerificationResult {
   walletAddress: string;
   twitterHandle: string;
@@ -33,7 +53,8 @@ interface VerificationResult {
   verified: boolean;
   verifiedAt: string;
   tweetId?: string;
-  tweetData?: any;
+  tweetData?: any; // This could be typed more specifically in a real app
+  userProfile?: TwitterUserData;
   flareAttestation?: {
     attestationId: string;
     txHash: string;
@@ -69,6 +90,7 @@ export default function VerifyPage() {
   const { toast } = useToast();
   const [activeStep, setActiveStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [mockModeEnabled, setMockModeEnabled] = useState(MOCK_API_ENABLED);
   const [verificationState, setVerificationState] = useState<VerificationState>({
     walletAddress: '',
     twitterHandle: '',
@@ -100,7 +122,7 @@ export default function VerifyPage() {
   const checkVerificationStatus = async (walletAddress: string) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/verification/status/${walletAddress}`);
+      const response = await fetch(`/api/verification/status/${walletAddress}?mock=${mockModeEnabled}`);
       const data = await response.json();
       
       if (data.verified) {
@@ -176,7 +198,7 @@ export default function VerifyPage() {
     try {
       if (selectedMethod === 'tweet') {
         // Tweet verification method
-        const response = await fetch('/api/verify-twitter', {
+        const response = await fetch(`/api/verify-twitter?mock=${mockModeEnabled}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -205,7 +227,7 @@ export default function VerifyPage() {
       } 
       else if (selectedMethod === 'bio') {
         // Bio verification method - Step 1: Get verification code
-        const response = await fetch('/api/verify-twitter/bio/initiate', {
+        const response = await fetch(`/api/verify-twitter/bio/initiate?mock=${mockModeEnabled}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -234,7 +256,7 @@ export default function VerifyPage() {
       } 
       else if (selectedMethod === 'oauth') {
         // OAuth verification method
-        const response = await fetch('/api/verify-twitter/oauth/initiate', {
+        const response = await fetch(`/api/verify-twitter/oauth/initiate?mock=${mockModeEnabled}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -273,7 +295,7 @@ export default function VerifyPage() {
     setLoading(true);
     
     try {
-      const response = await fetch('/api/verify-twitter/bio/complete', {
+      const response = await fetch(`/api/verify-twitter/bio/complete?mock=${mockModeEnabled}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -533,6 +555,20 @@ export default function VerifyPage() {
         <p className="text-muted-foreground mt-2">
           Connect your Twitter account to verify your identity on the blockchain
         </p>
+
+        {/* Developer Mode Toggle */}
+        <div className="mt-4 flex items-center justify-center gap-2 text-sm">
+          <span className={mockModeEnabled ? "text-amber-600" : "text-muted-foreground"}>Mock API Mode</span>
+          <Switch 
+            checked={mockModeEnabled} 
+            onCheckedChange={setMockModeEnabled} 
+            id="mock-mode" 
+            aria-label="Toggle mock API mode"
+          />
+          {mockModeEnabled && (
+            <span className="text-xs text-amber-600 font-medium">(Using mock data)</span>
+          )}
+        </div>
       </div>
       
       <Card>
