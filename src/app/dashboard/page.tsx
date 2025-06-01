@@ -175,11 +175,18 @@ export default function Dashboard() {
             Welcome back, {userInvestments.name}. Manage your ETF portfolio and discover new investment opportunities.
           </p>
         </div>
-        <Link href="/dashboard/create">
-          <Button className="w-full md:w-auto">
-            Create New ETF
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/dashboard/transactions">
+            <Button variant="outline" className="w-full md:w-auto">
+              View Transactions
+            </Button>
+          </Link>
+          <Link href="/dashboard/create">
+            <Button className="w-full md:w-auto">
+              Create New ETF
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Portfolio Summary */}

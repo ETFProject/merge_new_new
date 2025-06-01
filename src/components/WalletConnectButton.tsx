@@ -76,7 +76,7 @@ export function WalletConnectButton() {
 
   const openBlockExplorer = () => {
     if (primaryWallet?.address) {
-      const explorerUrl = `https://evm-testnet.flowscan.io/address/${primaryWallet.address}`;
+      const explorerUrl = `https://evm.flowscan.io/address/${primaryWallet.address}`;
       window.open(explorerUrl, '_blank');
     }
   };
