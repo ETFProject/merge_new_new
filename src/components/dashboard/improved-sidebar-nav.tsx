@@ -45,11 +45,6 @@ const defaultItems = [
     icon: '/1byone13.jpg'
   },
   {
-    title: 'Cross-Chain ETFs',
-    href: '/dashboard/cross-chain',
-    icon: '/jellyfish.png'
-  },
-  {
     title: 'Create ETF',
     href: '/dashboard/create',
     icon: '/flower.png'
