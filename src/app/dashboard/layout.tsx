@@ -3,7 +3,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { DashboardLayoutClient } from '@/components/dashboard/dashboard-layout-client';
 import { ClientButton } from '@/components/ui/client-button';
-import { WalletConnectButton } from '@/components/WalletConnectButton';
 
 export const metadata: Metadata = {
   title: 'BAEVII Dashboard',

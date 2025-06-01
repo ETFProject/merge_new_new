@@ -3,13 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "exec /bin/zsh -l && bun run --bun next dev --turbopack",
-    "build": "exec /bin/zsh -l && bun run --bun next build",
-    "start": "exec /bin/zsh -l && bun run --bun next start",
-    "lint": "exec /bin/zsh -l && bun run --bun next lint"
+    "dev": "bun run --bun next dev --turbopack",
+    "build": "bun run --bun next build",
+    "start": "bun run --bun next start",
+    "lint": "bun run --bun next lint"
   },
   "dependencies": {
+    "@google/genai": "^1.3.0",
+    "@hpke/chacha20poly1305": "^1.6.2",
+    "@hpke/core": "^1.7.2",
     "@privy-io/react-auth": "^2.13.5",
+    "@privy-io/server-auth": "^1.25.0",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-select": "^2.2.5",

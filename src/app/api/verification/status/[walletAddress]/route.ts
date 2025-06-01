@@ -1,14 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// In a real implementation, this would be a database query
-// For now, we'll use a mock in-memory storage
-const verifications = new Map();
-
-// Helper function to validate wallet address
-const validateWalletAddress = (address: string): boolean => {
-  const pattern = /^0x[a-fA-F0-9]{40}$/;
-  return pattern.test(address);
-};
+import { verifications, validateWalletAddress } from '@/lib/shared-storage';
 
 export async function GET(
   request: NextRequest,
@@ -48,10 +39,8 @@ export async function GET(
       });
     }
     
-    return NextResponse.json({
-      verified: true,
-      ...verification
-    });
+    // Return verification data (verification object already contains verified: true)
+    return NextResponse.json(verification);
   } catch (error) {
     console.error('Error checking verification status:', error);
     return NextResponse.json(
