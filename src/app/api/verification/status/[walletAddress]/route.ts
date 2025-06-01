@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifications, validateWalletAddress } from '@/lib/shared-storage';
 
-export async function GET(
+export function GET(
   request: NextRequest,
-  { params }: { params: { walletAddress: string } }
 ) {
   try {
-    const walletAddress = params.walletAddress.toLowerCase();
-    const mockMode = request.nextUrl.searchParams.get('mock') !== 'false';
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const walletAddress = pathParts[pathParts.length - 1].toLowerCase();
+    const mockMode = url.searchParams.get('mock') !== 'false';
     
     // Validate wallet address format
-    if (!validateWalletAddress(params.walletAddress)) {
+    if (!validateWalletAddress(walletAddress)) {
       return NextResponse.json(
         { error: 'Invalid wallet address format' },
         { status: 400 }

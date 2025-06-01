@@ -15,8 +15,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  // Disable server components cache for development
-  serverComponentsHmrCache: false,
 };
 
 export default nextConfig;
