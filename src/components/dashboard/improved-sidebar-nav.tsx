@@ -65,6 +65,11 @@ const defaultItems = [
     icon: '/jellowchurch.png'
   },
   {
+    title: 'Verify Account',
+    href: '/verify',
+    icon: '/sandwave.png'
+  },
+  {
     title: 'Transactions',
     href: '/dashboard/transactions',
     icon: '/1byone19.jpg'
