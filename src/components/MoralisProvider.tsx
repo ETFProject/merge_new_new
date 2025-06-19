@@ -63,7 +63,7 @@ export const MoralisProvider = ({ children }: MoralisProviderProps) => {
       if (!isInitialized) return;
       
       const user = await Moralis.Auth.authenticate({
-        signingMessage: 'Welcome to BAEVII ETF Manager! Please sign this message to authenticate.',
+        signingMessage: 'Welcome to BAEVII ITF Manager! Please sign this message to authenticate.',
       });
       
       setIsAuthenticated(true);

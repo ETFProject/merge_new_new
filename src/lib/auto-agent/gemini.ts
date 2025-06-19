@@ -31,7 +31,7 @@ export interface AgentContext {
   userAddress?: string;
   chainId?: string;
   currentBalance?: Record<string, string>;
-  etfInfo?: any;
+  itfInfo?: any;
   recentTransactions?: any[];
 }
 
@@ -62,12 +62,12 @@ class GeminiAutoAgent {
       throw new Error('Gemini agent not initialized with API key');
     }
 
-    const systemInstruction = `You are an autonomous blockchain agent that helps users manage their ETF portfolios and execute DeFi operations. 
+    const systemInstruction = `You are an autonomous blockchain agent that helps users manage their ITF portfolios and execute DeFi operations. 
 
 Your capabilities include:
 - Bridging assets between chains (Flow EVM ↔ Base USDC)
-- Interacting with ETF vault contracts
-- Depositing and withdrawing from ETFs
+- Interacting with ITF vault contracts
+- Depositing and withdrawing from ITFs
 - Rebalancing portfolios
 - Analyzing market conditions
 
@@ -75,7 +75,7 @@ Current context:
 - User Address: ${context.userAddress || 'Not connected'}
 - Chain ID: ${context.chainId || 'Unknown'}
 - Balances: ${JSON.stringify(context.currentBalance || {})}
-- ETF Info: ${JSON.stringify(context.etfInfo || {})}
+- ITF Info: ${JSON.stringify(context.itfInfo || {})}
 
 Create a detailed execution plan with specific steps. Each step should include:
 - type: The action type
@@ -174,7 +174,7 @@ Please create a step-by-step execution plan to achieve this goal. Consider the c
       actions.push({
         id: `action_${Date.now()}_1`,
         type: 'deposit',
-        description: 'Deposit assets into ETF vault',
+        description: 'Deposit assets into ITF vault',
         parameters: {
           token: 'WFLOW',
           amount: '10.0'
@@ -188,7 +188,7 @@ Please create a step-by-step execution plan to achieve this goal. Consider the c
       actions.push({
         id: `action_${Date.now()}_2`,
         type: 'rebalance',
-        description: 'Rebalance ETF portfolio allocation',
+        description: 'Rebalance ITF portfolio allocation',
         parameters: {
           strategy: 'optimize_returns'
         },
@@ -201,7 +201,7 @@ Please create a step-by-step execution plan to achieve this goal. Consider the c
       actions.push({
         id: `action_${Date.now()}_3`,
         type: 'withdraw',
-        description: 'Withdraw shares from ETF vault',
+        description: 'Withdraw shares from ITF vault',
         parameters: {
           shares: '5.0',
           tokenOut: 'WFLOW'
@@ -249,7 +249,7 @@ Please create a step-by-step execution plan to achieve this goal. Consider the c
 
     const systemInstruction = `You are a DeFi market analyst. Analyze the provided context and give insights about:
 1. Current market conditions
-2. ETF performance
+2. ITF performance
 3. Recommended actions
 4. Risk assessment
 
@@ -258,7 +258,7 @@ Keep responses concise and actionable.`;
     try {
       const response = await this.client.models.generateContent({
         model: 'gemini-2.0-flash',
-        contents: `Analyze the current market conditions and ETF status:
+        contents: `Analyze the current market conditions and ITF status:
 
 Context: ${JSON.stringify(context, null, 2)}
 

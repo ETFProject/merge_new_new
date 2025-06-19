@@ -33,10 +33,10 @@ interface Portfolio {
 }
 
 interface PortfolioViewProps {
-  etfId: string;
+  itfId: string;
 }
 
-export function PortfolioView({ etfId }: PortfolioViewProps) {
+export function PortfolioView({ itfId }: PortfolioViewProps) {
   const [portfolioData, setPortfolio] = useState<Portfolio | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +75,7 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
     async function fetchPortfolio() {
       setLoading(true);
       try {
-        const response = await fetch(`/api/etf/${etfId}/portfolio`);
+        const response = await fetch(`/api/etf/${itfId}/portfolio`);
         const data = await response.json();
         
         if (data.success) {
@@ -125,12 +125,12 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
     }
     
     fetchPortfolio();
-  }, [etfId]);
+  }, [itfId]);
   
   async function handleRebalance() {
     try {
       await triggerRebalance(undefined, async () => {
-        const response = await fetch(`/api/etf/${etfId}/rebalance`, {
+        const response = await fetch(`/api/etf/${itfId}/rebalance`, {
           method: 'POST',
         });
         const data = await response.json();
@@ -263,7 +263,7 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
     <ClientCard hover appear>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="animate-entry animate-delay-1">
-          <CardTitle>Cross-Chain ETF Portfolio</CardTitle>
+          <CardTitle>Cross-Chain ITF Portfolio</CardTitle>
           <CardDescription>
             Last rebalanced: {new Date(portfolio.lastRebalance).toLocaleDateString()}
           </CardDescription>
@@ -572,7 +572,7 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
               <div>
                 <p className="font-medium text-sm mb-2">Agent Recommendation</p>
                 <p className="text-sm mb-3">
-                  Based on current market conditions, consider optimizing your ETF allocation by moving 10% of your ETH to Flow EVM Testnet for enhanced cross-chain capabilities.
+                  Based on current market conditions, consider optimizing your ITF allocation by moving 10% of your ETH to Flow EVM Testnet for enhanced cross-chain capabilities.
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Button size="sm" variant="outline" className="text-xs" withHoverEffect>View Details</Button>
@@ -608,19 +608,19 @@ export function PortfolioView({ etfId }: PortfolioViewProps) {
               </div>
               <div className="p-4 h-64 overflow-auto space-y-4">
                 <div className="bg-muted/50 rounded-lg p-3 animate-entry">
-                  <p className="text-sm">I&apos;ve analyzed your ETF portfolio and found that you could benefit from utilizing cross-chain bridges to rebalance 15% of your assets to Flow EVM Testnet.</p>
+                  <p className="text-sm">I&apos;ve analyzed your ITF portfolio and found that you could benefit from utilizing cross-chain bridges to rebalance 15% of your assets to Flow EVM Testnet.</p>
                 </div>
                 <div className="bg-primary/10 rounded-lg p-3 ml-6 animate-entry animate-delay-1">
                   <p className="text-sm">Why should I move assets to Flow EVM Testnet?</p>
                 </div>
                 <div className="bg-muted/50 rounded-lg p-3 animate-entry animate-delay-2">
-                  <p className="text-sm">Flow EVM Testnet currently offers optimized performance for your ETF assets with enhanced cross-chain capabilities. I can facilitate this bridge operation through our integrated ETF bridge contracts.</p>
+                  <p className="text-sm">Flow EVM Testnet currently offers optimized performance for your ITF assets with enhanced cross-chain capabilities. I can facilitate this bridge operation through our integrated ITF bridge contracts.</p>
                 </div>
                 <div className="bg-primary/10 rounded-lg p-3 ml-6 animate-entry animate-delay-3">
                   <p className="text-sm">How does the cross-chain rebalancing work?</p>
                 </div>
                 <div className="bg-muted/50 rounded-lg p-3 animate-entry animate-delay-4">
-                  <p className="text-sm">The ETFVault contract will approve your tokens to cross-chain aggregators, which will handle the complex routing between chains. The funds will be bridged to Flow EVM Testnet and deposited into your ETF there, all while maintaining your overall portfolio allocations.</p>
+                  <p className="text-sm">The ITFVault contract will approve your tokens to cross-chain aggregators, which will handle the complex routing between chains. The funds will be bridged to Flow EVM Testnet and deposited into your ITF there, all while maintaining your overall portfolio allocations.</p>
                 </div>
               </div>
               <div className="p-4 border-t bg-card">

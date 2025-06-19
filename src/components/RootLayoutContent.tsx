@@ -101,6 +101,13 @@ export function RootLayoutContent({ children }: RootLayoutContentProps) {
                 </div>
 
                 <div className="flex items-center gap-4">
+                  <Link href="/dashboard">
+                    <Button variant="outline" size="sm">Dashboard</Button>
+                  </Link>
+                  <Link href="/dashboard/create">
+                    <Button size="sm">Create ITF</Button>
+                  </Link>
+                  <WalletConnectButton />
                   {theme !== null && (
                     <Button
                       variant="ghost"
@@ -116,13 +123,6 @@ export function RootLayoutContent({ children }: RootLayoutContentProps) {
                       <span className="sr-only">Switch to {nextTheme} mode</span>
                     </Button>
                   )}
-                  <WalletConnectButton />
-                  <Link href="/dashboard">
-                    <Button variant="outline" size="sm">Dashboard</Button>
-                  </Link>
-                  <Link href="/dashboard/create">
-                    <Button size="sm">Create ETF</Button>
-                  </Link>
                 </div>
               </div>
             </header>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Mock ETF creation data to simulate backend response
-interface ETFData {
+// Mock ITF creation data to simulate backend response
+interface ITFData {
   id: string;
   name: string;
   description?: string;
@@ -12,8 +12,8 @@ interface ETFData {
   timestamp: string;
 }
 
-// Store ETFs in memory for demo purposes
-const etfs: ETFData[] = [];
+// Store ITFs in memory for demo purposes
+const itfs: ITFData[] = [];
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,9 +27,9 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Create a new ETF entry
-    const newEtf: ETFData = {
-      id: `etf-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+    // Create a new ITF entry
+    const newItf: ITFData = {
+      id: `itf-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
       name: data.name,
       description: data.description,
       riskProfile: data.riskProfile,
@@ -40,35 +40,35 @@ export async function POST(request: NextRequest) {
     };
     
     // Add to our in-memory store
-    etfs.push(newEtf);
+    itfs.push(newItf);
     
     // Log for debugging
-    console.log('Created ETF:', newEtf);
+    console.log('Created ITF:', newItf);
     
     // In a real implementation, you would:
-    // 1. Call smart contract to create ETF
-    // 2. Store data in database
-    // 3. Return transaction hash and ETF ID
+    // 1. Call smart contract to create ITF
+    // 2. Store metadata in IPFS or database
+    // 3. Return transaction hash and ITF ID
     
     // Mock successful response
     return NextResponse.json({
       success: true,
-      data: newEtf,
-      message: 'ETF created successfully',
+      data: newItf,
+      message: 'ITF created successfully',
     });
   } catch (error) {
-    console.error('Error creating ETF:', error);
+    console.error('Error creating ITF:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to create ETF' },
+      { success: false, error: 'Failed to create ITF' },
       { status: 500 }
     );
   }
 }
 
-// GET handler to retrieve ETFs (for testing/debugging)
+// GET handler to retrieve ITFs (for testing/debugging)
 export async function GET(_request: NextRequest) {
   return NextResponse.json({
     success: true,
-    data: etfs,
+    data: itfs,
   });
 }

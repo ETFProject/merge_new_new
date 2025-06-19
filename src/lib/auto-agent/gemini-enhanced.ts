@@ -104,12 +104,12 @@ export class EnhancedGeminiAgent {
    * Build comprehensive system instruction for the agent
    */
   private buildSystemInstruction(context: AgentContext): string {
-    return `You are an advanced autonomous blockchain agent specialized in DeFi operations and ETF management. 
+    return `You are an advanced autonomous blockchain agent specialized in DeFi operations and ITF management. 
 
 ## Your Capabilities:
 - Cross-chain bridge operations (Flow EVM ↔ Base, other chains)
 - Smart contract interactions on multiple chains
-- ETF vault management (deposits, withdrawals, rebalancing)
+- ITF vault management (deposits, withdrawals, rebalancing)
 - Portfolio analysis and optimization
 - Risk assessment and mitigation
 - Gas optimization and transaction timing
@@ -118,7 +118,7 @@ export class EnhancedGeminiAgent {
 - User Address: ${context.userAddress || 'Not connected'}
 - Primary Chain: ${context.chainId || 'Unknown'}
 - Available Balances: ${JSON.stringify(context.currentBalance || {}, null, 2)}
-- ETF Information: ${JSON.stringify(context.etfInfo || {}, null, 2)}
+- ITF Information: ${JSON.stringify(context.itfInfo || {}, null, 2)}
 
 ## Planning Guidelines:
 1. Always prioritize safety and security
@@ -201,8 +201,8 @@ Please create a detailed execution plan that accomplishes this goal safely and e
       analysis.push(`💰 Available balances: ${balances}`);
     }
 
-    if (context.etfInfo) {
-      analysis.push(`📊 ETF Status: ${JSON.stringify(context.etfInfo)}`);
+    if (context.itfInfo) {
+      analysis.push(`📊 ITF Status: ${JSON.stringify(context.itfInfo)}`);
     }
 
     return analysis.join('\n');
@@ -227,7 +227,7 @@ Please create a detailed execution plan that accomplishes this goal safely and e
       return `Example Investment Plan:
 1. Check token balance and allowance
 2. Approve token spending if needed
-3. Execute deposit to ETF vault
+3. Execute deposit to ITF vault
 4. Monitor transaction confirmation
 5. Verify shares received and update portfolio`;
     }
@@ -329,11 +329,11 @@ Please create a detailed execution plan that accomplishes this goal safely and e
       });
     }
 
-    // ETF operations
+    // ITF operations
     if (goalLower.includes('deposit') || goalLower.includes('invest')) {
       templates.push({
         type: 'deposit',
-        description: 'Deposit assets into ETF vault',
+        description: 'Deposit assets into ITF vault',
         parameters: {
           token: 'WFLOW',
           amount: '10.0'
@@ -348,7 +348,7 @@ Please create a detailed execution plan that accomplishes this goal safely and e
     if (goalLower.includes('withdraw')) {
       templates.push({
         type: 'withdraw',
-        description: 'Withdraw shares from ETF vault',
+        description: 'Withdraw shares from ITF vault',
         parameters: {
           shares: '5.0',
           tokenOut: 'WFLOW'

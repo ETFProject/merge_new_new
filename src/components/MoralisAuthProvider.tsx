@@ -88,9 +88,9 @@ export const MoralisAuthProvider = ({ children }: MoralisAuthProviderProps) => {
       const authData = await Moralis.Auth.requestMessage({
         address: address,
         chain: authChainId,
-        domain: 'baevii-etf-manager.com',
-        statement: 'Welcome to BAEVII ETF Manager! Please sign this message to authenticate.',
-        uri: 'https://baevii-etf-manager.com',
+        domain: 'baevii-itf-manager.com',
+        statement: 'Welcome to BAEVII ITF Manager! Please sign this message to authenticate.',
+        uri: 'https://baevii-itf-manager.com',
         timeout: 15,
       });
 

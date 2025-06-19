@@ -17,7 +17,7 @@ export function AIAgentChat() {
     {
       id: '1',
       role: 'assistant',
-      content: 'Hello! I\'m your ETF portfolio assistant. How can I help you today?',
+      content: 'Hello! I\'m your ITF portfolio assistant. How can I help you today?',
       timestamp: new Date(),
     },
   ]);
@@ -41,15 +41,15 @@ export function AIAgentChat() {
       const lowercaseMsg = userMessage.toLowerCase();
       
       if (lowercaseMsg.includes('rebalance')) {
-        return "I can help you rebalance your ETF portfolio. Based on the current market conditions, I'd recommend increasing your allocation to Tech Basket ETF by 5% and reducing your position in DeFi Portfolio by the same amount.";
+        return "I can help you rebalance your ITF portfolio. Based on the current market conditions, I'd recommend increasing your allocation to Tech Basket ITF by 5% and reducing your position in DeFi Portfolio by the same amount.";
       }
       
       if (lowercaseMsg.includes('performance') || lowercaseMsg.includes('doing')) {
-        return "Your portfolio is up 2.4% today and 8.7% over the past month. Your best performing ETF is DeFi Portfolio with a 5.7% gain.";
+        return "Your portfolio is up 2.4% today and 8.7% over the past month. Your best performing ITF is DeFi Portfolio with a 5.7% gain.";
       }
       
-      if (lowercaseMsg.includes('create') || lowercaseMsg.includes('new etf')) {
-        return "To create a new ETF, you can go to the 'Create New ETF' section from your dashboard. Would you like me to explain the process in detail?";
+      if (lowercaseMsg.includes('create') || lowercaseMsg.includes('new itf')) {
+        return "To create a new ITF, you can go to the 'Create New ITF' section from your dashboard. Would you like me to explain the process in detail?";
       }
       
       return "I understand you're asking about " + userMessage.substring(0, 20) + "... Could you provide more details so I can assist you better?";
@@ -105,7 +105,7 @@ export function AIAgentChat() {
       <CardHeader>
         <CardTitle>AI Portfolio Assistant</CardTitle>
         <CardDescription>
-          Ask questions about your ETF portfolio
+          Ask questions about your ITF portfolio
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-grow overflow-hidden">

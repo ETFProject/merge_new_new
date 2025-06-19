@@ -326,53 +326,6 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
       </CardHeader>
       
       <CardContent className="space-y-6">
-        {/* Wallet Connection Status */}
-        <div className="p-4 border rounded-md bg-muted/20">
-          <h3 className="text-lg font-medium mb-2">Connection Status</h3>
-          {connected ? (
-            <div className="flex flex-col md:flex-row justify-between gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Connected Address</p>
-                <p className="font-mono text-sm truncate">{userAddress}</p>
-                <div className="mt-2 flex flex-col md:flex-row gap-2">
-                  <div className="p-2 bg-primary/10 rounded-md text-sm">
-                    <span className="text-muted-foreground mr-2">FLOW:</span>
-                    <span className="font-mono">{parseFloat(flowBalance).toFixed(4)}</span>
-                  </div>
-                  <div className="p-2 bg-primary/10 rounded-md text-sm">
-                    <span className="text-muted-foreground mr-2">WFLOW:</span>
-                    <span className="font-mono">{wflowBalance}</span>
-                  </div>
-                  <div className="p-2 bg-primary/10 rounded-md text-sm">
-                    <span className="text-muted-foreground mr-2">ETF Shares:</span>
-                    <span className="font-mono">{etfShareBalance}</span>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={connectWallet}
-                  disabled={loading}
-                >
-                  Refresh Balances
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center md:flex-row md:justify-between gap-4">
-              <p className="text-muted-foreground">Not connected to Flow EVM</p>
-              <Button 
-                onClick={connectWallet}
-                disabled={loading}
-              >
-                Connect Wallet
-              </Button>
-            </div>
-          )}
-        </div>
-        
         {/* ETF Info */}
         {etfData && (
           <div className="p-4 border rounded-md bg-muted/20">

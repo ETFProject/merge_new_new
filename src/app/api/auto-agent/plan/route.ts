@@ -88,12 +88,12 @@ export async function GET(request: NextRequest) {
       },
       {
         id: 'example_2',
-        goal: 'Deposit into ETF and rebalance portfolio',
+        goal: 'Deposit into ITF and rebalance portfolio',
         actions: [
           {
             id: 'action_1',
             type: 'deposit',
-            description: 'Deposit 50 WFLOW into ETF vault',
+            description: 'Deposit 50 WFLOW into ITF vault',
             parameters: {
               token: 'WFLOW',
               amount: '50.0'

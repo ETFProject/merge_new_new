@@ -89,7 +89,7 @@ export async function POST(request: Request) {
     // Set minAmountOut to 0 for simplicity - in production, this should be calculated
     const minAmountOut = 0;
     
-    // Withdraw from ETF
+    // Withdraw from ITF
     const tx = await contracts.etfVault.withdraw(sharesWei, tokenAddress, minAmountOut);
     const receipt = await tx.wait();
     

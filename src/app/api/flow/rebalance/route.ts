@@ -16,31 +16,28 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
     
-    console.log(`🔄 Checking if ETF needs rebalancing for ${userAddress}`);
+    console.log(`🔄 Checking if ITF needs rebalancing for ${userAddress}`);
     
     // Get provider and contracts
     const provider = getServerProvider();
     const contracts = getContracts(provider);
     
-    // Check if the ETF needs rebalancing
+    // Check if the ITF needs rebalancing
     const needsRebalancing = await contracts.etfVault.needsRebalancing();
     
     if (!needsRebalancing) {
-      console.log('✅ ETF is already balanced');
+      console.log('✅ ITF is already balanced');
       return NextResponse.json({
         success: true,
-        data: {
-          rebalanced: false,
-          message: "ETF is already balanced"
-        }
+        message: "ITF is already balanced"
       });
     }
     
-    console.log('🔄 ETF needs rebalancing, simulating rebalance operation');
+    console.log('🔄 ITF needs rebalancing, simulating rebalance operation');
     
     // In a real implementation, you would:
     // 1. Get the signer from a private key
-    // 2. Call the rebalance function on the ETF vault
+    // 2. Call the rebalance function on the ITF vault
     
     // For demo purposes, we'll simulate the rebalancing
     
@@ -139,11 +136,11 @@ export async function POST(request: Request) {
     */
     
   } catch (error) {
-    console.error('❌ Error rebalancing ETF:', error);
+    console.error('❌ Error rebalancing ITF:', error);
     
     return NextResponse.json({
       success: false,
-      error: "Failed to rebalance ETF"
+      error: "Failed to rebalance ITF"
     }, { status: 500 });
   }
 } 

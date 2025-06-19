@@ -298,41 +298,13 @@ export function AgentMonitoringClient({ onSuccess }: AgentMonitoringClientProps)
   return (
     <ClientCard className="w-full" hover appear>
       <CardHeader>
-        <CardTitle>ETF Agent Monitor</CardTitle>
+        <CardTitle>ITF Agent Monitor</CardTitle>
         <CardDescription>
-          Manage and monitor ETF agent operations on the Flow EVM Testnet
+          Manage and monitor ITF agent operations on the Flow EVM Testnet
         </CardDescription>
       </CardHeader>
       
       <CardContent className="space-y-6">
-        {/* Wallet Connection Status */}
-        <div className="p-4 border rounded-md bg-muted/20">
-          <h3 className="text-lg font-medium mb-2">Connection Status</h3>
-          {connected ? (
-            <div className="flex flex-col md:flex-row justify-between gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Connected Address</p>
-                <p className="font-mono text-sm truncate">{userAddress}</p>
-              </div>
-              <div>
-                {/* <Button variant="outline" size="sm" onClick={connectWallet} disabled={loading}>
-                  Refresh
-                </Button> */}
-                <WalletConnectButton />
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center md:flex-row md:justify-between gap-4">
-              <p className="text-muted-foreground">Not connected to Flow EVM</p>
-              {/* <Button onClick={connectWallet} disabled={loading}>
-                Connect Wallet
-              </Button> */}
-                              <WalletConnectButton />
-
-            </div>
-          )}
-        </div>
-        
         {/* Agent Status */}
         {agentData && (
           <div className="p-4 border rounded-md bg-muted/20">
@@ -424,7 +396,7 @@ export function AgentMonitoringClient({ onSuccess }: AgentMonitoringClientProps)
               </Button>
               
               <p className="text-xs text-muted-foreground">
-                Note: Setting a new agent requires approval from the ETF vault owner.
+                Note: Setting a new agent requires approval from the ITF vault owner.
                 The new agent will be in a pending state until it is authorized.
               </p>
             </div>

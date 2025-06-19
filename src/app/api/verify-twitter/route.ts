@@ -42,7 +42,7 @@ const mockGetTweetData = async (tweetId: string) => {
   
   return {
     id: tweetId,
-    text: 'Verifying my wallet 0x742d35Cc6634C0532925a3b8138FB7C75B4Fc75e for AI ETF platform #FlareVerified #AIETF',
+    text: 'Verifying my wallet 0x742d35Cc6634C0532925a3b8138FB7C75B4Fc75e for AI ITF platform #FlareVerified #AIITF',
     user: {
       screen_name: 'cryptouser123',
       name: 'Crypto User',
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
     // Verify tweet content
     const tweetText = tweetData.text.toLowerCase();
     const walletInTweet = tweetText.includes(walletAddress.toLowerCase());
-    const hasRequiredHashtags = tweetText.includes('#flareverified') && tweetText.includes('#aietf');
+    const hasRequiredHashtags = tweetText.includes('#flareverified') && tweetText.includes('#aiitf');
     
     if (!walletInTweet) {
       return NextResponse.json(
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
     
     if (!hasRequiredHashtags) {
       return NextResponse.json(
-        { error: 'Tweet must contain both #FlareVerified and #AIETF hashtags' },
+        { error: 'Tweet must contain both #FlareVerified and #AIITF hashtags' },
         { status: 400 }
       );
     }

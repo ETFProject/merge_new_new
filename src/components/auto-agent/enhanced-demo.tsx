@@ -62,7 +62,7 @@ export default function EnhancedAutoAgentDemo() {
             userAddress: '0x1234567890123456789012345678901234567890',
             chainId: '747',
             currentBalance: { FLOW: '10.0', USDC: '500.0' },
-            etfInfo: { totalValue: '1000.0', userShares: '5.0', status: 'active' }
+            itfInfo: { totalValue: '1000.0', userShares: '5.0', status: 'active' }
           }
         );
 

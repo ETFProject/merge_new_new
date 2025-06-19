@@ -10,20 +10,20 @@ import {
 
 export async function GET() {
   try {
-    console.log('📊 Getting Flow ETF portfolio data');
+    console.log('📊 Getting Flow ITF portfolio data');
     
     // Get provider and contracts
     const provider = getServerProvider();
     const contracts = getContracts(provider);
     
-    // Get ETF vault data
+    // Get ITF vault data
     const totalValue = await contracts.etfVault.getTotalValue();
     const navPerShare = await contracts.etfVault.getNetAssetValue();
     const activeAssets = await contracts.etfVault.getActiveAssets();
     const needsRebalancing = await contracts.etfVault.needsRebalancing();
     
-    console.log(`✅ Flow ETF total value: ${formatAmount(totalValue)}`);
-    console.log(`✅ Flow ETF NAV per share: ${formatAmount(navPerShare)}`);
+    console.log(`✅ Flow ITF total value: ${formatAmount(totalValue)}`);
+    console.log(`✅ Flow ITF NAV per share: ${formatAmount(navPerShare)}`);
     
     // Get allocation for each active asset
     const assetsData = await Promise.all(
@@ -70,7 +70,7 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       data: {
-        etfId: "flow-etf",
+        itfId: "flow-itf",
         totalValueUSD: Number(formatAmount(totalValue)),
         navPerShare: Number(formatAmount(navPerShare)),
         totalSupply: '1000',
@@ -89,14 +89,14 @@ export async function GET() {
       }
     });
   } catch (error) {
-    console.error('❌ Error fetching Flow ETF portfolio:', error);
+    console.error('❌ Error fetching Flow ITF portfolio:', error);
     
     // Return fallback data with an error flag
     return NextResponse.json({
       success: false,
-      error: 'Failed to fetch Flow ETF data',
+      error: 'Failed to fetch Flow ITF data',
       data: {
-        etfId: "flow-etf",
+        itfId: "flow-itf",
         totalValueUSD: 0,
         navPerShare: 0,
         totalSupply: '0',

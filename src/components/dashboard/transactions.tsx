@@ -70,7 +70,7 @@ export function TransactionsTable() {
       <CardHeader>
         <CardTitle>Recent Transactions</CardTitle>
         <CardDescription>
-          Your recent ETF transactions
+          Your recent ITF transactions
         </CardDescription>
       </CardHeader>
       <CardContent>

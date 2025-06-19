@@ -90,16 +90,15 @@ export async function POST(request: Request) {
     // Check if user has already approved spending
     const allowance = await tokenContract.allowance(userAddress, CONTRACT_ADDRESSES.etfVault);
     
-    if (allowance < amountWei) {
-      // In a real implementation, the user would need to approve from their wallet
-      console.log(`❌ User needs to approve ETF to spend USDC: ${formatAmount(allowance, 6)} < ${amount}`);
+    if (allowance.lt(amountWei)) {
+      console.log(`❌ User needs to approve ITF to spend USDC: ${formatAmount(allowance, 6)} < ${amount}`);
       return NextResponse.json({
         success: false,
-        error: "Insufficient allowance. User must approve ETF to spend USDC."
+        error: "Insufficient allowance. User must approve ITF to spend USDC."
       }, { status: 400 });
     }
     
-    // Deposit to ETF
+    // Deposit to ITF
     const tx = await contracts.etfVault.deposit(tokenAddress, amountWei);
     const receipt = await tx.wait();
     

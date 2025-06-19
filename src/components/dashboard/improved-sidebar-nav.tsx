@@ -31,9 +31,10 @@ const defaultItems = [
     icon: '/1byone20.jpg'
   },
   {
-    title: 'Flow ETF Manager',
+    title: 'Flow ITF Manager',
     href: '/dashboard/flow-etf',
-    icon: '/musicrainfdbow.png'
+    icon: '🌊',
+    description: 'Manage Flow blockchain ITF operations'
   },
   {
     title: 'Agent Monitoring',
@@ -46,14 +47,16 @@ const defaultItems = [
     icon: '/1byone13.jpg'
   },
   {
-    title: 'Create ETF',
+    title: 'Create ITF',
     href: '/dashboard/create',
-    icon: '/flower.png'
+    icon: '➕',
+    description: 'Create a new ITF portfolio'
   },
   {
-    title: 'My ETFs',
+    title: 'My ITFs',
     href: '/dashboard/etfs',
-    icon: '/cactus.png'
+    icon: '📊',
+    description: 'View your ITF portfolios'
   },
   {
     title: 'Cross-Chain Bridge',

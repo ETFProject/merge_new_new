@@ -3,37 +3,37 @@
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreateETFForm } from "@/components/etf/create-etf-form";
+import { CreateITFForm } from "@/components/etf/create-etf-form";
 
-export default function CreateEtfPage() {
+export default function CreateItfPage() {
   const router = useRouter();
   
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Create New ETF</h2>
+        <h2 className="text-3xl font-bold tracking-tight">Create New ITF</h2>
         <p className="text-muted-foreground">
-          Create a custom ETF portfolio with your desired token allocations
+          Create a custom ITF portfolio with your desired token allocations
         </p>
       </div>
       
       <Card className="max-w-3xl">
         <CardHeader>
-          <CardTitle>ETF Configuration</CardTitle>
+          <CardTitle>ITF Configuration</CardTitle>
           <CardDescription>
-            Configure your ETF settings and token allocations
+            Configure your ITF settings and token allocations
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <CreateETFForm onSuccess={() => router.push('/dashboard')} />
+          <CreateITFForm onSuccess={() => router.push('/dashboard')} />
         </CardContent>
       </Card>
       
       <Card className="max-w-3xl">
         <CardHeader>
-          <CardTitle>ETF Creation Guidelines</CardTitle>
+          <CardTitle>ITF Creation Guidelines</CardTitle>
           <CardDescription>
-            Important information about creating ETFs
+            Important information about creating ITFs
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -56,7 +56,7 @@ export default function CreateEtfPage() {
           <div>
             <h4 className="text-sm font-semibold">Rebalancing</h4>
             <p className="text-sm text-muted-foreground">
-              You can rebalance your ETF periodically to maintain your target allocations as market
+              You can rebalance your ITF periodically to maintain your target allocations as market
               conditions change. This helps manage risk and optimize returns.
             </p>
           </div>
@@ -64,7 +64,7 @@ export default function CreateEtfPage() {
           <div>
             <h4 className="text-sm font-semibold">Fees</h4>
             <p className="text-sm text-muted-foreground">
-              Creating an ETF incurs a small one-time setup fee, plus gas costs for the initial transaction.
+              Creating an ITF incurs a small one-time setup fee, plus gas costs for the initial transaction.
               Rebalancing operations will also incur gas costs based on network conditions.
             </p>
           </div>

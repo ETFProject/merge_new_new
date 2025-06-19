@@ -9,7 +9,7 @@ import { useFlareOracle } from '@/hooks/useFlareOracle';
 import { FEED_CATEGORIES } from '@/app/config/flare-contract';
 import { Search, RefreshCw, TrendingUp, TrendingDown, Wallet, Eye, Plus } from 'lucide-react';
 
-export function FlareETFManager() {
+export function FlareITFManager() {
   const { 
     feeds, 
     loading, 

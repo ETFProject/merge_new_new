@@ -47,14 +47,14 @@ const mockVotingProposals = [
   }
 ];
 
-interface ETFDetailDialogProps {
+interface ITFDetailDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  etf: {
+  itf: {
     name: string;
     description: string;
     icon: string;
-    iconText: string;
+    influencerImage: string;
     expenseRatio: string;
     aum: string;
     performance30D: string;
@@ -62,7 +62,7 @@ interface ETFDetailDialogProps {
   };
 }
 
-export function ETFDetailDialog({ isOpen, onClose, etf }: ETFDetailDialogProps) {
+export function ITFDetailDialog({ isOpen, onClose, itf }: ITFDetailDialogProps) {
   const [activeTab, setActiveTab] = useState('overview');
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
@@ -81,12 +81,18 @@ export function ETFDetailDialog({ isOpen, onClose, etf }: ETFDetailDialogProps) 
       <DialogContent className="max-w-4xl w-[90vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader className="pb-6 border-b">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-xl">
-              {etf.iconText}
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden">
+              <Image 
+                src={itf.influencerImage} 
+                alt={itf.name}
+                width={48} 
+                height={48} 
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
-              <DialogTitle className="text-2xl mb-1">{etf.name}</DialogTitle>
-              <DialogDescription className="text-base">{etf.description}</DialogDescription>
+              <DialogTitle className="text-2xl mb-1">{itf.name}</DialogTitle>
+              <DialogDescription className="text-base">{itf.description}</DialogDescription>
             </div>
           </div>
         </DialogHeader>
@@ -96,15 +102,15 @@ export function ETFDetailDialog({ isOpen, onClose, etf }: ETFDetailDialogProps) 
           <div className="grid grid-cols-3 gap-4">
             <Card className="p-4 bg-card/50">
               <h3 className="text-sm font-medium text-muted-foreground mb-1">Expense Ratio</h3>
-              <p className="text-2xl font-bold text-foreground">{etf.expenseRatio}</p>
+              <p className="text-2xl font-bold text-foreground">{itf.expenseRatio}</p>
             </Card>
             <Card className="p-4 bg-card/50">
               <h3 className="text-sm font-medium text-muted-foreground mb-1">Assets Under Management</h3>
-              <p className="text-2xl font-bold text-foreground">{etf.aum}</p>
+              <p className="text-2xl font-bold text-foreground">{itf.aum}</p>
             </Card>
             <Card className="p-4 bg-card/50">
               <h3 className="text-sm font-medium text-muted-foreground mb-1">30 Day Performance</h3>
-              <p className="text-2xl font-bold text-green-600">{etf.performance30D}</p>
+              <p className="text-2xl font-bold text-green-600">{itf.performance30D}</p>
             </Card>
           </div>
 
@@ -128,7 +134,7 @@ export function ETFDetailDialog({ isOpen, onClose, etf }: ETFDetailDialogProps) 
                     <span className="text-right">Weight</span>
                     <span className="text-right">Value</span>
                   </div>
-                  {etf.holdings.map((holding) => (
+                  {itf.holdings.map((holding) => (
                     <div key={holding.symbol} className="grid grid-cols-3 text-sm items-center">
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium">
@@ -138,7 +144,7 @@ export function ETFDetailDialog({ isOpen, onClose, etf }: ETFDetailDialogProps) 
                       </div>
                       <span className="text-right">{holding.weight}</span>
                       <span className="text-right text-muted-foreground">
-                        ${(parseFloat(etf.aum.replace(/[^0-9.]/g, '')) * parseFloat(holding.weight) / 100).toFixed(1)}M
+                        ${(parseFloat(itf.aum.replace(/[^0-9.]/g, '')) * parseFloat(holding.weight) / 100).toFixed(1)}M
                       </span>
                     </div>
                   ))}

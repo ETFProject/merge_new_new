@@ -7,10 +7,10 @@ import { MoralisAuthProvider } from "@/components/MoralisAuthProvider";
 
 // Metadata for the site
 export const metadata: Metadata = {
-  title: 'BAEVII - Cross-Chain ETF Platform',
-  description: 'Create and manage multi-chain crypto ETFs with AI-powered insights',
+  title: 'BAEVII - Cross-Chain ITF Platform',
+  description: 'Create and manage multi-chain crypto ITFs with AI-powered insights',
   applicationName: 'BAEVII',
-  keywords: ['ETF', 'Crypto', 'DeFi', 'Finance', 'AI', 'Blockchain', 'Portfolio Management'],
+  keywords: ['ITF', 'Crypto', 'DeFi', 'Finance', 'AI', 'Blockchain', 'Portfolio Management'],
   authors: [{ name: 'BAEVII Team' }],
   creator: 'BAEVII',
   publisher: 'BAEVII',

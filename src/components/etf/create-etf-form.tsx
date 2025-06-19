@@ -9,11 +9,11 @@ import { Label } from "@/components/ui/label";
 
 type RiskProfile = 'low' | 'medium' | 'high';
 
-interface CreateETFFormProps {
+interface CreateITFFormProps {
   onSuccess?: () => void;
 }
 
-export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
+export function CreateITFForm({ onSuccess }: CreateITFFormProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [riskProfile, setRiskProfile] = useState<RiskProfile>("medium");
@@ -51,7 +51,7 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('pinataMetadata', JSON.stringify({
-        name: `ETF-${name}-image`,
+        name: `ITF-${name}-image`,
       }));
       
       // Mock IPFS upload since we don't have Pinata integration yet
@@ -96,19 +96,19 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
     }
   };
   
-  // Save ETF data to local JSON for backup
+  // Save ITF data to local JSON for backup
   const saveToLocalJson = (data: any) => {
     try {
       // In a browser environment, we can use localStorage
-      const existingData = localStorage.getItem('baevii-etfs') || '[]';
-      const etfs = JSON.parse(existingData);
-      etfs.push(data);
-      localStorage.setItem('baevii-etfs', JSON.stringify(etfs));
+      const existingData = localStorage.getItem('baevii-itfs') || '[]';
+      const itfs = JSON.parse(existingData);
+      itfs.push(data);
+      localStorage.setItem('baevii-itfs', JSON.stringify(itfs));
       
       // In a real implementation, you might want to sync this with a backend
-      console.log("ETF data saved locally:", data);
+      console.log("ITF data saved locally:", data);
     } catch (error) {
-      console.error("Error saving ETF data locally:", error);
+      console.error("Error saving ITF data locally:", error);
     }
   };
   
@@ -152,7 +152,7 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
           riskProfile,
           initialAmount,
           imageIpfsHash,
-          userAddress: process.env.NEXT_PUBLIC_ETF_VAULT_ADDRESS || "0xb067fB16AFcABf8A8974a35CbCee243B8FDF0EA1", // Use deployer address for demo
+          userAddress: process.env.NEXT_PUBLIC_ITF_VAULT_ADDRESS || "0xb067fB16AFcABf8A8974a35CbCee243B8FDF0EA1", // Use deployer address for demo
         }),
       });
       
@@ -160,8 +160,8 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
       
       if (data.success) {
         toast({
-          title: "ETF created successfully!",
-          description: "Your new ETF has been created",
+          title: "ITF created successfully!",
+          description: "Your new ITF has been created",
         });
         
         // Reset form or redirect
@@ -180,16 +180,16 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
         }
       } else {
         toast({
-          title: "Error creating ETF",
-          description: data.error || "Could not create ETF",
+          title: "Error creating ITF",
+          description: data.error || "Could not create ITF",
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error("Error creating ETF:", error);
+      console.error("Error creating ITF:", error);
       toast({
         title: "Error",
-        description: "An error occurred while creating the ETF",
+        description: "An error occurred while creating the ITF",
         variant: "destructive",
       });
     } finally {
@@ -200,16 +200,16 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
   return (
     <ClientCard className="w-[600px] mx-auto" hover appear effect3d>
       <CardHeader>
-        <CardTitle className="animate-entry">Create New ETF</CardTitle>
+        <CardTitle className="animate-entry">Create New ITF</CardTitle>
         <CardDescription className="animate-entry animate-delay-1">
-          Set up a new ETF portfolio based on your risk tolerance
+          Set up a new ITF portfolio based on your risk tolerance
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4 animate-stagger">
           <div className="space-y-2">
             <label htmlFor="name" className="text-sm font-medium">
-              ETF Name *
+              ITF Name *
             </label>
             <input
               id="name"
@@ -218,7 +218,7 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
               onChange={(e) => setName(e.target.value)}
               required
               className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
-              placeholder="My Growth ETF"
+              placeholder="My Growth ITF"
             />
           </div>
           
@@ -231,29 +231,29 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200"
-              placeholder="A brief description of your ETF"
+              placeholder="A brief description of your ITF"
               rows={3}
             />
           </div>
           
           {/* Image Upload Section */}
           <div className="space-y-2">
-            <label htmlFor="etf-image-input" className="text-sm font-medium">
-              ETF Image
+            <label htmlFor="itf-image-input" className="text-sm font-medium">
+              ITF Image
             </label>
             <div className="flex items-center space-x-4">
               <div 
                 onClick={triggerFileInput}
                 className="w-24 h-24 border-2 border-dashed border-input rounded-md flex items-center justify-center cursor-pointer hover:border-primary transition-colors"
                 role="button"
-                aria-label="Select ETF image"
+                aria-label="Select ITF image"
                 tabIndex={0}
               >
                 {imagePreview ? (
                   <div className="relative w-full h-full">
                     <Image 
                       src={imagePreview}
-                      alt="ETF Preview"
+                      alt="ITF Preview"
                       fill
                       className="object-cover rounded-md"
                     />
@@ -267,12 +267,12 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
               <div className="flex-1">
                 <input
                   ref={fileInputRef}
-                  id="etf-image-input"
+                  id="itf-image-input"
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
                   className="hidden"
-                  aria-label="Upload ETF image"
+                  aria-label="Upload ITF image"
                 />
                 <Button 
                   type="button" 
@@ -353,7 +353,7 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
               disabled={isLoading || uploadStatus === 'uploading'}
               className={isLoading ? "loading-indicator" : ""}
             >
-              {isLoading ? "Creating..." : "Create ETF"}
+              {isLoading ? "Creating..." : "Create ITF"}
             </Button>
           </CardFooter>
         </form>

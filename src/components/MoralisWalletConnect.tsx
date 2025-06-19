@@ -74,7 +74,7 @@ export const MoralisWalletConnect = () => {
       <CardHeader>
         <CardTitle>Connect Wallet</CardTitle>
         <CardDescription>
-          Connect your wallet to view your portfolio and manage ETFs
+          Connect your wallet to view your portfolio and manage ITFs
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

@@ -31,12 +31,11 @@ export default function HomePage() {
           <h1 className="text-6xl font-extrabold text-foreground mb-8 tracking-tight">BAEVII</h1>
         </div>
         <div className="text-center max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6">
-            AI-Powered ETF Management
+          <h1 className="text-4xl md:text-6xl font-bold text-center bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-fade-in">
+            AI-Powered ITF Management
           </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Create, manage, and optimize your cryptocurrency ETFs with advanced AI insights. 
-            Seamless cross-chain operations and intelligent portfolio rebalancing.
+          <p className="text-xl md:text-2xl text-center text-muted-foreground max-w-3xl mx-auto animate-fade-in-delay mb-8">
+            Create, manage, and optimize your cryptocurrency ITFs with advanced AI insights.
           </p>
           
           {!isAuthenticated ? (
