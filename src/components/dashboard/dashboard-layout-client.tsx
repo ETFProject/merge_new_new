@@ -7,13 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSidebar } from '@/components/RootLayoutContent';
 
 interface DashboardLayoutClientProps {
   children: React.ReactNode;
 }
 
 export function DashboardLayoutClient({ children }: DashboardLayoutClientProps) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const { isSidebarOpen, toggleSidebar } = useSidebar();
 
   // Theme toggle logic (sync with RootLayoutContent)
   const [theme, setTheme] = useState<'light' | 'dark' | 'color-blind'>(() => {
@@ -34,10 +35,6 @@ export function DashboardLayoutClient({ children }: DashboardLayoutClientProps) 
   const nextTheme = theme === 'light' ? 'dark' : theme === 'dark' ? 'color-blind' : 'light';
   const themeIcon = theme === 'light' ? '🌞' : theme === 'dark' ? '🌚' : '👁️';
   const themeLabel = theme === 'light' ? 'Light' : theme === 'dark' ? 'Dark' : 'Color Blind';
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
 
   return (
     <>

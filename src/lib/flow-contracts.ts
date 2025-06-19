@@ -1,5 +1,3 @@
-'use client';
-
 import { ethers } from 'ethers';
 
 // Contract addresses - Flow EVM Testnet (ACTIVE DEPLOYMENT)
