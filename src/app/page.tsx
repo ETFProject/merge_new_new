@@ -4,7 +4,6 @@ import { useMoralisAuth } from '@/components/MoralisAuthProvider';
 import { WalletConnectButton } from '@/components/WalletConnectButton';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MoralisDebug } from '@/components/MoralisDebug';
 
 export default function HomePage() {
   const { isAuthenticated } = useMoralisAuth();
@@ -53,11 +52,6 @@ export default function HomePage() {
               </Link>
             </div>
           )}
-
-          {/* Debug Component for Testing */}
-          <div className="mb-8 flex justify-center">
-            <MoralisDebug />
-          </div>
 
           {/* Feature Grid */}
           <div className="grid md:grid-cols-3 gap-8 mt-16">

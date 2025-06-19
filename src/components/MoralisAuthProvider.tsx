@@ -47,9 +47,8 @@ export const MoralisAuthProvider = ({ children }: MoralisAuthProviderProps) => {
       try {
         await initializeMoralis();
         setIsInitialized(true);
-        console.log('✅ Moralis initialized successfully');
       } catch (error) {
-        console.error('❌ Failed to initialize Moralis:', error);
+        console.error('Failed to initialize Moralis:', error);
         setError('Failed to initialize Moralis');
       }
     };
@@ -68,10 +67,9 @@ export const MoralisAuthProvider = ({ children }: MoralisAuthProviderProps) => {
             const userData = JSON.parse(storedUser);
             setUser(userData);
             setIsAuthenticated(true);
-            console.log('🔄 Restored existing session:', userData);
           }
         } catch (error) {
-          console.error('❌ Failed to restore session:', error);
+          console.error('Failed to restore session:', error);
         }
       };
 
@@ -81,14 +79,10 @@ export const MoralisAuthProvider = ({ children }: MoralisAuthProviderProps) => {
 
   const authenticateWithMoralis = async (address: string, chainId: number) => {
     try {
-      console.log('🔐 Starting Moralis authentication for:', address);
-      
       // Check if chain is supported by Moralis Auth
       const supportedChains = [1, 5, 11155111, 137, 80001, 80002, 56, 97, 43114, 43113, 250, 25, 338, 100, 10200, 88888, 88882, 8453, 84531, 10, 420, 1284, 1285, 1287, 1337];
       
       const authChainId = supportedChains.includes(chainId) ? chainId : 1;
-      
-      console.log('📝 Requesting authentication message from Moralis...');
       
       // Request authentication message from Moralis
       const authData = await Moralis.Auth.requestMessage({
@@ -100,8 +94,6 @@ export const MoralisAuthProvider = ({ children }: MoralisAuthProviderProps) => {
         timeout: 15,
       });
 
-      console.log('✍️ Requesting signature from wallet...');
-
       // Sign the message with the wallet
       const ethereum = window.ethereum!;
       const signature = await ethereum.request({
@@ -109,15 +101,11 @@ export const MoralisAuthProvider = ({ children }: MoralisAuthProviderProps) => {
         params: [authData.result.message, address],
       });
 
-      console.log('✅ Signature received, verifying with Moralis...');
-
       // Verify the signature with Moralis
       const verifyResult = await Moralis.Auth.verify({
         message: authData.result.message,
         signature: signature,
       });
-
-      console.log('✅ Moralis verification successful:', verifyResult);
 
       // Create user session
       const userData = {
@@ -132,49 +120,37 @@ export const MoralisAuthProvider = ({ children }: MoralisAuthProviderProps) => {
       setUser(userData);
       setIsAuthenticated(true);
       setError(null);
-
-      console.log('🎉 User authenticated with Moralis:', userData);
       
       // Make initial API calls to log activity and ensure user is registered
       try {
-        console.log('📊 Fetching initial balance to register user...');
         const balance = await Moralis.EvmApi.balance.getNativeBalance({
           address: address,
           chain: `0x${chainId.toString(16)}`,
         });
-
-        console.log('💰 Initial balance fetch successful:', balance.result.balance.ether);
         
         // Also fetch token balances to ensure user is fully registered
         const tokenBalances = await Moralis.EvmApi.token.getWalletTokenBalances({
           address: address,
           chain: `0x${chainId.toString(16)}`,
         });
-
-        console.log('🪙 Token balances fetched:', tokenBalances.result.length, 'tokens');
         
       } catch (apiError) {
-        console.warn('⚠️ API calls failed but authentication succeeded:', apiError);
+        // Silently handle API errors - authentication is still successful
       }
       
       return userData;
     } catch (error) {
-      console.error('❌ Authentication failed:', error);
+      console.error('Authentication failed:', error);
       throw error;
     }
   };
 
   const connectWallet = async () => {
-    if (!isInitialized) {
-      console.log('⏳ Moralis not initialized yet, waiting...');
-      return;
-    }
+    if (!isInitialized) return;
 
     try {
       setIsLoading(true);
       setError(null);
-
-      console.log('🔌 Connecting wallet...');
 
       // Request wallet connection
       if (typeof window.ethereum === 'undefined') {
@@ -192,14 +168,12 @@ export const MoralisAuthProvider = ({ children }: MoralisAuthProviderProps) => {
       });
       
       const chainId = parseInt(chainIdHex, 16);
-      
-      console.log('🔗 Wallet connected:', { address, chainId });
 
       // Automatically authenticate with Moralis
       await authenticateWithMoralis(address, chainId);
 
     } catch (error) {
-      console.error('❌ Wallet connection failed:', error);
+      console.error('Wallet connection failed:', error);
       setError(error instanceof Error ? error.message : 'Connection failed');
     } finally {
       setIsLoading(false);
@@ -211,7 +185,6 @@ export const MoralisAuthProvider = ({ children }: MoralisAuthProviderProps) => {
     setUser(null);
     setIsAuthenticated(false);
     setError(null);
-    console.log('👋 User disconnected from Moralis');
   };
 
   const value: MoralisAuthContextType = {
