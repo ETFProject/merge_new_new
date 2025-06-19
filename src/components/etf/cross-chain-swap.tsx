@@ -163,28 +163,16 @@ export function CrossChainSwap({ onSuccess }: CrossChainSwapProps) {
         return;
       }
       
-      // Format amount to wei
-      const amountWei = ethers.parseEther(amount).toString();
+      // Mock quote data for demo
+      const mockQuote = {
+        srcAmount: amount,
+        dstAmount: (parseFloat(amount) * 0.9985).toFixed(6), // Mock exchange rate
+        fee: '0.15%',
+        estimatedTime: 120 // 2 minutes
+      };
       
-      // Get the quote from our API route
-      const response = await fetch(`/api/1inch/fusion-plus?srcChainId=${sourceChain.id}&dstChainId=${destChain.id}&srcTokenAddress=${TOKENS.ETH.address}&dstTokenAddress=${TOKENS.ETH.address}&amount=${amountWei}&walletAddress=${userAddress}&enableEstimate=true`);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Error getting quote:', errorData);
-        setErrorMessage(errorData.error || 'Failed to get quote');
-        return;
-      }
-      
-      const data = await response.json();
-      
-      if (!data.success) {
-        setErrorMessage(data.error || 'Failed to get quote');
-        return;
-      }
-      
-      console.log('Quote data:', data.data);
-      setQuote(data.data);
+      console.log('Mock quote data:', mockQuote);
+      setQuote(mockQuote);
       setSwapStatus('quoted');
       
     } catch (error) {

@@ -26,6 +26,23 @@ export function CreateITFForm({ onSuccess }: CreateITFFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
+  // Mock token options for ITF creation
+  const availableTokens = [
+    { symbol: 'BTC', name: 'Bitcoin', logo: '/sandwave.png', price: 65000 },
+    { symbol: 'ETH', name: 'Ethereum', logo: '/flower.png', price: 3500 },
+    { symbol: 'SOL', name: 'Solana', logo: '/snail.png', price: 180 },
+    { symbol: 'BNB', name: 'BNB', logo: '/jellyfish.png', price: 580 },
+    { symbol: 'USDC', name: 'USD Coin', logo: '/coffee.png', price: 1 },
+    { symbol: 'LINK', name: 'Chainlink', logo: '/cassette.png', price: 18 },
+    { symbol: 'UNI', name: 'Uniswap', logo: '/donut.png', price: 12 },
+    { symbol: 'AAVE', name: 'Aave', logo: '/giraffehorn.png', price: 320 },
+    { symbol: 'MKR', name: 'Maker', logo: '/ice.png', price: 2800 },
+    { symbol: 'SNX', name: 'Synthetix', logo: '/jellowchurch.png', price: 4.5 }
+  ];
+  
+  const [selectedTokens, setSelectedTokens] = useState<string[]>([]);
+  const [tokenAllocations, setTokenAllocations] = useState<Record<string, number>>({});
+  
   // Handle image selection
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
