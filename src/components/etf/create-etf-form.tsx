@@ -5,6 +5,7 @@ import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 
 import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
 import { ClientCard } from "@/components/ui/client-card";
+import { Label } from "@/components/ui/label";
 
 type RiskProfile = 'low' | 'medium' | 'high';
 
@@ -332,9 +333,9 @@ export function CreateETFForm({ onSuccess }: CreateETFFormProps) {
           </div>
           
           <div className="space-y-2">
-            <label htmlFor="initialAmount" className="text-sm font-medium">
-              Initial Investment Amount (USD) *
-            </label>
+            <Label htmlFor="initialAmount" className="text-sm font-medium">
+              Initial Portfolio Amount (USD) *
+            </Label>
             <input
               id="initialAmount"
               type="text"

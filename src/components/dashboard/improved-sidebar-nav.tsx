@@ -15,6 +15,7 @@ export interface ImprovedSidebarNavProps {
     description?: string;
   }[];
   className?: string;
+  isCollapsed?: boolean;
 }
 
 // Define default navigation items
@@ -82,7 +83,7 @@ const defaultItems = [
   },
 ];
 
-export function ImprovedSidebarNav({ items = defaultItems, className }: ImprovedSidebarNavProps) {
+export function ImprovedSidebarNav({ items = defaultItems, className, isCollapsed = false }: ImprovedSidebarNavProps) {
   const { navigateWithTransition, currentPath } = useViewTransitions();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isPending, startTransition] = useTransition();
@@ -108,9 +109,11 @@ export function ImprovedSidebarNav({ items = defaultItems, className }: Improved
   
   return (
     <div className={cn("px-3 py-2 w-full h-full", className)}>
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold">Dashboard</h2>
-      </div>
+      {!isCollapsed && (
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold">Dashboard</h2>
+        </div>
+      )}
       
       <nav className="flex flex-col space-y-1">
         {items.map((item) => {
@@ -130,10 +133,12 @@ export function ImprovedSidebarNav({ items = defaultItems, className }: Improved
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors w-full",
                   isActive 
                     ? "bg-accent text-accent-foreground" 
-                    : "hover:bg-accent/50 hover:text-accent-foreground/90"
+                    : "hover:bg-accent/50 hover:text-accent-foreground/90",
+                  isCollapsed && "justify-center"
                 )}
                 onClick={(e) => handleNavClick(e, item.href)}
                 aria-current={isActive ? 'page' : undefined}
+                title={isCollapsed ? item.title : undefined}
               >
                 <div className="flex-shrink-0 w-5 h-5 rounded-md overflow-hidden" aria-hidden="true">
                   {item.icon && (
@@ -147,36 +152,38 @@ export function ImprovedSidebarNav({ items = defaultItems, className }: Improved
                     />
                   )}
                 </div>
-                <span>{item.title}</span>
+                {!isCollapsed && <span>{item.title}</span>}
               </Link>
             </TransitionWrapper>
           );
         })}
       </nav>
       
-      <div className="mt-6 pt-6 border-t">
-        <div className="py-2">
-          <h3 className="text-xs font-medium text-muted-foreground mb-3">Cross-Chain Networks</h3>
-          <div className="flex flex-wrap gap-2">
-            <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded-md text-xs">
-              <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-              <span>Ethereum</span>
-            </div>
-            <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded-md text-xs">
-              <div className="w-3 h-3 rounded-full bg-blue-600"></div>
-              <span>Base</span>
-            </div>
-            <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded-md text-xs">
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <span>Flow</span>
-            </div>
-            <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded-md text-xs">
-              <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-              <span>Solana</span>
+      {!isCollapsed && (
+        <div className="mt-6 pt-6 border-t">
+          <div className="py-2">
+            <h3 className="text-xs font-medium text-muted-foreground mb-3">Cross-Chain Networks</h3>
+            <div className="flex flex-wrap gap-2">
+              <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded-md text-xs">
+                <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                <span>Ethereum</span>
+              </div>
+              <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded-md text-xs">
+                <div className="w-3 h-3 rounded-full bg-blue-600"></div>
+                <span>Base</span>
+              </div>
+              <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded-md text-xs">
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                <span>Flow</span>
+              </div>
+              <div className="flex items-center gap-2 px-2 py-1 bg-muted/50 rounded-md text-xs">
+                <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                <span>Solana</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 } 

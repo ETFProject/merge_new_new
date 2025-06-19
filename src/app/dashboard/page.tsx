@@ -1,348 +1,366 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { MoralisTest } from "@/components/MoralisTest";
-import { MoralisAuth } from "@/components/MoralisAuth";
+import { useMoralisAuth } from '@/components/MoralisAuthProvider';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { WalletConnectButton } from '@/components/WalletConnectButton';
+import { ETFDetailDialog } from '@/components/etf/etf-detail-dialog';
 
-// Mock data for user's current ETF investments
-const userInvestments = {
-  name: "John Doe",
-  totalValue: "$145,328.42",
-  totalChange: 2.4,
-  etfs: [
-    { 
-      id: "etf123", 
-      name: "Growth ETF", 
-      description: "Diversified growth portfolio across major crypto assets",
-      value: "$78,452.18", 
-      invested: "$75,000.00",
-      change: 3.2,
-      allocation: "45% BTC, 25% ETH, 20% SOL, 10% MATIC",
-      apy: "12.4%",
-      status: "Active"
-    },
-    { 
-      id: "etf456", 
-      name: "Tech Basket", 
-      description: "Technology-focused DeFi protocols and tokens",
-      value: "$45,129.33", 
-      invested: "$42,000.00",
-      change: -0.8,
-      allocation: "40% UNI, 30% AAVE, 20% COMP, 10% MKR",
-      apy: "8.7%",
-      status: "Active"
-    },
-    { 
-      id: "etf789", 
-      name: "DeFi Portfolio", 
-      description: "High-yield DeFi staking and liquidity protocols",
-      value: "$21,746.91", 
-      invested: "$20,000.00",
-      change: 5.7,
-      allocation: "35% WETH, 25% USDC, 25% DAI, 15% LINK",
-      apy: "15.2%",
-      status: "Active"
-    }
-  ]
-};
-
-// Mock data for available ETF funds to invest in
-const availableETFs = [
-  {
-    id: "available1",
-    name: "Blue Chip Crypto",
-    description: "Conservative portfolio of established cryptocurrencies",
-    manager: "BAEVII Protocol",
-    tvl: "$2.4M",
-    apy: "10.8%",
-    risk: "Low",
-    allocation: "60% BTC, 30% ETH, 10% BNB",
-    minInvestment: "$100",
-    category: "Conservative",
-    influencer: {
-      name: "Michael Saylor",
-      image: "/chatgpt.png",
-      twitter: "@saylor"
-    }
+// Mock ETF data
+const mockETFs = {
+  blueChip: {
+    name: 'BAEVII Blue Chip',
+    description: 'Large-Cap Crypto Index',
+    icon: '/baevii-logo.png',
+    iconText: 'B',
+    expenseRatio: '0.25%',
+    aum: '$12.4M',
+    performance30D: '+16.3%',
+    holdings: [
+      { symbol: 'BTC', weight: '35.2%' },
+      { symbol: 'ETH', weight: '28.7%' },
+      { symbol: 'SOL', weight: '18.4%' },
+      { symbol: 'BNB', weight: '12.1%' }
+    ]
   },
-  {
-    id: "available2",
-    name: "AI & Web3",
-    description: "Artificial Intelligence and Web3 infrastructure tokens",
-    manager: "BAEVII Labs",
-    tvl: "$1.8M",
-    apy: "18.5%",
-    risk: "Medium",
-    allocation: "30% FET, 25% OCEAN, 20% SingularityNET, 25% Other",
-    minInvestment: "$250",
-    category: "Technology",
-    influencer: {
-      name: "Vitalik Buterin",
-      image: "/jellyfish.png",
-      twitter: "@VitalikButerin"
-    }
+  defiGrowth: {
+    name: 'DeFi Growth',
+    description: 'DeFi Protocol Index',
+    icon: '/baevii-logo.png',
+    iconText: 'D',
+    expenseRatio: '0.35%',
+    aum: '$8.7M',
+    performance30D: '+24.7%',
+    holdings: [
+      { symbol: 'UNI', weight: '25.2%' },
+      { symbol: 'AAVE', weight: '22.7%' },
+      { symbol: 'MKR', weight: '20.4%' },
+      { symbol: 'SNX', weight: '15.1%' }
+    ]
   },
-  {
-    id: "available3",
-    name: "Layer 1 Champions",
-    description: "Top performing Layer 1 blockchain protocols",
-    manager: "Crypto Ventures",
-    tvl: "$3.1M",
-    apy: "14.2%",
-    risk: "Medium",
-    allocation: "25% SOL, 25% AVAX, 25% ATOM, 25% DOT",
-    minInvestment: "$500",
-    category: "Infrastructure",
-    influencer: {
-      name: "Anatoly Yakovenko",
-      image: "/tornado.png",
-      twitter: "@aeyakovenko"
-    }
+  aiWeb3: {
+    name: 'AI & Web3',
+    description: 'AI Innovation Index',
+    icon: '/baevii-logo.png',
+    iconText: 'A',
+    expenseRatio: '0.45%',
+    aum: '$6.2M',
+    performance30D: '+42.1%',
+    holdings: [
+      { symbol: 'OCEAN', weight: '30.2%' },
+      { symbol: 'FET', weight: '25.7%' },
+      { symbol: 'AGIX', weight: '22.4%' },
+      { symbol: 'NMR', weight: '15.1%' }
+    ]
   },
-  {
-    id: "available4",
-    name: "Yield Farming Max",
-    description: "Aggressive high-yield farming strategies",
-    manager: "DeFi Masters",
-    tvl: "$956K",
-    apy: "24.7%",
-    risk: "High",
-    allocation: "Dynamic allocation based on highest yields",
-    minInvestment: "$1,000",
-    category: "High Yield",
-    influencer: {
-      name: "Andre Cronje",
-      image: "/flower.png",
-      twitter: "@AndreCronjeTech"
-    }
+  metaverse: {
+    name: 'Metaverse Index',
+    description: 'Virtual World & Gaming',
+    icon: '/baevii-logo.png',
+    iconText: 'M',
+    expenseRatio: '0.40%',
+    aum: '$5.1M',
+    performance30D: '+28.5%',
+    holdings: [
+      { symbol: 'MANA', weight: '28.5%' },
+      { symbol: 'SAND', weight: '25.3%' },
+      { symbol: 'AXS', weight: '20.1%' },
+      { symbol: 'ENJ', weight: '15.4%' }
+    ]
   },
-  {
-    id: "available5",
-    name: "Gaming & NFTs",
-    description: "Gaming tokens and NFT ecosystem projects",
-    manager: "Metaverse Fund",
-    tvl: "$1.2M",
-    apy: "16.3%",
-    risk: "High",
-    allocation: "30% AXS, 20% SAND, 20% MANA, 30% Other",
-    minInvestment: "$200",
-    category: "Gaming",
-    influencer: {
-      name: "Yat Siu",
-      image: "/cactus.png",
-      twitter: "@ysiu"
-    }
+  layer2: {
+    name: 'Layer 2 Growth',
+    description: 'Scaling Solutions Index',
+    icon: '/baevii-logo.png',
+    iconText: 'L2',
+    expenseRatio: '0.38%',
+    aum: '$7.3M',
+    performance30D: '+31.2%',
+    holdings: [
+      { symbol: 'MATIC', weight: '32.1%' },
+      { symbol: 'ARB', weight: '28.4%' },
+      { symbol: 'OP', weight: '22.3%' },
+      { symbol: 'IMX', weight: '12.5%' }
+    ]
   },
-  {
-    id: "available6",
-    name: "Stablecoin Plus",
-    description: "Enhanced yield on stablecoin reserves",
-    manager: "Stable Yields",
-    tvl: "$5.7M",
-    apy: "6.8%",
-    risk: "Very Low",
-    allocation: "40% USDC, 30% DAI, 20% USDT, 10% FRAX",
-    minInvestment: "$50",
-    category: "Stablecoin",
-    influencer: {
-      name: "Rune Christensen",
-      image: "/donut.png",
-      twitter: "@RuneKek"
-    }
-  }
-];
-
-const getRiskColor = (risk: string) => {
-  switch (risk) {
-    case "Very Low": return "bg-green-100 text-green-800";
-    case "Low": return "bg-green-100 text-green-800";
-    case "Medium": return "bg-yellow-100 text-yellow-800";
-    case "High": return "bg-red-100 text-red-800";
-    default: return "bg-gray-100 text-gray-800";
+  privacy: {
+    name: 'Privacy Focus',
+    description: 'Privacy Tech Index',
+    icon: '/baevii-logo.png',
+    iconText: 'P',
+    expenseRatio: '0.42%',
+    aum: '$4.2M',
+    performance30D: '+19.8%',
+    holdings: [
+      { symbol: 'XMR', weight: '35.5%' },
+      { symbol: 'ZEC', weight: '25.2%' },
+      { symbol: 'SCRT', weight: '20.1%' },
+      { symbol: 'ROSE', weight: '14.5%' }
+    ]
+  },
+  cryptoCasey: {
+    name: 'Crypto Casey',
+    description: 'Technical Analysis Focus',
+    icon: '/baevii-logo.png',
+    iconText: 'C',
+    expenseRatio: '0.40%',
+    aum: '$4.8M',
+    performance30D: '+19.5%',
+    holdings: [
+      { symbol: 'BTC', weight: '40.2%' },
+      { symbol: 'ETH', weight: '35.7%' },
+      { symbol: 'ADA', weight: '12.4%' },
+      { symbol: 'DOT', weight: '8.1%' }
+    ]
+  },
+  coinBureau: {
+    name: 'Coin Bureau',
+    description: 'Research-Driven Portfolio',
+    icon: '/baevii-logo.png',
+    iconText: 'CB',
+    expenseRatio: '0.35%',
+    aum: '$9.2M',
+    performance30D: '+22.7%',
+    holdings: [
+      { symbol: 'ETH', weight: '35.0%' },
+      { symbol: 'DOT', weight: '25.5%' },
+      { symbol: 'LINK', weight: '20.2%' },
+      { symbol: 'ATOM', weight: '15.8%' }
+    ]
+  },
+  digitalAssets: {
+    name: 'Digital Assets',
+    description: 'Institutional Grade',
+    icon: '/baevii-logo.png',
+    iconText: 'DA',
+    expenseRatio: '0.32%',
+    aum: '$15.4M',
+    performance30D: '+17.9%',
+    holdings: [
+      { symbol: 'BTC', weight: '45.0%' },
+      { symbol: 'ETH', weight: '35.0%' },
+      { symbol: 'SOL', weight: '12.5%' },
+      { symbol: 'AVAX', weight: '7.5%' }
+    ]
   }
 };
 
-export default function Dashboard() {
-  return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back, {userInvestments.name}. Manage your ETF portfolio and discover new investment opportunities.
+export default function DashboardPage() {
+  const { isAuthenticated, user } = useMoralisAuth();
+  const [selectedETF, setSelectedETF] = useState<keyof typeof mockETFs | null>(null);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6">
+        <div className="text-center space-y-4">
+          <h1 className="text-3xl font-bold">Welcome to BAEVII ETF Manager</h1>
+          <p className="text-muted-foreground max-w-md">
+            Connect your wallet to start managing your ETFs with AI-powered insights.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Link href="/dashboard/transactions">
-            <Button variant="outline" className="w-full md:w-auto">
-              View Transactions
-            </Button>
-          </Link>
-          <Link href="/dashboard/create">
-            <Button className="w-full md:w-auto">
-              Create New ETF
-            </Button>
-          </Link>
+        <WalletConnectButton />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Welcome back! Your ETF portfolio overview.
+          </p>
         </div>
+        <WalletConnectButton />
       </div>
 
-      {/* Moralis Authentication */}
-      <MoralisAuth />
-
-      {/* Moralis Integration Test */}
-      <MoralisTest />
-
-      {/* Portfolio Summary */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       <Card>
         <CardHeader>
-          <CardTitle>Portfolio Summary</CardTitle>
-          <CardDescription>Overview of your total ETF investments</CardDescription>
+            <CardTitle>Wallet Status</CardTitle>
+            <CardDescription>Your connected wallet information</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-2xl font-bold">{userInvestments.totalValue}</p>
-              <p className="text-sm text-muted-foreground">Total Portfolio Value</p>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Address:</span>
+                <span className="text-sm font-mono">
+                  {user?.address.slice(0, 6)}...{user?.address.slice(-4)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Chain:</span>
+                <span className="text-sm">{user?.chainId}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">Connected:</span>
+                <span className="text-sm">
+                  {user?.authenticatedAt ? new Date(user.authenticatedAt).toLocaleDateString() : 'Unknown'}
+                </span>
+              </div>
             </div>
-            <div className="text-right">
-              <p className={`text-xl font-semibold ${userInvestments.totalChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {userInvestments.totalChange > 0 ? '+' : ''}{userInvestments.totalChange}%
-              </p>
-              <p className="text-sm text-muted-foreground">24h Change</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Wallet Balance</CardTitle>
+            <CardDescription>Current native token balance</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="text-2xl font-bold">-- ETH</div>
+              <div className="text-xs text-muted-foreground">
+                Balance will be displayed here
+              </div>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>ETF Portfolio</CardTitle>
+            <CardDescription>Your managed ETFs</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8">
+              <p className="text-muted-foreground mb-4">No ETFs created yet</p>
+              <Button>Create Your First ETF</Button>
           </div>
         </CardContent>
       </Card>
+      </div>
 
-      {/* Your ETF Investments */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Your ETF Investments</h2>
+      {/* Our ETFs Section */}
+      <div>
+        <h2 className="text-2xl font-semibold mb-4">Our ETFs</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {userInvestments.etfs.map((etf) => (
-            <Card key={etf.id} className="h-full">
-              <CardHeader>
+          {Object.entries(mockETFs).slice(0, 3).map(([key, etf]) => (
+            <Card
+              key={key}
+              className="hover:shadow-lg transition-all duration-200 border border-gray-200 bg-card h-auto flex flex-col cursor-pointer pt-4 px-1 pb-4"
+              onClick={() => setSelectedETF(key as keyof typeof mockETFs)}
+            >
+              <CardHeader className="pt-0 pb-0 border-b-0">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{etf.name}</CardTitle>
-                  <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${getRiskColor(etf.status)}`}>
-                    {etf.status}
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 bg-gray-900 rounded-lg flex items-center justify-center text-white font-bold text-xs">
+                      {etf.iconText}
+                    </div>
+                    <div>
+                      <CardTitle className="text-xs font-semibold text-foreground leading-tight mb-0">{etf.name}</CardTitle>
+                      <CardDescription className="text-[10px] text-muted-foreground leading-tight mt-0">{etf.description}</CardDescription>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] text-muted-foreground font-medium">ER</div>
+                    <div className="text-xs font-semibold text-foreground">{etf.expenseRatio}</div>
                   </div>
                 </div>
-                <CardDescription>{etf.description}</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Current Value:</span>
-                  <span className="font-semibold">{etf.value}</span>
+              <CardContent className="pt-0 flex-1 flex flex-col">
+                <div className="space-y-0 flex-1">
+                  <div className="flex justify-between items-center mt-0 mb-0">
+                    <div>
+                      <div className="text-[10px] text-muted-foreground font-medium">AUM</div>
+                      <div className="text-xs font-bold text-foreground">{etf.aum}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[10px] text-muted-foreground font-medium">30D</div>
+                      <div className="text-xs font-bold text-green-600">{etf.performance30D}</div>
+                    </div>
+                  </div>
+                  <div className="mt-0 mb-0">
+                    <div className="flex justify-between items-center mb-0 mt-0">
+                      <span className="text-[10px] font-medium text-foreground">Top Holdings</span>
+                      <span className="text-[10px] text-muted-foreground">Weight</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Invested:</span>
-                  <span>{etf.invested}</span>
+                    <div className="space-y-0">
+                      {etf.holdings.map((h) => (
+                        <div key={h.symbol} className="flex justify-between items-center">
+                          <span className="text-[10px] font-medium text-foreground">{h.symbol}</span>
+                          <span className="text-[10px] text-muted-foreground">{h.weight}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">24h Change:</span>
-                  <span className={`font-semibold ${etf.change > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {etf.change > 0 ? '+' : ''}{etf.change}%
-                  </span>
+                      ))}
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">APY:</span>
-                  <span className="font-semibold text-green-600">{etf.apy}</span>
                 </div>
-                <div className="pt-2">
-                  <p className="text-xs text-muted-foreground">Allocation:</p>
-                  <p className="text-sm">{etf.allocation}</p>
                 </div>
               </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="w-full">
-                  Manage Position
-                </Button>
-              </CardFooter>
             </Card>
           ))}
         </div>
       </div>
 
-      {/* Available ETF Funds */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Available ETF Funds</h2>
-          <p className="text-sm text-muted-foreground">{availableETFs.length} funds available</p>
-        </div>
+      {/* Influencer ETFs Section */}
+      <div>
+        <h2 className="text-2xl font-semibold mb-4">Influencer ETFs</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {availableETFs.map((etf) => (
-            <Card key={etf.id} className="h-full">
-              <CardHeader>
+          {Object.entries(mockETFs).slice(3).map(([key, etf]) => (
+            <Card
+              key={key}
+              className="hover:shadow-lg transition-all duration-200 border border-gray-200 bg-card h-auto flex flex-col cursor-pointer pt-4 px-1 pb-4"
+              onClick={() => setSelectedETF(key as keyof typeof mockETFs)}
+            >
+              <CardHeader className="pt-0 pb-0 border-b-0">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{etf.name}</CardTitle>
-                  <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${getRiskColor(etf.risk)}`}>
-                    {etf.risk}
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 bg-gray-900 rounded-lg flex items-center justify-center text-white font-bold text-xs">
+                      {etf.iconText}
+                    </div>
+                    <div>
+                      <CardTitle className="text-xs font-semibold text-foreground leading-tight mb-0">{etf.name}</CardTitle>
+                      <CardDescription className="text-[10px] text-muted-foreground leading-tight mt-0">{etf.description}</CardDescription>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] text-muted-foreground font-medium">ER</div>
+                    <div className="text-xs font-semibold text-foreground">{etf.expenseRatio}</div>
                   </div>
                 </div>
-                <CardDescription>{etf.description}</CardDescription>
-                
-                {/* Influencer Section */}
-                <div className="flex items-center gap-3 pt-2 border-t">
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                    <Image 
-                      src={etf.influencer.image} 
-                      alt={etf.influencer.name}
-                      fill
-                      className="object-cover"
-                    />
+              </CardHeader>
+              <CardContent className="pt-0 flex-1 flex flex-col">
+                <div className="space-y-0 flex-1">
+                  <div className="flex justify-between items-center mt-0 mb-0">
+                    <div>
+                      <div className="text-[10px] text-muted-foreground font-medium">AUM</div>
+                      <div className="text-xs font-bold text-foreground">{etf.aum}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[10px] text-muted-foreground font-medium">30D</div>
+                      <div className="text-xs font-bold text-green-600">{etf.performance30D}</div>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{etf.influencer.name}</p>
-                    <div className="flex items-center gap-1">
-                      <div className="w-4 h-4 rounded bg-blue-500 flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">𝕏</span>
+                  <div className="mt-0 mb-0">
+                    <div className="flex justify-between items-center mb-0 mt-0">
+                      <span className="text-[10px] font-medium text-foreground">Top Holdings</span>
+                      <span className="text-[10px] text-muted-foreground">Weight</span>
+                    </div>
+                    <div className="space-y-0">
+                      {etf.holdings.map((h) => (
+                        <div key={h.symbol} className="flex justify-between items-center">
+                          <span className="text-[10px] font-medium text-foreground">{h.symbol}</span>
+                          <span className="text-[10px] text-muted-foreground">{h.weight}</span>
                       </div>
-                      <span className="text-xs text-blue-600 hover:underline cursor-pointer">
-                        {etf.influencer.twitter}
-                      </span>
+                      ))}
                     </div>
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Manager:</span>
-                  <span className="text-sm font-medium">{etf.manager}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">TVL:</span>
-                  <span className="font-semibold">{etf.tvl}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">APY:</span>
-                  <span className="font-semibold text-green-600">{etf.apy}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Min Investment:</span>
-                  <span className="text-sm">{etf.minInvestment}</span>
-                </div>
-                <div className="pt-2">
-                  <p className="text-xs text-muted-foreground">Allocation:</p>
-                  <p className="text-sm">{etf.allocation}</p>
-                </div>
-                <div className="inline-flex items-center rounded-full border-transparent bg-secondary text-secondary-foreground px-2.5 py-0.5 text-xs font-semibold w-fit">
-                  {etf.category}
-                </div>
               </CardContent>
-              <CardFooter>
-                <Button className="w-full">
-                  Invest Now
-                </Button>
-              </CardFooter>
             </Card>
           ))}
         </div>
       </div>
+
+      {/* ETF Detail Dialog */}
+      {selectedETF && (
+        <ETFDetailDialog
+          isOpen={true}
+          onClose={() => setSelectedETF(null)}
+          etf={mockETFs[selectedETF]}
+        />
+      )}
     </div>
   );
 } 

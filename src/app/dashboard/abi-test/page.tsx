@@ -12,6 +12,8 @@ import { toast } from 'sonner';
 import { CONTRACT_ADDRESSES, ASSET_ADDRESSES } from '@/config/contracts';
 import { usePrivy } from '@privy-io/react-auth';
 import { usePrivyWallets } from '@/components/PrivyWalletsWrapper';
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 // Extract ABI function  
 const extractAbi = (abiJson: any): JsonFragment[] => {
@@ -133,8 +135,8 @@ export default function AbiTestPage() {
     
     setLoading(true);
     try {
-      const tokenAddress = ASSET_ADDRESSES[selectedToken];
-      const amt = ethers.parseEther(depositAmount);
+      const tokenAddress = ASSET_ADDRESSES.USDC; // Only USDC
+      const amt = ethers.parseUnits(depositAmount, 6); // USDC has 6 decimals
       const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, signer);
       const vaultContract = new ethers.Contract(CONTRACT_ADDRESSES.etfVault, vaultAbi, signer);
 
@@ -142,18 +144,18 @@ export default function AbiTestPage() {
       const allowance = await tokenContract.allowance(userAddress, CONTRACT_ADDRESSES.etfVault);
       
       if (allowance < amt) {
-        toast.info("Approving token spend...");
+        toast.info("Approving USDC spend...");
         const approvalTx = await tokenContract.approve(CONTRACT_ADDRESSES.etfVault, amt);
         await approvalTx.wait();
         toast.success("Approval successful");
       }
 
       // Execute deposit
-      toast.info("Executing deposit...");
+      toast.info("Executing USDC deposit...");
       const depositTx = await vaultContract.deposit(tokenAddress, amt);
       
       const receipt = await depositTx.wait();
-      toast.success(`Deposited ${depositAmount} ${selectedToken}! Tx: ${receipt.hash.slice(0, 10)}...`);
+      toast.success(`Deposited ${depositAmount} USDC! Tx: ${receipt.hash.slice(0, 10)}...`);
       
       await fetchTokenBalance();
       await fetchEtfInfo();
@@ -354,15 +356,30 @@ export default function AbiTestPage() {
       <Card>
         <CardHeader><CardTitle>🪙 Token Operations</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Select Token:</label>
-            <select 
-              value={selectedToken} 
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedToken(e.target.value as keyof typeof ASSET_ADDRESSES)}
-              className="w-full p-2 border rounded-md"
-            >
-              {Object.keys(ASSET_ADDRESSES).map(k => <option key={k} value={k}>{k}</option>)}
-            </select>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="token-select" className="text-sm font-medium">
+              Token:
+            </Label>
+            <div className="flex items-center px-3 py-2 bg-muted rounded-md text-sm font-medium">
+              USDC
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Label htmlFor="amount-input" className="text-sm font-medium">
+              Amount:
+            </Label>
+            <Input
+              id="amount-input"
+              type="number"
+              placeholder="USDC amount"
+              value={depositAmount}
+              onChange={(e) => setDepositAmount(e.target.value)}
+              className="w-32"
+            />
+            <Button onClick={handleDeposit} disabled={loading || !depositAmount}>
+              {loading ? "Processing..." : "Deposit USDC"}
+            </Button>
           </div>
           
           <div className="grid grid-cols-2 gap-2">
@@ -376,38 +393,6 @@ export default function AbiTestPage() {
           
           <div className="bg-gray-50 p-3 rounded">
             <div className="text-sm"><strong>Balance:</strong> {tokenBalance} {selectedToken}</div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Simplified Deposit */}
-      <Card>
-        <CardHeader><CardTitle>💰 Deposit (Fixed)</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Amount to Deposit:</label>
-            <input 
-              type="number"
-              step="0.1"
-              min="0"
-              value={depositAmount} 
-              onChange={e => setDepositAmount(e.target.value)}
-              placeholder="Enter amount"
-              className="w-full p-2 border rounded-md"
-            />
-          </div>
-          
-          <Button 
-            onClick={handleDeposit} 
-            disabled={loading || !authenticated || !depositAmount} 
-            className="w-full"
-          >
-            {loading ? 'Processing...' : `Deposit ${depositAmount || '0'} ${selectedToken}`}
-          </Button>
-          
-          <div className="text-xs text-gray-600 bg-yellow-50 p-2 rounded">
-            ℹ️ This simplified version removes pre-checks that were preventing wallet popup.
-            Errors will be shown after transaction attempt.
           </div>
         </CardContent>
       </Card>

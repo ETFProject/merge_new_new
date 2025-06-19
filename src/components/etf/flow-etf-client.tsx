@@ -193,7 +193,7 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          token: 'wflow',
+          token: 'usdc', // Only USDC
           amount: depositAmount,
           userAddress
         })
@@ -202,7 +202,7 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
       const data = await response.json();
       
       if (data.success) {
-        alert(`Successfully deposited ${depositAmount} WFLOW\nTransaction Hash: ${data.data.txHash}\nShares Received: ${data.data.shares}`);
+        alert(`Successfully deposited ${depositAmount} USDC\nTransaction Hash: ${data.data.txHash}\nShares Received: ${data.data.shares}`);
         setDepositAmount('');
         
         // Refresh balances and ETF data
@@ -225,7 +225,7 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
   
   // Withdraw from ETF
   const handleWithdraw = async () => {
-    if (!userAddress || !withdrawAmount || !withdrawToken) return;
+    if (!userAddress || !withdrawAmount) return;
     
     try {
       setLoading(true);
@@ -238,7 +238,7 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
         },
         body: JSON.stringify({
           shares: withdrawAmount,
-          tokenOut: withdrawToken,
+          tokenOut: 'usdc', // Only USDC
           userAddress
         })
       });
@@ -246,7 +246,7 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
       const data = await response.json();
       
       if (data.success) {
-        alert(`Successfully withdrew ${withdrawAmount} ETF shares\nTransaction Hash: ${data.data.txHash}\nTokens Received: ${data.data.amount} ${data.data.token.toUpperCase()}`);
+        alert(`Successfully withdrew ${withdrawAmount} ETF shares\nTransaction Hash: ${data.data.txHash}\nUSDC Received: ${data.data.amount}`);
         setWithdrawAmount('');
         
         // Refresh balances and ETF data
@@ -441,11 +441,11 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Deposit Section */}
             <div className="p-4 border rounded-md bg-muted/20">
-              <h3 className="text-lg font-medium mb-4">Deposit to ETF</h3>
+              <h3 className="text-lg font-medium mb-4">Deposit USDC to ETF</h3>
               <div className="space-y-4">
                 <div>
                   <label htmlFor="depositAmount" className="block text-sm font-medium mb-1">
-                    WFLOW Amount
+                    USDC Amount
                   </label>
                   <div className="flex space-x-2">
                     <input
@@ -461,33 +461,29 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => setDepositAmount(wflowBalance)}
+                      onClick={() => setDepositAmount(flowBalance)}
                     >
                       Max
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Available: {wflowBalance} WFLOW
+                    Available: {flowBalance} USDC
                   </p>
                 </div>
                 
                 <Button 
                   onClick={handleDeposit}
-                  disabled={loading || !depositAmount || parseFloat(depositAmount) <= 0 || parseFloat(depositAmount) > parseFloat(wflowBalance)}
+                  disabled={loading || !depositAmount || parseFloat(depositAmount) <= 0 || parseFloat(depositAmount) > parseFloat(flowBalance)}
                   className="w-full"
                 >
-                  {loading ? 'Processing...' : 'Deposit WFLOW'}
+                  {loading ? 'Processing...' : 'Deposit USDC'}
                 </Button>
-                
-                <p className="text-xs text-muted-foreground">
-                  Note: In a real app, you would need to approve the ETF vault to spend your WFLOW first.
-                </p>
               </div>
             </div>
             
             {/* Withdraw Section */}
             <div className="p-4 border rounded-md bg-muted/20">
-              <h3 className="text-lg font-medium mb-4">Withdraw from ETF</h3>
+              <h3 className="text-lg font-medium mb-4">Withdraw USDC from ETF</h3>
               <div className="space-y-4">
                 <div>
                   <label htmlFor="withdrawAmount" className="block text-sm font-medium mb-1">
@@ -517,30 +513,12 @@ export function FlowETFClient({ onSuccess }: FlowETFClientProps) {
                   </p>
                 </div>
                 
-                <div>
-                  <label htmlFor="withdrawToken" className="block text-sm font-medium mb-1">
-                    Receive Token
-                  </label>
-                  <select
-                    id="withdrawToken"
-                    value={withdrawToken}
-                    onChange={(e) => setWithdrawToken(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-md"
-                  >
-                    <option value="wflow">WFLOW</option>
-                    <option value="trump">TRUMP</option>
-                    <option value="ankrFlow">ankrFLOW</option>
-                    <option value="usdc">USDC</option>
-                    <option value="weth">WETH</option>
-                  </select>
-                </div>
-                
                 <Button 
                   onClick={handleWithdraw}
                   disabled={loading || !withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > parseFloat(etfShareBalance)}
                   className="w-full"
                 >
-                  {loading ? 'Processing...' : 'Withdraw to ' + withdrawToken.toUpperCase()}
+                  {loading ? 'Processing...' : 'Withdraw USDC'}
                 </Button>
               </div>
             </div>

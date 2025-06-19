@@ -1,8 +1,5 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
-import Image from 'next/image';
 import { DashboardLayoutClient } from '@/components/dashboard/dashboard-layout-client';
-import { ClientButton } from '@/components/ui/client-button';
 
 export const metadata: Metadata = {
   title: 'BAEVII Dashboard',
@@ -16,13 +13,12 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
-      
-      <div className="container mx-auto px-4 py-6 flex flex-1">
-        <div className="w-full flex-1 md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-          <DashboardLayoutClient>
-            {children}
-          </DashboardLayoutClient>
-        </div>
+      {/* Header can go here if needed */}
+      <div className="flex flex-1 min-h-0">
+        {/* Sidebar + Main content handled in DashboardLayoutClient */}
+        <DashboardLayoutClient>
+          {children}
+        </DashboardLayoutClient>
       </div>
     </div>
   );

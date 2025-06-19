@@ -3,6 +3,7 @@ import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { HydrationFix } from '@/components/HydrationFix';
 import { RootLayoutContent } from '@/components/RootLayoutContent';
+import { MoralisAuthProvider } from "@/components/MoralisAuthProvider";
 
 // Metadata for the site
 export const metadata: Metadata = {
@@ -55,7 +56,9 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning>
         <HydrationFix />
-        <RootLayoutContent>{children}</RootLayoutContent>
+        <MoralisAuthProvider>
+          <RootLayoutContent>{children}</RootLayoutContent>
+        </MoralisAuthProvider>
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +28,8 @@ import {
   DollarSign,
   Globe,
   Sparkles,
-  Eye
+  Eye,
+  Loader2
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -90,6 +91,7 @@ export default function ETFManagerAgentPage() {
   const [withdrawAmount, setWithdrawAmount] = useState('5');
   const [isProcessing, setIsProcessing] = useState(false);
   const [autoMode, setAutoMode] = useState(false);
+  const [isExecuting, setIsExecuting] = useState(false);
 
   const primaryWallet = wallets?.[0];
   const userAddress = primaryWallet?.address || '';
@@ -306,16 +308,27 @@ export default function ETFManagerAgentPage() {
 
   // Execute full cycle
   const handleFullCycle = async () => {
-    if (!depositAmount || isNaN(parseFloat(depositAmount))) {
-      toast.error('Please enter a valid amount');
+    if (!primaryWallet) {
+      toast.error('Please connect your wallet first');
       return;
     }
 
-    toast.info('🔄 Starting full ETF investment cycle...');
-    setAutoMode(true);
-    
+    toast.info('🔄 Starting full ETF management cycle...');
+
     // Start with bridging
     await handleBridgeToBase();
+  };
+
+  const handlePlanExecution = async () => {
+    setIsExecuting(true);
+    try {
+      await handleFullCycle();
+    } catch (error) {
+      console.error('Execution failed:', error);
+      toast.error('Execution failed');
+    } finally {
+      setIsExecuting(false);
+    }
   };
 
   if (!ready) {
@@ -361,7 +374,7 @@ export default function ETFManagerAgentPage() {
               <Image src="/baevii-logo.png" alt="Baevii" width={48} height={48} className="rounded-lg" />
               <div>
                 <h1 className="text-3xl font-bold">ETF Manager Agent</h1>
-                <p className="text-blue-200 mt-1">Automated cross-chain ETF investment & management</p>
+                <p className="text-blue-200 mt-1">Automated cross-chain ETF management & rebalancing</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -398,7 +411,7 @@ export default function ETFManagerAgentPage() {
 
       {/* Main Operations */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Investment Flow */}
+        {/* Portfolio Management Flow */}
         <div className="space-y-6">
           <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white">
             <CardHeader>
@@ -407,7 +420,7 @@ export default function ETFManagerAgentPage() {
                   <ArrowDownToLine className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <span className="text-xl font-bold">Invest in ETF</span>
+                  <span className="text-xl font-bold">Add to ETF Portfolio</span>
                   <p className="text-sm text-green-600 font-normal">FLOW → Base USDC → ETF Tokens</p>
                 </div>
               </CardTitle>
@@ -415,7 +428,7 @@ export default function ETFManagerAgentPage() {
             <CardContent className="space-y-6">
               <div>
                 <Label htmlFor="deposit-amount" className="text-base font-medium">
-                  Amount to Invest (FLOW)
+                  Amount to Add (FLOW)
                 </Label>
                 <Input
                   id="deposit-amount"
@@ -433,7 +446,7 @@ export default function ETFManagerAgentPage() {
               </div>
 
               <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                <h4 className="font-medium text-slate-700 mb-3">Investment Flow:</h4>
+                <h4 className="font-medium text-slate-700 mb-3">Portfolio Addition Flow:</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -488,7 +501,7 @@ export default function ETFManagerAgentPage() {
                 ) : (
                   <Zap className="w-5 h-5 mr-2" />
                 )}
-                Execute Full Investment Cycle
+                Execute Full Portfolio Cycle
               </Button>
             </CardContent>
           </Card>
@@ -662,6 +675,56 @@ export default function ETFManagerAgentPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Flow Management */}
+      <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+        <CardHeader>
+          <CardTitle className="text-white">ETF Management Flow</CardTitle>
+          <CardDescription className="text-blue-200">
+            Manage your ETF portfolio with AI assistance
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-blue-500/20 rounded-lg">
+              <div className="text-2xl mb-2">📊</div>
+              <h4 className="font-medium text-white mb-1">Portfolio Analysis</h4>
+              <p className="text-sm text-blue-200">AI analyzes your current allocations</p>
+            </div>
+            <div className="text-center p-4 bg-green-500/20 rounded-lg">
+              <div className="text-2xl mb-2">🔄</div>
+              <h4 className="font-medium text-white mb-1">Smart Rebalancing</h4>
+              <p className="text-sm text-blue-200">Automated cross-chain rebalancing</p>
+            </div>
+            <div className="text-center p-4 bg-purple-500/20 rounded-lg">
+              <div className="text-2xl mb-2">📈</div>
+              <h4 className="font-medium text-white mb-1">Performance Tracking</h4>
+              <p className="text-sm text-blue-200">Monitor your portfolio growth</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row gap-4 mt-8">
+        <Button 
+          onClick={handlePlanExecution}
+          disabled={isExecuting}
+          className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+        >
+          {isExecuting ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Executing...
+            </>
+          ) : (
+            <>
+              <Zap className="w-4 h-4 mr-2" />
+              Execute Full Management Cycle
+            </>
+          )}
+        </Button>
+      </div>
     </div>
   );
 }

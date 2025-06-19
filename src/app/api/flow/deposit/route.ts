@@ -1,4 +1,8 @@
 import { NextResponse } from 'next/server';
+import { 
+  getTokenName,
+  CONTRACT_ADDRESSES
+} from '@/lib/flow-contracts';
 
 export async function POST(request: Request) {
   try {
@@ -11,7 +15,15 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
     
-    console.log(`📥 Processing deposit of ${amount} ${token} for ${userAddress}`);
+    // Only allow USDC deposits
+    if (token.toLowerCase() !== 'usdc') {
+      return NextResponse.json({
+        success: false,
+        error: "Only USDC deposits are supported"
+      }, { status: 400 });
+    }
+    
+    console.log(`💰 Processing USDC deposit of ${amount} for ${userAddress}`);
     
     // In a production app, you would need proper key management
     // This is just for demonstration purposes
@@ -29,20 +41,22 @@ export async function POST(request: Request) {
     // In a real implementation, you would:
     // 1. Get the signer from the private key
     // 2. Get contract instances
-    // 3. Approve the ETF to spend the token
-    // 4. Call the deposit function
+    // 3. Call the deposit function
+    
+    // Use USDC contract address
+    const tokenAddress = CONTRACT_ADDRESSES.usdc;
     
     // Simulate a successful deposit
-    console.log(`✅ Simulated deposit of ${amount} ${token} for ${userAddress}`);
+    console.log(`✅ Simulated USDC deposit of ${amount} for ${userAddress}`);
     
-    // Calculate estimated ETF shares received (simplified calculation)
-    const estimatedShares = parseFloat(amount) * 0.95; // Account for slippage and fees
+    // Calculate estimated shares received (simplified calculation)
+    const estimatedShares = parseFloat(amount) * 0.95; // Account for fees
     
     return NextResponse.json({
       success: true,
       data: {
         txHash: `0x${Math.random().toString(16).slice(2)}`,
-        token,
+        token: 'USDC',
         amount,
         shares: estimatedShares.toString(),
         userAddress,
@@ -66,50 +80,22 @@ export async function POST(request: Request) {
     const signer = getServerSigner(privateKey);
     const contracts = getContracts(signer);
     
-    // Determine which token contract to use
-    let tokenContract;
-    let tokenAddress;
+    // Use USDC contract
+    const tokenContract = contracts.usdc;
+    const tokenAddress = CONTRACT_ADDRESSES.usdc;
     
-    switch (token.toUpperCase()) {
-      case 'WFLOW':
-        tokenContract = contracts.wflow;
-        tokenAddress = CONTRACT_ADDRESSES.wflow;
-        break;
-      case 'TRUMP':
-        tokenContract = contracts.trump;
-        tokenAddress = CONTRACT_ADDRESSES.trump;
-        break;
-      case 'ANKRFLOW':
-        tokenContract = contracts.ankrFlow;
-        tokenAddress = CONTRACT_ADDRESSES.ankrFlow;
-        break;
-      case 'USDC':
-        tokenContract = contracts.usdc;
-        tokenAddress = CONTRACT_ADDRESSES.usdc;
-        break;
-      case 'WETH':
-        tokenContract = contracts.weth;
-        tokenAddress = CONTRACT_ADDRESSES.weth;
-        break;
-      default:
-        return NextResponse.json({
-          success: false,
-          error: `Unsupported token: ${token}`
-        }, { status: 400 });
-    }
-    
-    // Convert amount to wei
-    const amountWei = parseAmount(amount);
+    // Convert amount to wei (USDC has 6 decimals)
+    const amountWei = parseAmount(amount, 6);
     
     // Check if user has already approved spending
     const allowance = await tokenContract.allowance(userAddress, CONTRACT_ADDRESSES.etfVault);
     
     if (allowance < amountWei) {
       // In a real implementation, the user would need to approve from their wallet
-      console.log(`❌ User needs to approve ETF to spend tokens: ${formatAmount(allowance)} < ${amount}`);
+      console.log(`❌ User needs to approve ETF to spend USDC: ${formatAmount(allowance, 6)} < ${amount}`);
       return NextResponse.json({
         success: false,
-        error: "Insufficient allowance. User must approve ETF to spend tokens."
+        error: "Insufficient allowance. User must approve ETF to spend USDC."
       }, { status: 400 });
     }
     
@@ -117,13 +103,13 @@ export async function POST(request: Request) {
     const tx = await contracts.etfVault.deposit(tokenAddress, amountWei);
     const receipt = await tx.wait();
     
-    console.log(`✅ Deposit successful: ${receipt.hash}`);
+    console.log(`✅ USDC deposit successful: ${receipt.hash}`);
     
     return NextResponse.json({
       success: true,
       data: {
         txHash: receipt.hash,
-        token,
+        token: 'USDC',
         amount,
         shares: formatAmount(receipt.logs[0].args.value), // Assuming Transfer event
         userAddress,
@@ -133,11 +119,10 @@ export async function POST(request: Request) {
     */
     
   } catch (error) {
-    console.error('❌ Error processing deposit:', error);
-    
+    console.error('❌ Error processing USDC deposit:', error);
     return NextResponse.json({
       success: false,
-      error: "Failed to process deposit"
+      error: "Internal server error"
     }, { status: 500 });
   }
 } 

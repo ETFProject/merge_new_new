@@ -366,11 +366,11 @@ export default function FlowEtfPage() {
     
     setContractLoading(true);
     try {
-      const tokenAddress = ASSET_ADDRESSES[depositToken];
-      const amount = ethers.parseEther(depositAmount);
+      const tokenAddress = ASSET_ADDRESSES.USDC; // Only USDC
+      const amount = ethers.parseUnits(depositAmount, 6); // USDC has 6 decimals
       
       // First approve the token transfer
-      const tokenContract = new ethers.Contract(tokenAddress, tokenAbis[depositToken], signer);
+      const tokenContract = new ethers.Contract(tokenAddress, tokenAbis.USDC, signer);
       const approveTx = await tokenContract.approve(CONTRACT_ADDRESSES.etfVault, amount);
       await approveTx.wait();
       
@@ -402,7 +402,7 @@ export default function FlowEtfPage() {
     setContractLoading(true);
     try {
       const shares = ethers.parseEther(withdrawAmount);
-      const tokenAddress = ASSET_ADDRESSES[withdrawToken];
+      const tokenAddress = ASSET_ADDRESSES.USDC; // Only USDC
       // Set minAmountOut to 0 for simplicity - in production, this should be calculated
       const minAmountOut = 0;
       
@@ -514,7 +514,7 @@ export default function FlowEtfPage() {
       suggestedStrategy = generateStrategy('Balanced') || null;
       
     } else if (command.includes('ai') || command.includes('tech') || command.includes('future') || command.includes('innovation')) {
-      response = '🤖 For future-focused investments, I recommend AI and technology tokens with strong fundamentals and growth potential.';
+      response = '�� For future-focused portfolio management, I recommend AI and technology tokens with strong fundamentals and growth potential.';
       suggestedStrategy = generateStrategy('AI Focus') || null;
       
     } else if (command.includes('rebalance') || command.includes('optimize') || command.includes('improve')) {
@@ -551,7 +551,7 @@ export default function FlowEtfPage() {
                 '• Try "make it more conservative" for safer allocations\n' +
                 '• Say "aggressive growth portfolio" for higher risk/reward\n' +
                 '• Ask for "balanced diversification" for mixed strategy\n' +
-                '• Request "AI and tech focus" for future-oriented investments\n' +
+                '• Request "AI and tech focus" for future-oriented portfolio management\n' +
                 '• Say "rebalance my portfolio" for optimization suggestions';
     }
     
@@ -859,23 +859,16 @@ export default function FlowEtfPage() {
                   <div className="col-span-1 md:col-span-2 lg:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <Card className="bg-muted/30">
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-base">Deposit to ETF</CardTitle>
+                        <CardTitle className="text-base">Deposit USDC to ETF</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-2">
                         <div className="flex gap-2">
-                          <Select value={depositToken} onValueChange={(v) => setDepositToken(v as keyof typeof ASSET_ADDRESSES)}>
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder="Select token" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Object.keys(ASSET_ADDRESSES).map((token) => (
-                                <SelectItem key={token} value={token}>{token}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <div className="flex items-center px-3 py-2 bg-muted rounded-md text-sm font-medium">
+                            USDC
+                          </div>
                           <Input
                             type="number"
-                            placeholder="Amount"
+                            placeholder="USDC Amount"
                             value={depositAmount}
                             onChange={(e) => setDepositAmount(e.target.value)}
                           />
@@ -888,20 +881,13 @@ export default function FlowEtfPage() {
                     
                     <Card className="bg-muted/30">
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-base">Withdraw from ETF</CardTitle>
+                        <CardTitle className="text-base">Withdraw USDC from ETF</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-2">
                         <div className="flex gap-2">
-                          <Select value={withdrawToken} onValueChange={(v) => setWithdrawToken(v as keyof typeof ASSET_ADDRESSES)}>
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder="Select token" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Object.keys(ASSET_ADDRESSES).map((token) => (
-                                <SelectItem key={token} value={token}>{token}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <div className="flex items-center px-3 py-2 bg-muted rounded-md text-sm font-medium">
+                            USDC
+                          </div>
                           <Input
                             type="number"
                             placeholder="Shares to withdraw"

@@ -2,6 +2,7 @@ import { AgentAction, AgentPlan } from './gemini';
 import { PrivyServerAgent, BridgeParams, ContractInteractionParams } from './privy-server';
 import { getContracts, formatAmount, parseAmount } from '@/lib/flow-contracts';
 import { CONTRACT_ADDRESSES, ASSET_ADDRESSES } from '@/config/contracts';
+import { ethers } from 'ethers';
 
 export interface ActionExecutorConfig {
   privyAgent: PrivyServerAgent;
@@ -153,35 +154,18 @@ export class ActionExecutor {
   private async executeDeposit(action: AgentAction): Promise<ExecutionResult> {
     const { token, amount } = action.parameters;
     
-    const tokenAddress = ASSET_ADDRESSES[token as keyof typeof ASSET_ADDRESSES] || ASSET_ADDRESSES.WFLOW;
-    const amountWei = parseAmount(amount || '1.0').toString();
-
-    // First approve the token
-    const approveInteraction: ContractInteractionParams = {
-      contractAddress: tokenAddress,
-      abi: [
-        'function approve(address spender, uint256 amount) returns (bool)'
-      ],
-      methodName: 'approve',
-      params: [CONTRACT_ADDRESSES.etfVault, amountWei]
-    };
-
-    const approveResult = await this.config.privyAgent.executeContractInteraction(
-      this.config.userId,
-      this.config.walletId,
-      '545', // Flow EVM Testnet
-      approveInteraction
-    );
-
-    if (!approveResult.success) {
+    // Only allow USDC deposits
+    if (token?.toLowerCase() !== 'usdc') {
       return {
         success: false,
-        error: 'Failed to approve token'
+        error: 'Only USDC deposits are supported'
       };
     }
+    
+    const tokenAddress = ASSET_ADDRESSES.USDC;
+    const amountWei = ethers.parseUnits(amount || '1.0', 6).toString(); // USDC has 6 decimals
 
-    // Then execute deposit
-    const depositInteraction: ContractInteractionParams = {
+    const interaction: ContractInteractionParams = {
       contractAddress: CONTRACT_ADDRESSES.etfVault,
       abi: [
         'function deposit(address token, uint256 amount) returns (uint256)'
@@ -190,21 +174,20 @@ export class ActionExecutor {
       params: [tokenAddress, amountWei]
     };
 
-    const depositResult = await this.config.privyAgent.executeContractInteraction(
+    const result = await this.config.privyAgent.executeContractInteraction(
       this.config.userId,
       this.config.walletId,
       '545', // Flow EVM Testnet
-      depositInteraction
+      interaction
     );
 
     return {
-      success: depositResult.success,
-      txHash: depositResult.txHash,
+      success: result.success,
+      txHash: result.txHash,
       result: {
-        token,
+        token: 'USDC',
         amount,
-        approveHash: approveResult.txHash,
-        depositHash: depositResult.txHash
+        hash: result.txHash
       }
     };
   }
@@ -215,7 +198,15 @@ export class ActionExecutor {
   private async executeWithdraw(action: AgentAction): Promise<ExecutionResult> {
     const { shares, tokenOut } = action.parameters;
     
-    const tokenAddress = ASSET_ADDRESSES[tokenOut as keyof typeof ASSET_ADDRESSES] || ASSET_ADDRESSES.WFLOW;
+    // Only allow USDC withdrawals
+    if (tokenOut?.toLowerCase() !== 'usdc') {
+      return {
+        success: false,
+        error: 'Only USDC withdrawals are supported'
+      };
+    }
+    
+    const tokenAddress = ASSET_ADDRESSES.USDC;
     const sharesWei = parseAmount(shares || '1.0').toString();
 
     const interaction: ContractInteractionParams = {
@@ -239,7 +230,7 @@ export class ActionExecutor {
       txHash: result.txHash,
       result: {
         shares,
-        tokenOut,
+        tokenOut: 'USDC',
         hash: result.txHash
       }
     };

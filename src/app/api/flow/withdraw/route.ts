@@ -15,7 +15,15 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
     
-    console.log(`📤 Processing withdrawal of ${shares} shares to ${tokenOut} for ${userAddress}`);
+    // Only allow USDC withdrawals
+    if (tokenOut.toLowerCase() !== 'usdc') {
+      return NextResponse.json({
+        success: false,
+        error: "Only USDC withdrawals are supported"
+      }, { status: 400 });
+    }
+    
+    console.log(`📤 Processing withdrawal of ${shares} shares to USDC for ${userAddress}`);
     
     // In a production app, you would need proper key management
     // This is just for demonstration purposes
@@ -35,40 +43,20 @@ export async function POST(request: Request) {
     // 2. Get contract instances
     // 3. Call the withdraw function
     
-    // Determine token address from token name or symbol
-    let tokenAddress = '';
-    
-    if (tokenOut.startsWith('0x')) {
-      // If it's already an address, use it directly
-      tokenAddress = tokenOut;
-    } else {
-      // Otherwise, look up the address by token name
-      const tokenKey = Object.keys(CONTRACT_ADDRESSES).find(key => 
-        key.toLowerCase() === tokenOut.toLowerCase() || 
-        getTokenName(CONTRACT_ADDRESSES[key as keyof typeof CONTRACT_ADDRESSES]).toLowerCase() === tokenOut.toLowerCase()
-      );
-      
-      if (!tokenKey) {
-        return NextResponse.json({
-          success: false,
-          error: `Unsupported token: ${tokenOut}`
-        }, { status: 400 });
-      }
-      
-      tokenAddress = CONTRACT_ADDRESSES[tokenKey as keyof typeof CONTRACT_ADDRESSES];
-    }
+    // Use USDC contract address
+    const tokenAddress = CONTRACT_ADDRESSES.usdc;
     
     // Simulate a successful withdrawal
-    console.log(`✅ Simulated withdrawal of ${shares} shares to ${tokenOut} (${tokenAddress}) for ${userAddress}`);
+    console.log(`✅ Simulated withdrawal of ${shares} shares to USDC for ${userAddress}`);
     
-    // Calculate estimated token amount received (simplified calculation)
+    // Calculate estimated USDC amount received (simplified calculation)
     const estimatedAmount = parseFloat(shares) * 0.95; // Account for slippage and fees
     
     return NextResponse.json({
       success: true,
       data: {
         txHash: `0x${Math.random().toString(16).slice(2)}`,
-        token: tokenOut,
+        token: 'USDC',
         shares,
         amount: estimatedAmount.toString(),
         userAddress,
@@ -79,55 +67,41 @@ export async function POST(request: Request) {
     /* 
     // Uncomment this for actual implementation with ethers.js
     
-    // Import the necessary functions when implementing
-    import { getServerSigner, getContracts, formatAmount, parseAmount } from '@/lib/flow-contracts';
+    // Import the necessary functions at the top of the file when implementing
+    import { 
+      getServerSigner, 
+      getContracts, 
+      formatAmount,
+      parseAmount,
+      CONTRACT_ADDRESSES
+    } from '@/lib/flow-contracts';
     
     // Get signer and contracts
     const signer = getServerSigner(privateKey);
     const contracts = getContracts(signer);
     
+    // Use USDC contract
+    const tokenAddress = CONTRACT_ADDRESSES.usdc;
+    
     // Convert shares to wei
     const sharesWei = parseAmount(shares);
     
-    // Call withdraw with minimum amount out of 0 (not recommended in production)
-    // In production, you'd calculate a reasonable minAmountOut based on current prices
-    const tx = await contracts.etfVault.withdraw(sharesWei, tokenAddress, 0);
+    // Set minAmountOut to 0 for simplicity - in production, this should be calculated
+    const minAmountOut = 0;
+    
+    // Withdraw from ETF
+    const tx = await contracts.etfVault.withdraw(sharesWei, tokenAddress, minAmountOut);
     const receipt = await tx.wait();
     
-    // Find the Transfer event for the token received
-    const transferEvent = receipt.logs.find(log => 
-      log.topics[0] === ethers.id('Transfer(address,address,uint256)')
-    );
-    
-    let amountOut = '0';
-    if (transferEvent) {
-      const parsedLog = ethers.AbiCoder.parseLog({
-        topics: transferEvent.topics,
-        data: transferEvent.data,
-        eventFragment: {
-          name: 'Transfer',
-          type: 'event',
-          inputs: [
-            { name: 'from', type: 'address', indexed: true },
-            { name: 'to', type: 'address', indexed: true },
-            { name: 'value', type: 'uint256', indexed: false }
-          ]
-        }
-      });
-      
-      amountOut = formatAmount(parsedLog.args.value);
-    }
-    
-    console.log(`✅ Withdrawal successful: ${receipt.hash}`);
-    console.log(`✅ Received: ${amountOut} ${tokenOut}`);
+    console.log(`✅ USDC withdrawal successful: ${receipt.hash}`);
     
     return NextResponse.json({
       success: true,
       data: {
         txHash: receipt.hash,
-        token: tokenOut,
+        token: 'USDC',
         shares,
-        amount: amountOut,
+        amount: formatAmount(receipt.logs[0].args.value, 6), // Assuming Transfer event, USDC has 6 decimals
         userAddress,
         timestamp: new Date().toISOString()
       }
@@ -135,11 +109,10 @@ export async function POST(request: Request) {
     */
     
   } catch (error) {
-    console.error('❌ Error processing withdrawal:', error);
-    
+    console.error('❌ Error processing USDC withdrawal:', error);
     return NextResponse.json({
       success: false,
-      error: "Failed to process withdrawal"
+      error: "Internal server error"
     }, { status: 500 });
   }
 } 
