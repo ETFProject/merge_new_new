@@ -41,7 +41,7 @@ export const MoralisAuth = () => {
       setIsLoading(true);
       setError(null);
 
-      // Request wallet connection
+      // Request wallet connection first
       if (typeof window.ethereum === 'undefined') {
         throw new Error('No wallet detected. Please install MetaMask.');
       }
@@ -55,33 +55,62 @@ export const MoralisAuth = () => {
         method: 'eth_chainId' 
       });
 
-      // Create a user session by making an authenticated API call
-      // This will log the user in Moralis database
+      // Step 1: Request authentication message from Moralis
+      const authData = await Moralis.Auth.requestMessage({
+        address: address,
+        chain: chainId,
+        network: 'evm',
+        domain: 'baevii-etf-manager.com',
+        statement: 'Welcome to BAEVII ETF Manager! Please sign this message to authenticate.',
+        uri: 'https://baevii-etf-manager.com',
+        timeout: 15,
+      });
+
+      console.log('Auth message requested:', authData);
+
+      // Step 2: Sign the message with the wallet
+      const signature = await window.ethereum.request({
+        method: 'personal_sign',
+        params: [authData.result.message, address],
+      });
+
+      console.log('Message signed:', signature);
+
+      // Step 3: Verify the signature with Moralis
+      const verifyData = await Moralis.Auth.verify({
+        message: authData.result.message,
+        signature: signature,
+        network: 'evm',
+      });
+
+      console.log('Signature verified:', verifyData);
+
+      // Step 4: Create user session
       const userData = {
         address,
         chainId,
         authenticatedAt: new Date().toISOString(),
       };
 
-      // Make a test API call to ensure user is logged
+      setIsAuthenticated(true);
+      setUser(userData);
+
+      console.log('User authenticated with Moralis Auth:', userData);
+
+      // Step 5: Make authenticated API calls
       const balance = await Moralis.EvmApi.balance.getNativeBalance({
         address: address,
         chain: chainId,
       });
 
-      setIsAuthenticated(true);
-      setUser(userData);
+      console.log('Balance fetched for authenticated user:', balance.result.balance.ether);
 
-      console.log('User authenticated with Moralis:', userData);
-      console.log('Balance fetched:', balance.result.balance.ether);
-
-      // You can also make additional API calls here to ensure user activity is logged
       const tokens = await Moralis.EvmApi.token.getWalletTokenBalances({
         address: address,
         chain: chainId,
       });
 
-      console.log('Tokens fetched:', tokens.result.length, 'tokens');
+      console.log('Tokens fetched for authenticated user:', tokens.result.length, 'tokens');
 
     } catch (error) {
       console.error('Login failed:', error);
@@ -112,17 +141,17 @@ export const MoralisAuth = () => {
       <CardHeader>
         <CardTitle>Moralis Authentication</CardTitle>
         <CardDescription>
-          Connect your wallet to create user activity in Moralis database
+          Complete authentication flow with message signing
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {!isAuthenticated ? (
           <Button onClick={handleLogin} disabled={isLoading} className="w-full">
-            {isLoading ? 'Connecting...' : 'Connect Wallet & Log Activity'}
+            {isLoading ? 'Authenticating...' : 'Sign In with Moralis Auth'}
           </Button>
         ) : (
           <Button onClick={handleLogout} variant="outline" className="w-full">
-            Disconnect
+            Sign Out
           </Button>
         )}
 
@@ -135,8 +164,8 @@ export const MoralisAuth = () => {
         {user && (
           <div className="space-y-4">
             <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-green-800 font-medium">✅ Connected to Moralis!</p>
-              <p className="text-green-700 text-sm">User activity logged in database</p>
+              <p className="text-green-800 font-medium">✅ Authenticated with Moralis Auth!</p>
+              <p className="text-green-700 text-sm">User session created in Moralis database</p>
             </div>
 
             <div className="p-4 bg-muted rounded-lg">
@@ -154,7 +183,7 @@ export const MoralisAuth = () => {
             </div>
 
             <div className="p-4 bg-muted rounded-lg">
-              <p className="text-sm font-medium">Connected At</p>
+              <p className="text-sm font-medium">Authenticated At</p>
               <p className="text-xs text-muted-foreground">
                 {new Date(user.authenticatedAt).toLocaleString()}
               </p>
