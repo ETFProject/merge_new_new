@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MoralisTest } from "@/components/MoralisTest";
+import { MoralisAuth } from "@/components/MoralisAuth";
 
 // Mock data for user's current ETF investments
 const userInvestments = {
@@ -189,6 +190,9 @@ export default function Dashboard() {
           </Link>
         </div>
       </div>
+
+      {/* Moralis Authentication */}
+      <MoralisAuth />
 
       {/* Moralis Integration Test */}
       <MoralisTest />

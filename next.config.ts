@@ -23,6 +23,27 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  // Handle ES modules and resolve import issues
+  webpack: (config, { isServer }) => {
+    // Handle ES modules
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+    };
+
+    // Handle bs58 and other problematic modules
+    config.module.rules.push({
+      test: /\.m?js$/,
+      resolve: {
+        fullySpecified: false,
+      },
+    });
+
+    return config;
+  },
 };
 
 export default nextConfig;
