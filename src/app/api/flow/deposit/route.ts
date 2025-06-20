@@ -3,12 +3,10 @@ import {
   getServerProvider, 
   getContracts,
   formatAmount,
-  parseAmount
-} from '@/lib/flow-contracts-server';
-import { 
+  parseAmount,
   getTokenName,
   CONTRACT_ADDRESSES
-} from '@/lib/flow-contracts';
+} from '@/lib/flow-contracts-server';
 
 export async function POST(request: Request) {
   try {
@@ -80,7 +78,7 @@ export async function POST(request: Request) {
       formatAmount,
       parseAmount,
       CONTRACT_ADDRESSES
-    } from '@/lib/flow-contracts';
+    } from '@/lib/flow-contracts-server';
     
     // Get signer and contracts
     const signer = getServerSigner(privateKey);

@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     // Uncomment this for actual implementation with ethers.js
     
     // Import when implementing
-    import { getServerSigner } from '@/lib/flow-contracts';
+    import { getServerSigner } from '@/lib/flow-contracts-server';
     
     // Get signer and contracts
     const privateKey = process.env.FLOW_ETF_PRIVATE_KEY;
