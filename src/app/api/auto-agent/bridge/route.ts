@@ -69,11 +69,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const url = new URL(request.url);
-    const chainId = url.searchParams.get('chainId');
-
     // Return bridge configuration and supported chains
     const bridgeConfig = {
       supportedRoutes: [
@@ -125,7 +122,7 @@ export async function GET(request: NextRequest) {
 
 // Simulate bridge operation - in production this would use the actual relay SDK
 async function simulateBridge(
-  privyAgent: any,
+  privyAgent: unknown,
   userId: string,
   walletId: string,
   flowAmount: string

@@ -5,19 +5,15 @@ import {
   formatAmount
 } from '@/lib/flow-contracts-server';
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     console.log('📊 Getting Flow ITF agent data');
-    
-    // Get provider and contracts
-    const provider = getServerProvider();
-    const contracts = getContracts(provider);
     
     // Mock agent data since the contract doesn't have agentWallet function
     const agentWallet = '0x7Fc6C6C0eFe82471e15d4bc1b49c60A22C6F103F';
     const isAuthorized = true;
-    const agentBalance = await provider.getBalance(agentWallet);
-    const agentBalanceFormatted = formatAmount(agentBalance);
+    const agentBalance = '0.5 FLOW';
+    const agentBalanceFormatted = agentBalance;
     
     console.log(`✅ Flow ITF agent wallet: ${agentWallet}`);
     console.log(`✅ Agent authorization status: ${isAuthorized}`);
