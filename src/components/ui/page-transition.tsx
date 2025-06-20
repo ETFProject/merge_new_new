@@ -26,7 +26,6 @@ export function PageTransition({
         // We're ready to start using the view transition API
         console.log('View Transition API is supported');
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       console.log('View Transition API is not supported');
     }

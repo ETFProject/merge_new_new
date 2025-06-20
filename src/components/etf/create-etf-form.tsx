@@ -1,7 +1,8 @@
 'use client';
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
 import { ClientCard } from "@/components/ui/client-card";
 import { Label } from "@/components/ui/label";
