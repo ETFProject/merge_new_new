@@ -1,5 +1,9 @@
 # ETF Manager Frontend
 
+## Deployment Status
+- Latest commit: c6a9924
+- Vercel deployment trigger: 2024-06-19
+
 A modern UI for managing multi-chain crypto ETFs with AI-powered insights and cross-chain liquidity.
 
 ## Features
