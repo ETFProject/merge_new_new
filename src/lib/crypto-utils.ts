@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/exhaustive-deps */
-
 'use client';
 
 import { ethers } from 'ethers';
@@ -53,7 +49,7 @@ export const HashLock = {
 /**
  * Creates a keccak256 hash of solidityPacked data
  */
-export function solidityPackedKeccak256(types: string[], values: unknown[]): string {
+export function solidityPackedKeccak256(types: string[], values: (string | number | boolean)[]): string {
   const encoded = ethers.solidityPacked(types, values);
   return ethers.keccak256(encoded);
 } 

@@ -1,10 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import { createContext, useContext, ReactNode, useState, useEffect, useCallback, useRef } from 'react';
-import { Bell, ExternalLink, Copy, Check, TrendingUp, AlertTriangle, Info, X, BarChart3 } from 'lucide-react';
+import { Bell, ExternalLink, Copy, Check, TrendingUp, Info, X, BarChart3 } from 'lucide-react';
 
 // Enhanced types for Blockscout SDK
 export interface TransactionToastOptions {
@@ -119,21 +116,21 @@ class EnhancedBlockscoutApiClient {
     '545': 'https://evm-testnet.flowscan.io'
   };
 
-  private cache = new Map<string, { data: any; timestamp: number; ttl: number }>();
+  private cache = new Map<string, { data: unknown; timestamp: number; ttl: number }>();
   private retryDelays = [1000, 2000, 4000];
 
   private getBaseUrl(chainId: string): string {
     return this.baseUrls[chainId] || `https://blockscout.com/chain/${chainId}`;
   }
 
-  private getCacheKey(url: string, params?: Record<string, any>): string {
-    return `${url}${params ? `?${new URLSearchParams(params).toString()}` : ''}`;
+  private getCacheKey(url: string, params?: Record<string, unknown>): string {
+    return `${url}${params ? `?${new URLSearchParams(params as Record<string, string>).toString()}` : ''}`;
   }
 
   private getFromCache<T>(key: string): T | null {
     const cached = this.cache.get(key);
     if (cached && Date.now() - cached.timestamp < cached.ttl) {
-      return cached.data;
+      return cached.data as T;
     }
     this.cache.delete(key);
     return null;
@@ -191,11 +188,11 @@ class EnhancedBlockscoutApiClient {
         value: data.value || '0',
         gasUsed: data.gas_used || '0',
         gasPrice: data.gas_price || '0',
-        status: data.status === 'ok' ? 'success' : data.status === 'error' ? 'failed' : 'pending',
+        status: (data.status === 'ok' ? 'success' : data.status === 'error' ? 'failed' : 'pending') as 'success' | 'failed' | 'pending',
         timestamp: data.timestamp ? new Date(data.timestamp).getTime() : Date.now(),
         method: data.method || 'transfer',
         interpretation: data.decoded_input?.method_call || 'Transaction',
-        txType: this.classifyTransactionType(data),
+        txType: this.classifyTransactionType(data) as TransactionDetails['txType'],
         usdValue: data.exchange_rate ? parseFloat(data.value || '0') * data.exchange_rate : undefined,
         fee: data.fee || '0',
         confirmations: data.confirmations || 0
@@ -219,7 +216,7 @@ class EnhancedBlockscoutApiClient {
         timestamp: Date.now(),
         method: 'transfer',
         interpretation: 'Mock transaction for development',
-        txType: ['transfer', 'contract', 'defi', 'bridge'][Math.floor(Math.random() * 4)] as any,
+        txType: ['transfer', 'contract', 'defi', 'bridge'][Math.floor(Math.random() * 4)] as TransactionDetails['txType'],
         usdValue: Math.random() * 1000,
         fee: (Math.random() * 0.01).toFixed(6),
         confirmations: Math.floor(Math.random() * 100)
@@ -253,22 +250,22 @@ class EnhancedBlockscoutApiClient {
 
       const data = await response.json();
       
-      const transactions = (data.items || []).map((tx: any) => ({
-        hash: tx.hash,
-        blockNumber: parseInt(tx.block_number || '0'),
-        from: tx.from?.hash || '',
-        to: tx.to?.hash || '',
-        value: tx.value || '0',
-        gasUsed: tx.gas_used || '0',
-        gasPrice: tx.gas_price || '0',
-        status: tx.status === 'ok' ? 'success' : tx.status === 'error' ? 'failed' : 'pending',
-        timestamp: tx.timestamp ? new Date(tx.timestamp).getTime() : Date.now(),
-        method: tx.method || 'transfer',
-        interpretation: tx.decoded_input?.method_call || 'Transaction',
-        txType: this.classifyTransactionType(tx),
-        usdValue: tx.exchange_rate ? parseFloat(tx.value || '0') * tx.exchange_rate : undefined,
-        fee: tx.fee || '0',
-        confirmations: tx.confirmations || 0
+      const transactions = (data.items || []).map((tx: Record<string, unknown>) => ({
+        hash: tx.hash as string,
+        blockNumber: parseInt((tx.block_number as string) || '0'),
+        from: (tx.from as Record<string, unknown>)?.hash as string || '',
+        to: (tx.to as Record<string, unknown>)?.hash as string || '',
+        value: (tx.value as string) || '0',
+        gasUsed: (tx.gas_used as string) || '0',
+        gasPrice: (tx.gas_price as string) || '0',
+        status: (tx.status === 'ok' ? 'success' : tx.status === 'error' ? 'failed' : 'pending') as 'success' | 'failed' | 'pending',
+        timestamp: (tx.timestamp as string) ? new Date(tx.timestamp as string).getTime() : Date.now(),
+        method: (tx.method as string) || 'transfer',
+        interpretation: (tx.decoded_input as Record<string, unknown>)?.method_call as string || 'Transaction',
+        txType: this.classifyTransactionType(tx) as TransactionDetails['txType'],
+        usdValue: (tx.exchange_rate as number) ? parseFloat((tx.value as string) || '0') * (tx.exchange_rate as number) : undefined,
+        fee: (tx.fee as string) || '0',
+        confirmations: (tx.confirmations as number) || 0
       }));
 
       const result = { transactions, total: data.total_count || transactions.length };
@@ -290,7 +287,7 @@ class EnhancedBlockscoutApiClient {
         timestamp: Date.now() - (i * 3600000), // 1 hour apart
         method: ['transfer', 'approve', 'deposit', 'withdraw', 'swap'][Math.floor(Math.random() * 5)],
         interpretation: `Mock transaction ${offset + i + 1}`,
-        txType: ['transfer', 'contract', 'defi', 'nft', 'bridge'][Math.floor(Math.random() * 5)] as any,
+        txType: ['transfer', 'contract', 'defi', 'nft', 'bridge'][Math.floor(Math.random() * 5)] as TransactionDetails['txType'],
         usdValue: Math.random() * 1000,
         fee: (Math.random() * 0.01).toFixed(6),
         confirmations: Math.floor(Math.random() * 100)
@@ -318,7 +315,7 @@ class EnhancedBlockscoutApiClient {
       const stats: ChainStats = {
         chainId,
         name: getChainName(chainId),
-        latestBlock: parseInt(data.latest_block || '0'),
+        latestBlock: parseInt(data.latest_block_number || '0'),
         avgBlockTime: parseFloat(data.average_block_time || '12'),
         totalTransactions: parseInt(data.total_transactions || '0'),
         activeAddresses: parseInt(data.active_addresses || '0'),
@@ -326,39 +323,39 @@ class EnhancedBlockscoutApiClient {
         networkHealth: this.calculateNetworkHealth(data)
       };
 
-      this.setCache(cacheKey, stats, 120000); // Cache for 2 minutes
+      this.setCache(cacheKey, stats, 60000); // Cache for 1 minute
       return stats;
     } catch (error) {
       console.error(`Error fetching chain stats for ${chainId}:`, error);
       
-      // Mock data
+      // Return mock stats
       return {
         chainId,
         name: getChainName(chainId),
         latestBlock: Math.floor(Math.random() * 1000000) + 18000000,
-        avgBlockTime: 12 + Math.random() * 8,
+        avgBlockTime: Math.random() * 20 + 5,
         totalTransactions: Math.floor(Math.random() * 100000000),
         activeAddresses: Math.floor(Math.random() * 1000000),
         gasPrice: (Math.random() * 50 + 10).toFixed(9),
-        networkHealth: ['excellent', 'good', 'fair'][Math.floor(Math.random() * 3)] as any
+        networkHealth: ['excellent', 'good', 'fair'][Math.floor(Math.random() * 3)] as ChainStats['networkHealth']
       };
     }
   }
 
-  private classifyTransactionType(tx: any): TransactionDetails['txType'] {
-    const method = tx.method?.toLowerCase() || '';
-    const to = tx.to?.hash?.toLowerCase() || '';
+  private classifyTransactionType(tx: Record<string, unknown>): TransactionDetails['txType'] {
+    const method = (tx.method as string)?.toLowerCase() || '';
+    const to = (tx.to as Record<string, unknown>)?.hash as string || '';
     
     if (method.includes('bridge') || to.includes('bridge')) return 'bridge';
     if (method.includes('swap') || method.includes('trade')) return 'defi';
     if (method.includes('mint') || method.includes('nft')) return 'nft';
-    if (tx.to?.is_contract) return 'contract';
+    if ((tx.to as Record<string, unknown>)?.is_contract) return 'contract';
     return 'transfer';
   }
 
-  private calculateNetworkHealth(stats: any): ChainStats['networkHealth'] {
+  private calculateNetworkHealth(stats: Record<string, unknown>): ChainStats['networkHealth'] {
     // Simple health calculation based on block time and activity
-    const blockTime = parseFloat(stats.average_block_time || '12');
+    const blockTime = parseFloat((stats.average_block_time as string) || '12');
     const score = blockTime < 15 ? 100 : blockTime < 30 ? 75 : blockTime < 60 ? 50 : 25;
     
     if (score >= 90) return 'excellent';
@@ -381,7 +378,6 @@ const TransactionPopupContext = createContext<TransactionPopupContextType | null
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const [isPaused, setIsPaused] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Initialize audio for notifications
@@ -390,13 +386,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     audioRef.current.volume = 0.3;
   }, []);
 
-  const unreadCount = notifications.filter(n => n.status === 'pending').length;
+  const unreadCount = notifications.filter((n: NotificationData) => n.status === 'pending').length;
 
   const playNotificationSound = useCallback(() => {
-    if (soundEnabled && audioRef.current) {
-      audioRef.current.play().catch(e => console.log('Audio play failed:', e));
+    if (audioRef.current) {
+      audioRef.current.play().catch((e: Error) => console.log('Audio play failed:', e));
     }
-  }, [soundEnabled]);
+  }, []);
 
   const openTxToast = useCallback(async (
     chainId: string, 
@@ -422,7 +418,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       confirmations: 0
     };
     
-    setNotifications(prev => [pendingNotification, ...prev.slice(0, 19)]); // Keep last 20
+    setNotifications((prev: NotificationData[]) => [pendingNotification, ...prev.slice(0, 19)]); // Keep last 20
     playNotificationSound();
     
     // Show browser notification if supported
@@ -452,8 +448,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
             
             const finalStatus = updatedTx.status === 'pending' ? 'failed' : updatedTx.status;
             
-            setNotifications(prev => 
-              prev.map(notif => 
+            setNotifications((prev: NotificationData[]) => 
+              prev.map((notif: NotificationData) => 
                 notif.id === notificationId 
                   ? { 
                       ...notif, 
@@ -487,8 +483,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
             }
           } else if (updatedTx) {
             // Update confirmations
-            setNotifications(prev => 
-              prev.map(notif => 
+            setNotifications((prev: NotificationData[]) => 
+              prev.map((notif: NotificationData) => 
                 notif.id === notificationId 
                   ? { ...notif, confirmations: updatedTx.confirmations || 0 }
                   : notif
@@ -502,8 +498,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       
       // Mark as failed after timeout
       setTimeout(() => {
-        setNotifications(prev => 
-          prev.map(notif => 
+        setNotifications((prev: NotificationData[]) => 
+          prev.map((notif: NotificationData) => 
             notif.id === notificationId 
               ? { ...notif, status: 'failed', interpretation: 'Transaction monitoring failed' }
               : notif
@@ -514,11 +510,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   }, [isPaused, playNotificationSound]);
 
   const clearNotification = useCallback((id: string) => {
-    setNotifications(prev => prev.filter(notif => notif.id !== id));
+    setNotifications((prev: NotificationData[]) => prev.filter(notif => notif.id !== id));
   }, []);
 
   const clearAllNotifications = useCallback(() => {
-    setNotifications([]);
+    setNotifications(() => []);
   }, []);
 
   const pauseNotifications = useCallback(() => {
@@ -533,8 +529,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const cleanup = setInterval(() => {
       const now = Date.now();
-      setNotifications(prev => 
-        prev.filter(notif => {
+      setNotifications((prev: NotificationData[]) => 
+        prev.filter((notif: NotificationData) => {
           if (notif.status === 'pending') return true; // Keep pending
           if (!notif.autoHide) return true; // Keep if auto-hide disabled
           return now - notif.timestamp < notif.hideAfter; // Remove if expired
@@ -960,7 +956,7 @@ function EnhancedTransactionHistoryModal({
               <span className="text-sm text-slate-600">Sort by:</span>
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as 'time' | 'value' | 'gas')}
                 className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="time">Time</option>

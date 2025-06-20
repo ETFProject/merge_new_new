@@ -1,13 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/exhaustive-deps */
-
 declare global {
   interface Window {
     ethereum?: {
-      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-      on: (event: string, callback: (...args: unknown[]) => void) => void;
-      removeListener: (event: string, callback: (...args: unknown[]) => void) => void;
+      request: (args: { method: string; params?: (string | number | boolean | Record<string, unknown>)[] }) => Promise<unknown>;
+      on: (event: string, callback: (...args: (string | number | boolean | Record<string, unknown>)[]) => void) => void;
+      removeListener: (event: string, callback: (...args: (string | number | boolean | Record<string, unknown>)[]) => void) => void;
       isMetaMask?: boolean;
     };
   }
