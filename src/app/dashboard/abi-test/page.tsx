@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
 // Extract ABI function  
-const extractAbi = (abiJson: any): JsonFragment[] => {
+const extractAbi = (abiJson: unknown): JsonFragment[] => {
   try {
     if (Array.isArray(abiJson)) return abiJson as JsonFragment[];
     if (abiJson?.abi) return abiJson.abi;
@@ -160,7 +160,7 @@ export default function AbiTestPage() {
       await fetchTokenBalance();
       await fetchEtfInfo();
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Deposit failed:", error);
       if (error?.data && error.data.includes('0xe450d38c')) {
         toast.error("Asset not supported by ETF");

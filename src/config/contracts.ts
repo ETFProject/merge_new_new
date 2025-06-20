@@ -61,5 +61,5 @@ export function isValidContractAddress(address: string): boolean {
     ...Object.values(CONTRACT_ADDRESSES),
     ...Object.values(ASSET_ADDRESSES),
   ];
-  return allAddresses.includes(address as any);
+  return allAddresses.includes(address as unknown as string);
 }

@@ -66,9 +66,61 @@ export async function POST(request: NextRequest) {
 }
 
 // GET handler to retrieve ITFs (for testing/debugging)
-export async function GET(_request: NextRequest) {
-  return NextResponse.json({
-    success: true,
-    data: itfs,
-  });
+export async function GET() {
+  try {
+    // Return example ITF configurations
+    const exampleConfigs = [
+      {
+        id: 'example_1',
+        name: 'Flow DeFi Index',
+        description: 'Diversified DeFi tokens on Flow blockchain',
+        tokens: [
+          { symbol: 'WFLOW', allocation: 40 },
+          { symbol: 'USDC', allocation: 30 },
+          { symbol: 'WETH', allocation: 20 },
+          { symbol: 'ANKR', allocation: 10 }
+        ],
+        rebalanceFrequency: 'weekly',
+        riskLevel: 'medium',
+        minInvestment: '100',
+        maxInvestment: '10000'
+      },
+      {
+        id: 'example_2',
+        name: 'Cross-Chain Bridge Fund',
+        description: 'Multi-chain bridge tokens and protocols',
+        tokens: [
+          { symbol: 'FLOW', allocation: 50 },
+          { symbol: 'USDC', allocation: 30 },
+          { symbol: 'WETH', allocation: 20 }
+        ],
+        rebalanceFrequency: 'daily',
+        riskLevel: 'high',
+        minInvestment: '500',
+        maxInvestment: '50000'
+      }
+    ];
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        examples: exampleConfigs,
+        supportedTokens: [
+          'WFLOW', 'USDC', 'WETH', 'ANKR', 'FLOW', 'TRUMP'
+        ],
+        supportedChains: [
+          { id: '747', name: 'Flow EVM Mainnet' },
+          { id: '545', name: 'Flow EVM Testnet' }
+        ]
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error getting ITF configs:', error);
+    
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to get ITF configurations'
+    }, { status: 500 });
+  }
 }

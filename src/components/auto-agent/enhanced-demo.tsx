@@ -14,7 +14,7 @@ interface TestResult {
   status: 'pending' | 'success' | 'failed';
   message: string;
   duration?: number;
-  details?: any;
+  details?: unknown;
 }
 
 export default function EnhancedAutoAgentDemo() {

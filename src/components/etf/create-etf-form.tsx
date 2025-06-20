@@ -1,8 +1,7 @@
 'use client';
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from "next/image";
+import { CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { ClientCard } from "@/components/ui/client-card";
 import { Label } from "@/components/ui/label";
@@ -114,7 +113,7 @@ export function CreateITFForm({ onSuccess }: CreateITFFormProps) {
   };
   
   // Save ITF data to local JSON for backup
-  const saveToLocalJson = (data: any) => {
+  const saveToLocalJson = (data: unknown) => {
     try {
       // In a browser environment, we can use localStorage
       const existingData = localStorage.getItem('baevii-itfs') || '[]';
@@ -218,9 +217,6 @@ export function CreateITFForm({ onSuccess }: CreateITFFormProps) {
     <ClientCard className="w-[600px] mx-auto" hover appear effect3d>
       <CardHeader>
         <CardTitle className="animate-entry">Create New ITF</CardTitle>
-        <CardDescription className="animate-entry animate-delay-1">
-          Set up a new ITF portfolio based on your risk tolerance
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4 animate-stagger">

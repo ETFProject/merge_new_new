@@ -2,14 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import Moralis from 'moralis';
+
+interface TokenData {
+  symbol: string;
+  balance: string;
+  decimals: number;
+}
 
 interface WalletData {
   address: string;
   balance: string;
   chainId: string;
-  tokens: any[];
+  tokens: TokenData[];
 }
 
 export const MoralisWalletConnect = () => {
@@ -27,9 +33,7 @@ export const MoralisWalletConnect = () => {
       setIsLoading(true);
       
       // Request account access
-      const accounts = await window.ethereum.request({ 
-        method: 'eth_requestAccounts' 
-      });
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }) as string[];
       
       const address = accounts[0];
       const chainId = await window.ethereum.request({ 
@@ -71,12 +75,12 @@ export const MoralisWalletConnect = () => {
 
   return (
     <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>Connect Wallet</CardTitle>
-        <CardDescription>
+      <div className="p-4 border-b">
+        <h2 className="text-lg font-bold">Connect Wallet</h2>
+        <p className="text-sm text-muted-foreground mb-2">
           Connect your wallet to view your portfolio and manage ITFs
-        </CardDescription>
-      </CardHeader>
+        </p>
+      </div>
       <CardContent className="space-y-4">
         {!isConnected ? (
           <Button 
@@ -111,7 +115,7 @@ export const MoralisWalletConnect = () => {
               <div className="p-4 bg-muted rounded-lg">
                 <p className="text-sm font-medium mb-2">Tokens</p>
                 <div className="space-y-2">
-                  {walletData.tokens.slice(0, 5).map((token, index) => (
+                  {walletData.tokens.slice(0, 5).map((token: TokenData, index: number) => (
                     <div key={index} className="flex justify-between text-sm">
                       <span>{token.symbol}</span>
                       <span>{parseFloat(token.balance) / Math.pow(10, token.decimals)}</span>

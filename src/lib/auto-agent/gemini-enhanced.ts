@@ -15,7 +15,7 @@ interface GeminiConfig {
 interface ActionTemplate {
   type: AgentAction['type'];
   description: string;
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
   estimatedDuration: number;
   priority: 'low' | 'medium' | 'high';
   prerequisites?: string[];
@@ -41,7 +41,7 @@ export class EnhancedGeminiAgent {
       this.client = new GoogleGenAI({ apiKey });
       this.initialized = true;
     } else {
-      this.client = null as any;
+      this.client = null as unknown;
     }
   }
 
@@ -259,7 +259,7 @@ Please create a detailed execution plan that accomplishes this goal safely and e
       if (planMatch) {
         const planData = JSON.parse(planMatch[1]);
         
-        const actions: AgentAction[] = planData.actions.map((action: any, index: number) => ({
+        const actions: AgentAction[] = planData.actions.map((action: unknown, index: number) => ({
           id: `action_${Date.now()}_${index}`,
           type: action.type || 'analysis',
           description: action.description || `Action ${index + 1}`,

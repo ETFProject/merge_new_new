@@ -17,9 +17,9 @@ export interface BridgeParams {
 
 export interface ContractInteractionParams {
   contractAddress: string;
-  abi: any[];
+  abi: unknown[];
   methodName: string;
-  params: any[];
+  params: unknown[];
   value?: string;
 }
 
@@ -161,16 +161,16 @@ class PrivyServerAgent {
           console.log('Signing message with adapter:', { message });
           return `0x${Math.random().toString(16).slice(2)}`;
         },
-        signTransaction: async (transaction: any) => {
+        signTransaction: async (transaction: unknown) => {
           console.log('Signing transaction with adapter:', { transaction });
           return `0x${Math.random().toString(16).slice(2)}`;
         }
       },
-      sendTransaction: async (transaction: any) => {
+      sendTransaction: async (transaction: unknown) => {
         console.log('Sending transaction with adapter:', { transaction });
         return `0x${Math.random().toString(16).slice(2)}`;
       },
-      signTypedData: async (typedData: any) => {
+      signTypedData: async (typedData: unknown) => {
         console.log('Signing typed data with adapter:', { typedData });
         return `0x${Math.random().toString(16).slice(2)}`;
       },

@@ -49,7 +49,7 @@ export const HashLock = {
 /**
  * Creates a keccak256 hash of solidityPacked data
  */
-export function solidityPackedKeccak256(types: string[], values: any[]): string {
+export function solidityPackedKeccak256(types: string[], values: unknown[]): string {
   const encoded = ethers.solidityPacked(types, values);
   return ethers.keccak256(encoded);
 } 

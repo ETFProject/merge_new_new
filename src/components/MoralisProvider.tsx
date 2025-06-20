@@ -7,7 +7,7 @@ import { initializeMoralis } from '@/lib/moralis';
 interface MoralisContextType {
   isInitialized: boolean;
   isAuthenticated: boolean;
-  user: any;
+  user: unknown;
   account: string | null;
   chainId: string | null;
   login: () => Promise<void>;
@@ -32,7 +32,7 @@ interface MoralisProviderProps {
 export const MoralisProvider = ({ children }: MoralisProviderProps) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<unknown>(null);
   const [account, setAccount] = useState<string | null>(null);
   const [chainId, setChainId] = useState<string | null>(null);
 
