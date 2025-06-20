@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "bun run --bun next dev --turbopack",
     "build": "bun run --bun next build",
+    "build:npm": "next build",
     "start": "bun run --bun next start",
     "lint": "bun run --bun next lint"
   },
