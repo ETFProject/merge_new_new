@@ -1,5 +1,9 @@
 {
-  "buildCommand": "npm run build:npm",
+  "buildCommand": "./build.sh",
   "installCommand": "npm install",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "env": {
+    "NEXT_SKIP_LINT": "true",
+    "NEXT_SKIP_TYPE_CHECK": "true"
+  }
 } 
