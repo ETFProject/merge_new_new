@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
-import { 
-  getServerProvider, 
-  getContracts, 
-  formatAmount, 
+import {
+  getContracts,
+  formatAmount,
   getTokenName,
-  getTokenLogo,
   CONTRACT_ADDRESSES
 } from '@/lib/flow-contracts-server';
 
@@ -39,7 +37,7 @@ export async function GET() {
           weight: Number(formatAmount(allocation[0])) * 100, // Convert to percentage
           amount: formatAmount(allocation[1]),
           price: 1.0, // Mock price for now
-          logoUrl: getTokenLogo(assetAddress)
+          logoUrl: '/file.svg'
         };
       })
     );
@@ -53,7 +51,7 @@ export async function GET() {
         weight: 50,
         amount: '100',
         price: 1.0,
-        logoUrl: getTokenLogo(CONTRACT_ADDRESSES.wflow)
+        logoUrl: '/file.svg'
       },
       {
         chainId: 545,
@@ -62,7 +60,7 @@ export async function GET() {
         weight: 50,
         amount: '100',
         price: 1.0,
-        logoUrl: getTokenLogo(CONTRACT_ADDRESSES.usdc)
+        logoUrl: '/file.svg'
       }
     ];
     
@@ -108,7 +106,7 @@ export async function GET() {
             weight: 100,
             amount: '0',
             price: 1.0,
-            logoUrl: getTokenLogo(CONTRACT_ADDRESSES.wflow)
+            logoUrl: '/file.svg'
           }
         ],
         performance: {
