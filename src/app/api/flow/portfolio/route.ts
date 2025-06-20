@@ -6,7 +6,7 @@ import {
   getTokenName,
   getTokenLogo,
   CONTRACT_ADDRESSES
-} from '@/lib/flow-contracts';
+} from '@/lib/flow-contracts-server';
 
 export async function GET() {
   try {
