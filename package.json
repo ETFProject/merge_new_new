@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "bun run --bun next dev --turbopack",
-    "build": "bun run --bun next build",
-    "build:npm": "next build",
+    "build": "bun run --bun next build --no-lint",
+    "build:npm": "next build --no-lint",
     "start": "bun run --bun next start",
     "lint": "bun run --bun next lint"
   },
