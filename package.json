@@ -2,9 +2,12 @@
   "name": "etf-manager-front",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "bun run --bun next dev --turbopack",
-    "build": "bun run --bun next build --no-lint",
+    "build": "next build --no-lint",
     "build:npm": "next build --no-lint",
     "start": "bun run --bun next start",
     "lint": "bun run --bun next lint"

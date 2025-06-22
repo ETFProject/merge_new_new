@@ -11,11 +11,6 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   
-  // Disable all experimental features that might cause issues
-  experimental: {
-    esmExternals: false,
-  },
-  
   // Handle ES modules and resolve import issues
   webpack: (config, { isServer }) => {
     // Handle ES modules
