@@ -223,14 +223,66 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
             <div className="w-full flex flex-col items-center justify-center p-2" role="region" aria-label="Asset Allocation">
               <div className="w-full max-w-5xl">
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                  {/* 3D Pie Chart */}
+                  {/* Simple Pie Chart */}
                   <div className="xl:col-span-2">
                     <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 p-4 rounded-xl border border-slate-700/50">
                       <h4 className="text-lg font-semibold mb-4 text-center text-slate-200">
                         {itfData ? `${itfData.name} Asset Allocation` : 'Portfolio Asset Allocation'}
                       </h4>
                       <div className="w-full h-72 flex items-center justify-center">
-                        <ThreePieChart data={chartData.assetAllocation} height={288} />
+                        <div className="relative w-48 h-48">
+                          {/* Simple SVG Pie Chart */}
+                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                            {(() => {
+                              let currentAngle = 0;
+                              return chartData.assetAllocation.map((item, index) => {
+                                const percentage = item.percentage;
+                                const angle = (percentage / 100) * 360;
+                                const startAngle = currentAngle;
+                                const endAngle = currentAngle + angle;
+                                
+                                const x1 = 50 + 40 * Math.cos((startAngle * Math.PI) / 180);
+                                const y1 = 50 + 40 * Math.sin((startAngle * Math.PI) / 180);
+                                const x2 = 50 + 40 * Math.cos((endAngle * Math.PI) / 180);
+                                const y2 = 50 + 40 * Math.sin((endAngle * Math.PI) / 180);
+                                
+                                const largeArcFlag = angle > 180 ? 1 : 0;
+                                
+                                const pathData = [
+                                  `M 50 50`,
+                                  `L ${x1} ${y1}`,
+                                  `A 40 40 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+                                  'Z'
+                                ].join(' ');
+                                
+                                currentAngle += angle;
+                                
+                                return (
+                                  <path
+                                    key={index}
+                                    d={pathData}
+                                    fill={item.color}
+                                    stroke="#1f2937"
+                                    strokeWidth="0.5"
+                                    className="transition-all duration-300 hover:opacity-80"
+                                  />
+                                );
+                              });
+                            })()}
+                            {/* Center circle */}
+                            <circle cx="50" cy="50" r="15" fill="#1f2937" stroke="#374151" strokeWidth="0.5" />
+                          </svg>
+                          
+                          {/* Center text */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="text-center">
+                              <div className="text-lg font-bold text-white">Total</div>
+                              <div className="text-sm text-slate-300">
+                                {itfData ? itfData.aum : '$2.4M'}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -326,18 +378,79 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
             <div className="w-full flex flex-col items-center justify-center p-2" role="region" aria-label="Chain Distribution">
               <div className="w-full max-w-6xl">
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                  {/* 3D Orbital View */}
+                  {/* Simple Chain Distribution Chart */}
                   <div className="xl:col-span-2">
                     <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 p-4 rounded-xl border border-slate-700/50">
                       <h4 className="text-lg font-semibold mb-4 text-center text-slate-200">
                         {itfData ? `${itfData.name} Cross-Chain Distribution` : 'Cross-Chain Portfolio Distribution'}
                       </h4>
                       <div className="w-full h-72 flex items-center justify-center">
-                        <ThreeOrbitalView
-                          data={chartData.chainDistribution}
-                          centerIcon={itfData?.icon || "/baevii-logo.png"}
-                          height={288}
-                        />
+                        <div className="relative w-full max-w-md">
+                          {/* Simple Network Diagram */}
+                          <div className="relative w-full h-64">
+                            {/* Center Node */}
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center border-4 border-blue-400 shadow-lg">
+                                <img 
+                                  src={itfData?.icon || "/baevii-logo.png"} 
+                                  alt="Center" 
+                                  className="w-8 h-8 rounded-full"
+                                />
+                              </div>
+                            </div>
+                            
+                            {/* Chain Nodes */}
+                            {chartData.chainDistribution.map((chain, index) => {
+                              const angle = (index / chartData.chainDistribution.length) * 2 * Math.PI;
+                              const radius = 80;
+                              const x = 50 + radius * Math.cos(angle);
+                              const y = 50 + radius * Math.sin(angle);
+                              
+                              return (
+                                <div key={index} className="absolute" style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)' }}>
+                                  <div 
+                                    className="w-12 h-12 rounded-full flex items-center justify-center border-2 border-slate-400 shadow-lg transition-all duration-300 hover:scale-110"
+                                    style={{ backgroundColor: chain.color + '20' }}
+                                  >
+                                    <img 
+                                      src={chain.icon} 
+                                      alt={chain.chain} 
+                                      className="w-6 h-6 rounded-full"
+                                    />
+                                  </div>
+                                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-center">
+                                    <div className="text-xs font-semibold text-white">{chain.chain}</div>
+                                    <div className="text-xs text-slate-300">{chain.percentage}%</div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                            
+                            {/* Connection Lines */}
+                            <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                              {chartData.chainDistribution.map((chain, index) => {
+                                const angle = (index / chartData.chainDistribution.length) * 2 * Math.PI;
+                                const radius = 80;
+                                const x = 50 + radius * Math.cos(angle);
+                                const y = 50 + radius * Math.sin(angle);
+                                
+                                return (
+                                  <line
+                                    key={index}
+                                    x1="50%"
+                                    y1="50%"
+                                    x2={`${x}%`}
+                                    y2={`${y}%`}
+                                    stroke={chain.color}
+                                    strokeWidth="2"
+                                    strokeDasharray="5,5"
+                                    opacity="0.6"
+                                  />
+                                );
+                              })}
+                            </svg>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
