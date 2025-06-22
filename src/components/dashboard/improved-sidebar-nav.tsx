@@ -1,13 +1,14 @@
 'use client';
 
 import { useViewTransitions } from './use-view-transitions';
-import { useOptimistic, useTransition, useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { TransitionWrapper } from '@/components/ui/transition-wrapper';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, LogOut, Wallet } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export interface ImprovedSidebarNavProps {
   items?: {
@@ -97,28 +98,8 @@ const chains = [
 ];
 
 export function ImprovedSidebarNav({ items = defaultItems, className, isCollapsed = false }: ImprovedSidebarNavProps) {
-  const { navigateWithTransition, currentPath } = useViewTransitions();
-  const [isPending, startTransition] = useTransition();
+  const pathname = usePathname();
   
-  // Use optimistic UI to update the active item before the navigation completes
-  const [optimisticPath, setOptimisticPath] = useOptimistic<string, string>(
-    currentPath, 
-    (_: string, newPath: string) => newPath
-  );
-  
-  // Click handler for navigation items
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    
-    // Optimistically update the path using startTransition
-    startTransition(() => {
-      setOptimisticPath(href);
-    });
-    
-    // Navigate with view transition
-    navigateWithTransition(href, 'nav');
-  };
-
   const handleDisconnect = (chainId: string) => {
     console.log(`Disconnecting from ${chainId}`);
     // Add actual disconnect logic here
@@ -134,9 +115,9 @@ export function ImprovedSidebarNav({ items = defaultItems, className, isCollapse
       
       <nav className="flex flex-col space-y-1">
         {items.map((item) => {
-          // Check if this item is active (either actually or optimistically)
-          const isActive = optimisticPath === item.href || 
-                          (item.href !== '/dashboard' && optimisticPath.startsWith(item.href));
+          // Check if this item is active
+          const isActive = pathname === item.href || 
+                          (item.href !== '/dashboard' && pathname.startsWith(item.href));
           
           return (
             <TransitionWrapper
@@ -153,7 +134,6 @@ export function ImprovedSidebarNav({ items = defaultItems, className, isCollapse
                     : "hover:bg-accent/50 hover:text-accent-foreground/90",
                   isCollapsed && "justify-center"
                 )}
-                onClick={(e) => handleNavClick(e, item.href)}
                 aria-current={isActive ? 'page' : undefined}
                 title={isCollapsed ? item.title : undefined}
               >
