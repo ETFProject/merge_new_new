@@ -14,7 +14,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowUpFromLine, ArrowDownToLine, ThumbsUp, ThumbsDown, Plus } from "lucide-react";
+import { ArrowUpFromLine, ArrowDownToLine, ThumbsUp, ThumbsDown, Plus, Twitter, Youtube, MessageCircle, Users } from "lucide-react";
 
 // Mock voting data
 const mockVotingProposals = [
@@ -58,6 +58,13 @@ interface ITFDetailDialogProps {
     expenseRatio: string;
     aum: string;
     performance30D: string;
+    bio?: string;
+    socialMedia?: {
+      twitter?: string;
+      youtube?: string;
+      telegram?: string;
+      discord?: string;
+    };
     holdings: Array<{ symbol: string; weight: string }>;
   };
 }
@@ -126,6 +133,68 @@ export function ITFDetailDialog({ isOpen, onClose, itf }: ITFDetailDialogProps) 
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
+              {/* Bio Section */}
+              {itf.bio && (
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">About This ITF</h3>
+                  <p className="text-muted-foreground leading-relaxed">{itf.bio}</p>
+                </Card>
+              )}
+
+              {/* Social Media Section */}
+              {itf.socialMedia && (
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Social Media & Community</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {itf.socialMedia.twitter && (
+                      <a
+                        href={itf.socialMedia.twitter}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 transition-colors"
+                      >
+                        <Twitter className="w-4 h-4" />
+                        <span className="text-sm font-medium">Twitter</span>
+                      </a>
+                    )}
+                    {itf.socialMedia.youtube && (
+                      <a
+                        href={itf.socialMedia.youtube}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/10 text-red-600 hover:bg-red-500/20 transition-colors"
+                      >
+                        <Youtube className="w-4 h-4" />
+                        <span className="text-sm font-medium">YouTube</span>
+                      </a>
+                    )}
+                    {itf.socialMedia.telegram && (
+                      <a
+                        href={itf.socialMedia.telegram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-400/10 text-blue-500 hover:bg-blue-400/20 transition-colors"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        <span className="text-sm font-medium">Telegram</span>
+                      </a>
+                    )}
+                    {itf.socialMedia.discord && (
+                      <a
+                        href={itf.socialMedia.discord}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/10 text-purple-600 hover:bg-purple-500/20 transition-colors"
+                      >
+                        <Users className="w-4 h-4" />
+                        <span className="text-sm font-medium">Discord</span>
+                      </a>
+                    )}
+                  </div>
+                </Card>
+              )}
+
+              {/* Holdings Section */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Holdings</h3>
                 <div className="grid gap-3">
