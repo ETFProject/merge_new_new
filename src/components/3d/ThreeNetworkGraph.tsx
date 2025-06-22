@@ -118,9 +118,10 @@ interface ThreeNetworkGraphProps {
     to: string;
     color: string;
   }>;
+  height?: number;
 }
 
-export function ThreeNetworkGraph({ nodes, flows }: ThreeNetworkGraphProps) {
+export function ThreeNetworkGraph({ nodes, flows, height = 400 }: ThreeNetworkGraphProps) {
   // Pre-compute node positions and flow data
   const { nodePositions, flowData } = useMemo(() => {
     const positions: { [key: string]: [number, number, number] } = {};
@@ -138,7 +139,7 @@ export function ThreeNetworkGraph({ nodes, flows }: ThreeNetworkGraphProps) {
   }, [nodes, flows]);
 
   return (
-    <div style={{ width: '100%', height: '400px' }}>
+    <div style={{ width: '100%', height: `${height}px` }}>
       <Canvas
         camera={{ position: [0, 4, 8], fov: 75 }}
         dpr={[1, 2]}

@@ -30,9 +30,10 @@ const OrbitalNode = ({ position, icon, label, percentage, color, isCenter = fals
       color,
       transparent: true,
       opacity: 1.0,
-      metalness: 0.9,
-      roughness: 0.1,
-      emissive: new THREE.Color(color).multiplyScalar(hovered ? 0.8 : 0.3),
+      metalness: 0.95,
+      roughness: 0.05,
+      emissive: new THREE.Color(color).multiplyScalar(hovered ? 1.0 : 0.4),
+      emissiveIntensity: hovered ? 1.5 : 1.0,
     });
   }, [texture, color, hovered]);
 
@@ -40,7 +41,7 @@ const OrbitalNode = ({ position, icon, label, percentage, color, isCenter = fals
     return new THREE.MeshBasicMaterial({
       color,
       transparent: true,
-      opacity: hovered ? 0.6 : 0.2,
+      opacity: hovered ? 0.8 : 0.3,
       side: THREE.BackSide,
       blending: THREE.AdditiveBlending,
     });
@@ -48,41 +49,47 @@ const OrbitalNode = ({ position, icon, label, percentage, color, isCenter = fals
 
   useFrame((state) => {
     if (!isCenter && meshRef.current) {
-      // Enhanced orbital animation
+      // Enhanced orbital animation with more complex movement
       const time = state.clock.getElapsedTime();
-      meshRef.current.rotation.y = time * 0.3;
-      meshRef.current.rotation.x = Math.sin(time * 0.5) * 0.1;
+      meshRef.current.rotation.y = time * 0.4;
+      meshRef.current.rotation.x = Math.sin(time * 0.6) * 0.15;
+      meshRef.current.rotation.z = Math.cos(time * 0.3) * 0.1;
       
-      // Add floating animation
-      meshRef.current.position.y = Math.sin(time * 2) * 0.1;
+      // Enhanced floating animation
+      meshRef.current.position.y = Math.sin(time * 2.5) * 0.15;
+      
+      // Add subtle scale animation
+      const scale = 1 + Math.sin(time * 3) * 0.05;
+      meshRef.current.scale.setScalar(scale);
     }
     
     if (glowRef.current) {
-      glowRef.current.scale.setScalar(hovered ? 1.4 : 1.2);
+      glowRef.current.scale.setScalar(hovered ? 1.6 : 1.3);
       glowRef.current.rotation.copy(meshRef.current?.rotation || new THREE.Euler());
+      glowRef.current.position.y = meshRef.current?.position.y || 0;
     }
     
     if (ringRef.current) {
-      ringRef.current.rotation.z = state.clock.getElapsedTime() * 0.5;
+      ringRef.current.rotation.z = state.clock.getElapsedTime() * 0.8;
       const material = ringRef.current.material as THREE.MeshBasicMaterial;
-      material.opacity = hovered ? 0.8 : 0.3;
+      material.opacity = hovered ? 1.0 : 0.4;
     }
   });
 
-  const baseSize = isCenter ? 1.2 : size;
-  const scale = hovered ? baseSize * 1.3 : baseSize;
+  const baseSize = isCenter ? 1.4 : size;
+  const scale = hovered ? baseSize * 1.4 : baseSize;
 
   return (
     <group position={position}>
-      {/* Glow effect */}
+      {/* Enhanced glow effect */}
       <mesh
         ref={glowRef}
         geometry={geometry}
         material={glowMaterial}
-        scale={baseSize * 1.3}
+        scale={baseSize * 1.5}
       />
       
-      {/* Main sphere */}
+      {/* Main sphere with enhanced material */}
       <mesh
         ref={meshRef}
         geometry={geometry}
@@ -92,13 +99,24 @@ const OrbitalNode = ({ position, icon, label, percentage, color, isCenter = fals
         onPointerOut={() => setHovered(false)}
       />
       
-      {/* Holographic ring */}
+      {/* Enhanced holographic ring */}
       <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[baseSize * 0.8, baseSize * 1.1, 32]} />
+        <ringGeometry args={[baseSize * 0.7, baseSize * 1.2, 32]} />
         <meshBasicMaterial 
           color="#00ffff" 
           transparent 
-          opacity={0.3}
+          opacity={0.5}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+      
+      {/* Secondary ring for enhanced effect */}
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[baseSize * 0.9, baseSize * 1.0, 16]} />
+        <meshBasicMaterial 
+          color="#ffffff" 
+          transparent 
+          opacity={hovered ? 0.3 : 0.1}
           side={THREE.DoubleSide}
         />
       </mesh>
@@ -106,42 +124,55 @@ const OrbitalNode = ({ position, icon, label, percentage, color, isCenter = fals
       {!isCenter && (
         <>
           <Text
-            position={[0, baseSize + 0.6, 0]}
-            fontSize={0.25}
+            position={[0, baseSize + 0.8, 0]}
+            fontSize={0.28}
             color="#00ffff"
             anchorX="center"
             anchorY="middle"
             renderOrder={1}
-            outlineWidth={0.02}
+            outlineWidth={0.03}
             outlineColor="#000000"
             font="/fonts/Orbitron-Bold.ttf"
           >
             {label}
           </Text>
           <Text
-            position={[0, baseSize + 0.2, 0]}
-            fontSize={0.18}
+            position={[0, baseSize + 0.3, 0]}
+            fontSize={0.2}
             color="#FFD700"
             anchorX="center"
             anchorY="middle"
             renderOrder={1}
-            outlineWidth={0.01}
+            outlineWidth={0.02}
             outlineColor="#000000"
           >
             {percentage}
           </Text>
           
-          {/* Energy beam effect when hovered */}
+          {/* Enhanced energy beam effect when hovered */}
           {hovered && (
-            <mesh position={[0, baseSize + 0.4, 0]} rotation={[Math.PI / 2, 0, 0]}>
-              <cylinderGeometry args={[0.02, 0.02, 0.8, 8]} />
-              <meshBasicMaterial 
-                color="#00ffff" 
-                transparent 
-                opacity={0.8}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
+            <>
+              <mesh position={[0, baseSize + 0.5, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                <cylinderGeometry args={[0.03, 0.03, 1.0, 8]} />
+                <meshBasicMaterial 
+                  color="#00ffff" 
+                  transparent 
+                  opacity={0.9}
+                  side={THREE.DoubleSide}
+                />
+              </mesh>
+              
+              {/* Holographic data ring */}
+              <mesh position={[0, baseSize + 0.7, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                <ringGeometry args={[0.8, 1.2, 32]} />
+                <meshBasicMaterial 
+                  color="#00ffff" 
+                  transparent 
+                  opacity={0.7}
+                  side={THREE.DoubleSide}
+                />
+              </mesh>
+            </>
           )}
         </>
       )}
@@ -260,11 +291,12 @@ interface ThreeOrbitalViewProps {
     icon: string;
   }>;
   centerIcon: string;
+  height?: number;
 }
 
-export function ThreeOrbitalView({ data, centerIcon }: ThreeOrbitalViewProps) {
+export function ThreeOrbitalView({ data, centerIcon, height = 400 }: ThreeOrbitalViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerSize, setContainerSize] = useState({ width: 400, height: 400 });
+  const [containerSize, setContainerSize] = useState({ width: 400, height: height });
 
   // Responsive sizing
   useEffect(() => {
@@ -281,12 +313,12 @@ export function ThreeOrbitalView({ data, centerIcon }: ThreeOrbitalViewProps) {
     updateSize();
     window.addEventListener('resize', updateSize);
     return () => window.removeEventListener('resize', updateSize);
-  }, []);
+  }, [height]);
 
   // Adjust radius based on container size
   const radius = useMemo(() => {
     const minDimension = Math.min(containerSize.width, containerSize.height);
-    return Math.max(3, minDimension / 80); // Responsive radius
+    return Math.max(2.5, minDimension / 100); // Responsive radius, smaller for dialogs
   }, [containerSize]);
 
   // Pre-compute node positions and connections
@@ -297,8 +329,8 @@ export function ThreeOrbitalView({ data, centerIcon }: ThreeOrbitalViewProps) {
       const z = Math.sin(angle) * radius;
       const position: [number, number, number] = [x, 0, z];
 
-      // Calculate size based on percentage (min 0.4, max 1.0)
-      const size = Math.max(0.4, Math.min(1.0, (item.percentage / 100) * 1.5 + 0.3));
+      // Calculate size based on percentage (min 0.3, max 0.8 for dialogs)
+      const size = Math.max(0.3, Math.min(0.8, (item.percentage / 100) * 1.2 + 0.2));
 
       return {
         position,
@@ -320,7 +352,7 @@ export function ThreeOrbitalView({ data, centerIcon }: ThreeOrbitalViewProps) {
   }, [data, radius]);
 
   return (
-    <div ref={containerRef} style={{ width: '100%', height: '400px', position: 'relative' }}>
+    <div ref={containerRef} style={{ width: '100%', height: `${height}px`, position: 'relative' }}>
       {/* Background gradient */}
       <div 
         style={{

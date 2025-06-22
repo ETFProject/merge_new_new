@@ -196,9 +196,10 @@ interface ThreeBarChartProps {
     date: string;
     value: number;
   }>;
+  height?: number;
 }
 
-export function ThreeBarChart({ data }: ThreeBarChartProps) {
+export function ThreeBarChart({ data, height = 400 }: ThreeBarChartProps) {
   // Pre-compute chart layout data
   const { maxValue, spacing, totalWidth, startX, bars } = useMemo(() => {
     const maxVal = Math.max(...data.map(item => item.value));
@@ -224,7 +225,7 @@ export function ThreeBarChart({ data }: ThreeBarChartProps) {
   }, [data]);
 
   return (
-    <div style={{ width: '100%', height: '400px', position: 'relative' }}>
+    <div style={{ width: '100%', height: `${height}px`, position: 'relative' }}>
       {/* Background gradient */}
       <div 
         style={{

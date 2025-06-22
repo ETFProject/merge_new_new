@@ -19,6 +19,7 @@ interface PieChartSegmentProps {
 const PieChartSegment = ({ startAngle, endAngle, color, radius, isHighlighted, onHover, category, percentage }: PieChartSegmentProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
+  const ringRef = useRef<THREE.Mesh>(null);
   
   const shape = new THREE.Shape();
   shape.moveTo(0, 0);
@@ -36,28 +37,39 @@ const PieChartSegment = ({ startAngle, endAngle, color, radius, isHighlighted, o
   shape.lineTo(0, 0);
 
   const baseColor = new THREE.Color(color);
-  const highlightColor = new THREE.Color(color).multiplyScalar(1.5);
+  const highlightColor = new THREE.Color(color).multiplyScalar(1.3);
 
   useFrame((state) => {
     if (meshRef.current) {
-      // Add subtle floating animation
-      meshRef.current.position.y = Math.sin(state.clock.getElapsedTime() * 2 + startAngle) * 0.02;
+      // Enhanced floating animation with subtle rotation
+      meshRef.current.position.y = Math.sin(state.clock.getElapsedTime() * 1.5 + startAngle) * 0.03;
+      meshRef.current.rotation.z = Math.sin(state.clock.getElapsedTime() * 0.8) * 0.05;
       
       // Add rotation animation when highlighted
       if (isHighlighted) {
-        meshRef.current.rotation.z = Math.sin(state.clock.getElapsedTime() * 3) * 0.1;
+        meshRef.current.rotation.z += Math.sin(state.clock.getElapsedTime() * 4) * 0.1;
+        meshRef.current.scale.setScalar(1.05);
+      } else {
+        meshRef.current.scale.setScalar(1);
       }
     }
     
     if (glowRef.current) {
       glowRef.current.position.y = meshRef.current?.position.y || 0;
       glowRef.current.rotation.z = meshRef.current?.rotation.z || 0;
+      glowRef.current.scale.setScalar(meshRef.current?.scale.x || 1);
+    }
+    
+    if (ringRef.current) {
+      ringRef.current.rotation.z = state.clock.getElapsedTime() * 0.8;
+      const material = ringRef.current.material as THREE.MeshBasicMaterial;
+      material.opacity = isHighlighted ? 0.9 : 0.4;
     }
   });
 
   return (
     <group>
-      {/* Glow effect */}
+      {/* Enhanced glow effect */}
       <mesh
         ref={glowRef}
         onPointerOver={() => onHover(category)}
@@ -67,13 +79,13 @@ const PieChartSegment = ({ startAngle, endAngle, color, radius, isHighlighted, o
         <meshBasicMaterial 
           color={color}
           transparent
-          opacity={isHighlighted ? 0.8 : 0.3}
+          opacity={isHighlighted ? 0.9 : 0.4}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
       
-      {/* Main segment */}
+      {/* Main segment with enhanced material */}
       <mesh
         ref={meshRef}
         onPointerOver={() => onHover(category)}
@@ -84,15 +96,17 @@ const PieChartSegment = ({ startAngle, endAngle, color, radius, isHighlighted, o
           color={isHighlighted ? highlightColor : baseColor} 
           side={THREE.DoubleSide}
           transparent
-          opacity={isHighlighted ? 1 : 0.9}
-          metalness={0.8}
-          roughness={0.2}
-          emissive={new THREE.Color(color).multiplyScalar(isHighlighted ? 0.5 : 0.1)}
+          opacity={isHighlighted ? 1 : 0.95}
+          metalness={0.9}
+          roughness={0.1}
+          emissive={new THREE.Color(color).multiplyScalar(isHighlighted ? 0.6 : 0.15)}
+          emissiveIntensity={isHighlighted ? 1.2 : 0.8}
         />
       </mesh>
       
-      {/* Holographic edge */}
+      {/* Enhanced holographic edge */}
       <mesh
+        ref={ringRef}
         onPointerOver={() => onHover(category)}
         onPointerOut={() => onHover(null)}
       >
@@ -100,30 +114,62 @@ const PieChartSegment = ({ startAngle, endAngle, color, radius, isHighlighted, o
         <meshBasicMaterial 
           color="#00ffff"
           transparent
-          opacity={isHighlighted ? 0.6 : 0.2}
+          opacity={isHighlighted ? 0.8 : 0.3}
           side={THREE.FrontSide}
           wireframe={true}
         />
       </mesh>
       
-      {/* Percentage text */}
+      {/* Enhanced percentage text with better positioning */}
       {isHighlighted && (
-        <Text
-          position={[
-            Math.cos((startAngle + endAngle) / 2) * (radius * 0.7),
-            Math.sin((startAngle + endAngle) / 2) * (radius * 0.7),
-            0.1
-          ]}
-          fontSize={0.3}
-          color="#00ffff"
-          anchorX="center"
-          anchorY="middle"
-          renderOrder={1}
-          outlineWidth={0.02}
-          outlineColor="#000000"
-        >
-          {`${percentage}%`}
-        </Text>
+        <>
+          <Text
+            position={[
+              Math.cos((startAngle + endAngle) / 2) * (radius * 0.6),
+              Math.sin((startAngle + endAngle) / 2) * (radius * 0.6),
+              0.1
+            ]}
+            fontSize={0.35}
+            color="#00ffff"
+            anchorX="center"
+            anchorY="middle"
+            renderOrder={1}
+            outlineWidth={0.03}
+            outlineColor="#000000"
+            font="/fonts/Orbitron-Bold.ttf"
+          >
+            {`${percentage}%`}
+          </Text>
+          
+          {/* Category label */}
+          <Text
+            position={[
+              Math.cos((startAngle + endAngle) / 2) * (radius * 0.8),
+              Math.sin((startAngle + endAngle) / 2) * (radius * 0.8),
+              0.1
+            ]}
+            fontSize={0.2}
+            color="#ffffff"
+            anchorX="center"
+            anchorY="middle"
+            renderOrder={1}
+            outlineWidth={0.02}
+            outlineColor="#000000"
+          >
+            {category}
+          </Text>
+          
+          {/* Holographic ring effect */}
+          <mesh position={[0, 0, 0.05]} rotation={[Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[radius * 0.9, radius * 1.1, 32]} />
+            <meshBasicMaterial 
+              color="#00ffff" 
+              transparent 
+              opacity={0.6}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+        </>
       )}
     </group>
   );
@@ -204,9 +250,10 @@ interface ThreePieChartProps {
     icon?: string;
   }>;
   className?: string;
+  height?: number;
 }
 
-export function ThreePieChart({ data, className = '' }: ThreePieChartProps) {
+export function ThreePieChart({ data, className = '', height = 400 }: ThreePieChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [highlightedCategory, setHighlightedCategory] = useState<string | null>(null);
 
@@ -231,8 +278,8 @@ export function ThreePieChart({ data, className = '' }: ThreePieChartProps) {
   }, [data]);
 
   return (
-    <div className={`flex flex-col items-center gap-8 w-full ${className}`}>
-      <div ref={containerRef} className="w-full h-[400px] relative">
+    <div className={`flex flex-col items-center gap-4 w-full ${className}`}>
+      <div ref={containerRef} style={{ width: '100%', height: `${height}px` }} className="relative">
         {/* Background gradient */}
         <div 
           style={{
@@ -287,46 +334,48 @@ export function ThreePieChart({ data, className = '' }: ThreePieChartProps) {
         </Canvas>
       </div>
       
-      {/* Enhanced Legend */}
-      <div className="flex flex-col gap-4 w-full max-w-[350px] px-4">
-        {data.map((item, index) => (
-          <div 
-            key={index} 
-            className={`flex items-center gap-3 text-sm cursor-pointer transition-all duration-300 p-3 rounded-lg ${
-              highlightedCategory === item.category 
-                ? 'opacity-100 scale-105 bg-cyan-500/10 border border-cyan-500/30' 
-                : 'opacity-80 hover:opacity-90 hover:bg-cyan-500/5'
-            }`}
-            onMouseEnter={() => setHighlightedCategory(item.category)}
-            onMouseLeave={() => setHighlightedCategory(null)}
-          >
-            {item.icon ? (
-              <div className="relative">
-                <img 
-                  src={item.icon} 
-                  alt={item.category}
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-                {highlightedCategory === item.category && (
-                  <div className="absolute inset-0 rounded-full bg-cyan-500/30 animate-pulse" />
-                )}
-              </div>
-            ) : (
-              <div className="relative">
-                <div 
-                  className="w-8 h-8 rounded-full" 
-                  style={{ backgroundColor: item.color }} 
-                />
-                {highlightedCategory === item.category && (
-                  <div className="absolute inset-0 rounded-full bg-cyan-500/30 animate-pulse" />
-                )}
-              </div>
-            )}
-            <span className="flex-1 text-foreground font-medium">{item.category}</span>
-            <span className="font-bold text-cyan-400">{item.percentage}%</span>
-          </div>
-        ))}
-      </div>
+      {/* Enhanced Legend - Only show if there's enough space */}
+      {height > 300 && (
+        <div className="flex flex-col gap-2 w-full max-w-[300px] px-2">
+          {data.map((item, index) => (
+            <div 
+              key={index} 
+              className={`flex items-center gap-2 text-xs cursor-pointer transition-all duration-300 p-2 rounded-lg ${
+                highlightedCategory === item.category 
+                  ? 'opacity-100 scale-105 bg-cyan-500/10 border border-cyan-500/30' 
+                  : 'opacity-80 hover:opacity-90 hover:bg-cyan-500/5'
+              }`}
+              onMouseEnter={() => setHighlightedCategory(item.category)}
+              onMouseLeave={() => setHighlightedCategory(null)}
+            >
+              {item.icon ? (
+                <div className="relative">
+                  <img 
+                    src={item.icon} 
+                    alt={item.category}
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                  {highlightedCategory === item.category && (
+                    <div className="absolute inset-0 rounded-full bg-cyan-500/30 animate-pulse" />
+                  )}
+                </div>
+              ) : (
+                <div className="relative">
+                  <div 
+                    className="w-6 h-6 rounded-full" 
+                    style={{ backgroundColor: item.color }} 
+                  />
+                  {highlightedCategory === item.category && (
+                    <div className="absolute inset-0 rounded-full bg-cyan-500/30 animate-pulse" />
+                  )}
+                </div>
+              )}
+              <span className="flex-1 text-foreground font-medium">{item.category}</span>
+              <span className="font-bold text-cyan-400">{item.percentage}%</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 } 

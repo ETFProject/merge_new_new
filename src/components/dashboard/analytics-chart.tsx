@@ -203,13 +203,15 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
       case 'performance':
         return (
           <TransitionWrapper transitionType="card-appear">
-            <div className="w-full flex flex-col items-center justify-center p-4" role="img" aria-label={`Performance chart for ${itfData?.name || 'Portfolio'} over ${period} timeframe`}>
-              <div className="w-full max-w-3xl">
-                <div className="mb-4 bg-muted/30 p-6 rounded-lg">
-                  <p className="font-medium mb-2 text-center">
+            <div className="w-full flex flex-col items-center justify-center p-2" role="img" aria-label={`Performance chart for ${itfData?.name || 'Portfolio'} over ${period} timeframe`}>
+              <div className="w-full max-w-2xl">
+                <div className="mb-4 bg-muted/30 p-4 rounded-lg">
+                  <p className="font-medium mb-2 text-center text-sm">
                     {itfData ? `${itfData.name} Performance` : 'Portfolio Performance'}
                   </p>
-                  <ThreeBarChart data={chartData.daily} />
+                  <div className="w-full h-64">
+                    <ThreeBarChart data={chartData.daily} height={256} />
+                  </div>
                 </div>
               </div>
             </div>
@@ -218,10 +220,101 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
       case 'allocation':
         return (
           <TransitionWrapper transitionType="card-appear">
-            <div className="w-full flex flex-col items-center justify-center p-4" role="region" aria-label="Asset Allocation">
+            <div className="w-full flex flex-col items-center justify-center p-2" role="region" aria-label="Asset Allocation">
               <div className="w-full max-w-4xl">
-                <div className="flex justify-center">
-                  <ThreePieChart data={chartData.assetAllocation} />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* 3D Pie Chart */}
+                  <div className="lg:col-span-2">
+                    <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 p-6 rounded-xl border border-slate-700/50">
+                      <h4 className="text-lg font-semibold mb-4 text-center text-slate-200">
+                        {itfData ? `${itfData.name} Asset Allocation` : 'Portfolio Asset Allocation'}
+                      </h4>
+                      <div className="w-full h-80">
+                        <ThreePieChart data={chartData.assetAllocation} height={320} />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Enhanced Legend & Stats */}
+                  <div className="space-y-6">
+                    {/* Summary Stats */}
+                    <div className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 p-4 rounded-xl border border-blue-700/30">
+                      <h5 className="text-sm font-semibold text-blue-200 mb-3">Portfolio Summary</h5>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-slate-300">Total Assets</span>
+                          <span className="text-sm font-semibold text-white">
+                            {itfData ? itfData.aum : '$2.4M'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-slate-300">Holdings</span>
+                          <span className="text-sm font-semibold text-white">
+                            {chartData.assetAllocation.length}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-slate-300">Top Asset</span>
+                          <span className="text-sm font-semibold text-green-400">
+                            {chartData.assetAllocation[0]?.category || 'DeFi'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Enhanced Legend */}
+                    <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 p-4 rounded-xl border border-slate-700/50">
+                      <h5 className="text-sm font-semibold text-slate-200 mb-3">Asset Breakdown</h5>
+                      <div className="space-y-3">
+                        {chartData.assetAllocation.map((item, index) => (
+                          <div 
+                            key={index} 
+                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700/30 transition-all duration-200 cursor-pointer group"
+                          >
+                            <div className="relative">
+                              {item.icon ? (
+                                <img 
+                                  src={item.icon} 
+                                  alt={item.category}
+                                  className="w-8 h-8 rounded-full object-cover ring-2 ring-slate-600 group-hover:ring-slate-400 transition-all"
+                                />
+                              ) : (
+                                <div 
+                                  className="w-8 h-8 rounded-full ring-2 ring-slate-600 group-hover:ring-slate-400 transition-all flex items-center justify-center text-xs font-bold text-white"
+                                  style={{ backgroundColor: item.color }}
+                                >
+                                  {item.category.slice(0, 2)}
+                                </div>
+                              )}
+                              <div 
+                                className="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-slate-800"
+                                style={{ backgroundColor: item.color }}
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium text-slate-200 truncate">
+                                  {item.category}
+                                </span>
+                                <span className="text-sm font-bold text-slate-100">
+                                  {item.percentage}%
+                                </span>
+                              </div>
+                              <div className="w-full bg-slate-700 rounded-full h-1.5 mt-1">
+                                <div 
+                                  className="h-1.5 rounded-full transition-all duration-300"
+                                  style={{ 
+                                    width: `${item.percentage}%`,
+                                    backgroundColor: item.color 
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -230,25 +323,135 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
       case 'chains':
         return (
           <TransitionWrapper transitionType="card-appear">
-            <div className="w-full flex flex-col items-center justify-center p-4" role="region" aria-label="Chain Distribution">
-              <div className="w-full max-w-4xl">
-                <ThreeOrbitalView
-                  data={chartData.chainDistribution}
-                  centerIcon={itfData?.icon || "/baevii-logo.png"}
-                />
+            <div className="w-full flex flex-col items-center justify-center p-2" role="region" aria-label="Chain Distribution">
+              <div className="w-full max-w-6xl">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* 3D Orbital View */}
+                  <div className="lg:col-span-2">
+                    <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 p-6 rounded-xl border border-slate-700/50">
+                      <h4 className="text-lg font-semibold mb-4 text-center text-slate-200">
+                        {itfData ? `${itfData.name} Cross-Chain Distribution` : 'Cross-Chain Portfolio Distribution'}
+                      </h4>
+                      <div className="w-full h-80">
+                        <ThreeOrbitalView
+                          data={chartData.chainDistribution}
+                          centerIcon={itfData?.icon || "/baevii-logo.png"}
+                          height={320}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Enhanced Chain Stats & Insights */}
+                  <div className="space-y-6">
+                    {/* Chain Performance */}
+                    <div className="bg-gradient-to-br from-emerald-900/30 to-teal-900/30 p-4 rounded-xl border border-emerald-700/30">
+                      <h5 className="text-sm font-semibold text-emerald-200 mb-3">Chain Performance</h5>
+                      <div className="space-y-3">
+                        {chartData.chainDistribution.slice(0, 3).map((chain, index) => (
+                          <div key={index} className="flex items-center justify-between p-2 rounded-lg bg-slate-800/30">
+                            <div className="flex items-center gap-2">
+                              <img 
+                                src={chain.icon} 
+                                alt={chain.chain}
+                                className="w-6 h-6 rounded-full"
+                              />
+                              <span className="text-sm font-medium text-slate-200">
+                                {chain.chain}
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-bold text-white">{chain.percentage}%</div>
+                              <div className="text-xs text-slate-400">
+                                {index === 0 ? 'Primary' : index === 1 ? 'Secondary' : 'Tertiary'}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Cross-Chain Insights */}
+                    <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 p-4 rounded-xl border border-slate-700/50">
+                      <h5 className="text-sm font-semibold text-slate-200 mb-3">Cross-Chain Insights</h5>
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-3 p-2 rounded-lg bg-blue-900/20 border border-blue-700/30">
+                          <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 flex-shrink-0"></div>
+                          <div>
+                            <div className="text-sm font-medium text-blue-200">Diversified Risk</div>
+                            <div className="text-xs text-slate-400 mt-1">
+                              Spread across {chartData.chainDistribution.length} chains reduces single-chain exposure
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start gap-3 p-2 rounded-lg bg-green-900/20 border border-green-700/30">
+                          <div className="w-2 h-2 rounded-full bg-green-400 mt-2 flex-shrink-0"></div>
+                          <div>
+                            <div className="text-sm font-medium text-green-200">Yield Optimization</div>
+                            <div className="text-xs text-slate-400 mt-1">
+                              Strategic allocation maximizes yield opportunities across ecosystems
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-start gap-3 p-2 rounded-lg bg-purple-900/20 border border-purple-700/30">
+                          <div className="w-2 h-2 rounded-full bg-purple-400 mt-2 flex-shrink-0"></div>
+                          <div>
+                            <div className="text-sm font-medium text-purple-200">Gas Efficiency</div>
+                            <div className="text-xs text-slate-400 mt-1">
+                              Lower transaction costs through optimized chain selection
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Chain Distribution Chart */}
+                    <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 p-4 rounded-xl border border-slate-700/50">
+                      <h5 className="text-sm font-semibold text-slate-200 mb-3">Distribution Overview</h5>
+                      <div className="space-y-2">
+                        {chartData.chainDistribution.map((chain, index) => (
+                          <div key={index} className="flex items-center gap-3">
+                            <img 
+                              src={chain.icon} 
+                              alt={chain.chain}
+                              className="w-5 h-5 rounded-full"
+                            />
+                            <div className="flex-1">
+                              <div className="flex justify-between items-center mb-1">
+                                <span className="text-xs text-slate-300">{chain.chain}</span>
+                                <span className="text-xs font-semibold text-slate-200">{chain.percentage}%</span>
+                              </div>
+                              <div className="w-full bg-slate-700 rounded-full h-1">
+                                <div 
+                                  className="h-1 rounded-full transition-all duration-300"
+                                  style={{ 
+                                    width: `${chain.percentage}%`,
+                                    backgroundColor: chain.color 
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Cross-Chain Distribution Insight */}
-                <div className="mt-8 bg-muted/30 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Image src={itfData?.icon || "/baevii-logo.png"} alt="BAEVII" width={20} height={20} />
-                    <span className="font-medium">
-                      {itfData ? `${itfData.name} Chain Distribution` : 'Cross-Chain Distribution Insight'}
+                <div className="mt-6 bg-gradient-to-r from-slate-900/50 via-blue-900/20 to-purple-900/20 p-4 rounded-xl border border-slate-700/50">
+                  <div className="flex items-center gap-3 mb-3">
+                    <img src={itfData?.icon || "/baevii-logo.png"} alt="BAEVII" className="w-6 h-6 rounded-full" />
+                    <span className="font-semibold text-slate-200">
+                      {itfData ? `${itfData.name} Cross-Chain Strategy` : 'Cross-Chain Distribution Strategy'}
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-slate-300 leading-relaxed">
                     {itfData 
-                      ? `This ${itfData.name} ITF is optimized for cross-chain efficiency with strategic allocation across multiple blockchains to maximize yield opportunities and minimize network-specific risks.`
-                      : 'Your portfolio is well-diversified across multiple chains, with a balanced allocation that reduces blockchain-specific risks. Consider increasing your Base allocation to take advantage of lower gas fees and higher yields currently available there.'
+                      ? `This ${itfData.name} ITF employs a sophisticated cross-chain strategy that optimizes for yield, risk diversification, and gas efficiency. The allocation across ${chartData.chainDistribution.length} blockchains ensures resilience against single-chain risks while maximizing opportunities in the most promising ecosystems.`
+                      : 'Your portfolio demonstrates a well-balanced cross-chain approach, strategically distributed across multiple blockchains to minimize network-specific risks while capitalizing on the unique advantages of each ecosystem. The current allocation favors established chains for stability while maintaining exposure to emerging platforms for growth potential.'
                     }
                   </p>
                 </div>
@@ -259,12 +462,15 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
       case 'history':
         return (
           <TransitionWrapper transitionType="card-appear">
-            <div className="w-full flex flex-col items-center justify-center p-4" role="region" aria-label="Cross-Chain Activity">
-              <div className="w-full max-w-4xl">
-                <ThreeNetworkGraph
-                  nodes={chartData.networkNodes}
-                  flows={chartData.networkFlows}
-                />
+            <div className="w-full flex flex-col items-center justify-center p-2" role="region" aria-label="Cross-Chain Activity">
+              <div className="w-full max-w-2xl">
+                <div className="w-full h-64">
+                  <ThreeNetworkGraph
+                    nodes={chartData.networkNodes}
+                    flows={chartData.networkFlows}
+                    height={256}
+                  />
+                </div>
               </div>
             </div>
           </TransitionWrapper>
@@ -275,7 +481,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
   };
 
   return (
-    <div className="w-full min-h-[500px] flex items-center justify-center">
+    <div className="w-full min-h-[300px] flex items-center justify-center">
       {renderChart()}
     </div>
   );
