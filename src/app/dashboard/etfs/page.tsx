@@ -19,10 +19,10 @@ const mockUserITFs = {
     aum: '$2.4M',
     performance30D: '+16.3%',
     holdings: [
-      { symbol: 'BTC', weight: '35.2%' },
-      { symbol: 'ETH', weight: '28.7%' },
-      { symbol: 'SOL', weight: '18.4%' },
-      { symbol: 'BNB', weight: '12.1%' }
+      { symbol: 'BTC', weight: '40.0%' },
+      { symbol: 'ETH', weight: '30.0%' },
+      { symbol: 'SOL', weight: '20.0%' },
+      { symbol: 'BNB', weight: '10.0%' }
     ],
     status: 'active',
     createdAt: '2024-01-15',
@@ -38,10 +38,10 @@ const mockUserITFs = {
     aum: '$1.7M',
     performance30D: '+24.7%',
     holdings: [
-      { symbol: 'UNI', weight: '25.2%' },
-      { symbol: 'AAVE', weight: '22.7%' },
-      { symbol: 'MKR', weight: '20.4%' },
-      { symbol: 'SNX', weight: '15.1%' }
+      { symbol: 'UNI', weight: '30.0%' },
+      { symbol: 'AAVE', weight: '25.0%' },
+      { symbol: 'MKR', weight: '25.0%' },
+      { symbol: 'SNX', weight: '20.0%' }
     ],
     status: 'active',
     createdAt: '2024-02-01',
@@ -57,10 +57,10 @@ const mockUserITFs = {
     aum: '$1.2M',
     performance30D: '+42.1%',
     holdings: [
-      { symbol: 'OCEAN', weight: '30.2%' },
-      { symbol: 'FET', weight: '25.7%' },
-      { symbol: 'AGIX', weight: '22.4%' },
-      { symbol: 'NMR', weight: '15.1%' }
+      { symbol: 'OCEAN', weight: '30.0%' },
+      { symbol: 'FET', weight: '30.0%' },
+      { symbol: 'AGIX', weight: '20.0%' },
+      { symbol: 'NMR', weight: '20.0%' }
     ],
     status: 'active',
     createdAt: '2024-02-15',
