@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import Image from 'next/image';
-import { ThreePieChart } from '@/components/3d/ThreePieChart';
-import { ThreeOrbitalView } from '@/components/3d/ThreeOrbitalView';
+import { SimplePieChart } from '@/components/2d/SimplePieChart';
+import { SimpleDistributionChart } from '@/components/2d/SimpleDistributionChart';
 import { ThreeBarChart } from '@/components/3d/ThreeBarChart';
 import { ThreeNetworkGraph } from '@/components/3d/ThreeNetworkGraph';
 import { TransitionWrapper } from "@/components/ui/transition-wrapper";
@@ -215,7 +215,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
                     {itfData ? `${itfData.name} Performance` : 'Portfolio Performance'}
                   </p>
                   <div className="w-full h-64">
-                    <ThreeBarChart data={chartData.daily} height={256} />
+                    <ThreeBarChart data={chartData.daily} />
                   </div>
                 </div>
               </div>
@@ -227,7 +227,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
           <TransitionWrapper transitionType="card-appear">
             <div className="w-full p-2" role="region" aria-label="Asset Allocation">
               <div className="w-full h-[400px] bg-slate-900/50 rounded-lg">
-                <ThreePieChart data={chartData.assetAllocation} />
+                <SimplePieChart data={chartData.assetAllocation} />
               </div>
             </div>
           </TransitionWrapper>
@@ -237,9 +237,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
           <TransitionWrapper transitionType="card-appear">
             <div className="w-full p-2" role="region" aria-label="Chain Distribution">
               <div className="w-full h-[400px] bg-slate-900/50 rounded-lg">
-                <ThreeOrbitalView
-                  data={chartData.chainDistribution}
-                />
+                <SimpleDistributionChart data={chartData.chainDistribution} />
               </div>
             </div>
           </TransitionWrapper>
