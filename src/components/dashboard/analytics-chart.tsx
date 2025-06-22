@@ -95,7 +95,12 @@ const generateChainDistributionData = (itf: ITFData) => {
     chainData[4].percentage = 5;
   }
   
-  return chainData.filter(chain => chain.percentage > 0);
+  return chainData
+    .filter(chain => chain.percentage > 0)
+    .map(chain => ({
+      ...chain,
+      category: chain.chain, // Add category field for consistency
+    }));
 };
 
 // Generate network flow data
@@ -162,11 +167,11 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
           { category: 'Stablecoins', percentage: 10, icon: '/donut.png', color: '#A8E6CF' }
         ],
         chainDistribution: [
-          { chain: 'Ethereum', percentage: 45, color: '#FF6B6B', icon: '/tornado.png' },
-          { chain: 'Flow', percentage: 25, color: '#4ECDC4', icon: '/jellyfish.png' },
-          { chain: 'Base', percentage: 15, color: '#45B7D1', icon: '/sandwave.png' },
-          { chain: 'Avalanche', percentage: 10, color: '#96CEB4', icon: '/musicrainfdbow.png' },
-          { chain: 'Solana', percentage: 5, color: '#FFEAA7', icon: '/flower.png' },
+          { category: 'Ethereum', chain: 'Ethereum', percentage: 45, color: '#FF6B6B', icon: '/tornado.png' },
+          { category: 'Flow', chain: 'Flow', percentage: 25, color: '#4ECDC4', icon: '/jellyfish.png' },
+          { category: 'Base', chain: 'Base', percentage: 15, color: '#45B7D1', icon: '/sandwave.png' },
+          { category: 'Avalanche', chain: 'Avalanche', percentage: 10, color: '#96CEB4', icon: '/musicrainfdbow.png' },
+          { category: 'Solana', chain: 'Solana', percentage: 5, color: '#FFEAA7', icon: '/flower.png' },
         ],
         networkNodes: [
           { id: 'eth', label: 'Ethereum', icon: '/tornado.png', color: '#FF6B6B', position: [-2, 0, -2] as [number, number, number] },
@@ -234,7 +239,6 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
               <div className="w-full h-[400px] bg-slate-900/50 rounded-lg">
                 <ThreeOrbitalView
                   data={chartData.chainDistribution}
-                  centerIcon={itfData?.icon || "/baevii-logo.png"}
                 />
               </div>
             </div>

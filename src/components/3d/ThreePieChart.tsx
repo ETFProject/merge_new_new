@@ -1,55 +1,101 @@
 'use client';
 
-import { useRef, useMemo, useState } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Stars, Text } from '@react-three/drei';
+import { Stars, Text, Line } from '@react-three/drei';
 import * as THREE from 'three';
+import { BufferGeometry, Mesh } from 'three';
 
-interface PieChartSegmentProps {
+interface PieSegmentProps {
+  radius: number;
   startAngle: number;
   endAngle: number;
   color: string;
-  radius: number;
-  isHighlighted: boolean;
-  onHover: (category: string | null) => void;
+  highlighted: boolean;
+  onHover: (isHovered: boolean) => void;
   category: string;
   percentage: number;
 }
 
-const PieChartSegment = ({ startAngle, endAngle, color, radius, isHighlighted, onHover, category, percentage }: PieChartSegmentProps) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  
+const PieSegment = ({ radius, startAngle, endAngle, color, highlighted, onHover, category, percentage }: PieSegmentProps) => {
+  const segmentRef = useRef<Mesh>(null!);
+  const textRef = useRef<any>(null!);
+
   const shape = useMemo(() => {
     const s = new THREE.Shape();
     s.moveTo(0, 0);
     s.arc(0, 0, radius, startAngle, endAngle, false);
     s.lineTo(0, 0);
     return s;
-  }, [startAngle, endAngle, radius]);
+  }, [radius, startAngle, endAngle]);
 
-  const baseColor = useMemo(() => new THREE.Color(color), [color]);
-  const highlightColor = useMemo(() => new THREE.Color(color).multiplyScalar(1.2), [color]);
+  const extrudeSettings = {
+    steps: 1,
+    depth: highlighted ? 0.3 : 0.2,
+    bevelEnabled: true,
+    bevelThickness: 0.05,
+    bevelSize: 0.05,
+    bevelSegments: 2,
+  };
+
+  const textPosition = useMemo(() => {
+    const midAngle = startAngle + (endAngle - startAngle) / 2;
+    const r = radius * 1.3;
+    return new THREE.Vector3(Math.cos(midAngle) * r, Math.sin(midAngle) * r, 0.2);
+  }, [radius, startAngle, endAngle]);
+  
+  const leaderLinePoints = useMemo(() => {
+    const midAngle = startAngle + (endAngle - startAngle) / 2;
+    const p1 = new THREE.Vector3(
+      Math.cos(midAngle) * radius * 0.9, 
+      Math.sin(midAngle) * radius * 0.9, 
+      extrudeSettings.depth / 2
+    );
+    const p2 = new THREE.Vector3(
+      Math.cos(midAngle) * radius * 1.1, 
+      Math.sin(midAngle) * radius * 1.1, 
+      extrudeSettings.depth / 2
+    );
+    const p3 = new THREE.Vector3(
+      textPosition.x, 
+      textPosition.y, 
+      textPosition.z
+    );
+    return [p1,p2,p3];
+  }, [radius, startAngle, endAngle, textPosition, extrudeSettings.depth]);
 
   useFrame(() => {
-    if (meshRef.current) {
-      meshRef.current.scale.setScalar(isHighlighted ? 1.05 : 1);
-    }
+    segmentRef.current.scale.z = THREE.MathUtils.lerp(segmentRef.current.scale.z, highlighted ? 1.5 : 1, 0.1);
   });
-
+  
   return (
-    <mesh
-      ref={meshRef}
-      onPointerOver={() => onHover(category)}
-      onPointerOut={() => onHover(null)}
-      geometry={new THREE.ExtrudeGeometry(shape, { depth: 0.2, bevelEnabled: false })}
-    >
-      <meshStandardMaterial 
-        color={isHighlighted ? highlightColor : baseColor} 
-        side={THREE.DoubleSide}
-        metalness={0.6}
-        roughness={0.4}
-      />
-    </mesh>
+    <group onPointerOver={() => onHover(true)} onPointerOut={() => onHover(false)}>
+      <mesh ref={segmentRef}>
+        <extrudeGeometry args={[shape, extrudeSettings]} />
+        <meshStandardMaterial
+          color={color}
+          metalness={0.7}
+          roughness={0.3}
+          emissive={highlighted ? color : '#000000'}
+          emissiveIntensity={0.5}
+        />
+      </mesh>
+      
+      {highlighted && (
+        <>
+          <Text ref={textRef} position={textPosition} fontSize={0.2} color="white" anchorX="center">
+            {`${category}: ${percentage.toFixed(1)}%`}
+          </Text>
+          <Line
+            points={leaderLinePoints}
+            color="white"
+            lineWidth={1}
+            transparent
+            opacity={0.7}
+          />
+        </>
+      )}
+    </group>
   );
 };
 
@@ -60,68 +106,47 @@ interface ThreePieChartProps {
     color: string;
     icon?: string;
   }>;
-  height?: number;
 }
 
-export function ThreePieChart({ data, height = 400 }: ThreePieChartProps) {
-  const [highlightedCategory, setHighlightedCategory] = useState<string | null>(null);
+export function ThreePieChart({ data }: ThreePieChartProps) {
+  const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
 
   const segments = useMemo(() => {
     let currentAngle = 0;
-    const radius = 1.5;
-
-    return data.map((item) => {
-      const angle = (item.percentage / 100) * Math.PI * 2;
-      const segment = {
+    return data.map((item, index) => {
+      const angle = (item.percentage / 100) * 2 * Math.PI;
+      const segmentData = {
+        ...item,
         startAngle: currentAngle,
         endAngle: currentAngle + angle,
-        color: item.color,
-        radius,
-        category: item.category,
-        percentage: item.percentage,
+        index,
       };
       currentAngle += angle;
-      return segment;
+      return segmentData;
     });
   }, [data]);
 
   return (
-    <div style={{ width: '100%', height: `${height}px`, position: 'relative' }}>
-      <Canvas
-        camera={{ position: [0, 0, 4], fov: 50 }}
-        gl={{ antialias: true, alpha: true }}
-        dpr={[1, 1.5]}
-      >
-        <ambientLight intensity={0.5} />
-        <pointLight position={[5, 5, 5]} intensity={1} />
-        
-        <Stars radius={50} depth={20} count={1000} factor={2} saturation={0} fade speed={0.5} />
-        
-        <group rotation={[Math.PI / 6, Math.PI / 9, 0]}>
-          {segments.map((segment, index) => (
-            <PieChartSegment 
-              key={index} 
-              {...segment} 
-              isHighlighted={highlightedCategory === segment.category}
-              onHover={setHighlightedCategory}
-            />
-          ))}
-        </group>
-      </Canvas>
-      <div className="absolute top-4 right-4 flex flex-col gap-2">
-        {data.map((item, index) => (
-          <div 
-            key={index} 
-            className={`flex items-center gap-2 text-xs p-2 rounded-md transition-all ${highlightedCategory === item.category ? 'bg-slate-700/80' : 'bg-slate-800/50'}`}
-            onMouseEnter={() => setHighlightedCategory(item.category)}
-            onMouseLeave={() => setHighlightedCategory(null)}
-          >
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-            <span className="text-white font-medium">{item.category}</span>
-            <span className="text-cyan-400 font-bold">{item.percentage}%</span>
-          </div>
+    <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
+      <ambientLight intensity={0.5} />
+      <pointLight position={[10, 10, 10]} intensity={1} />
+      <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade />
+      
+      <group rotation={[Math.PI / 6, 0, 0]}>
+        {segments.map((seg) => (
+          <PieSegment
+            key={seg.category}
+            radius={1.5}
+            startAngle={seg.startAngle}
+            endAngle={seg.endAngle}
+            color={seg.color}
+            category={seg.category}
+            percentage={seg.percentage}
+            highlighted={highlightedIndex === seg.index}
+            onHover={(isHovered) => setHighlightedIndex(isHovered ? seg.index : null)}
+          />
         ))}
-      </div>
-    </div>
+      </group>
+    </Canvas>
   );
 } 

@@ -2,162 +2,140 @@
 
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text, useTexture, Stars } from '@react-three/drei';
+import { Sparkles, Stars, Text, Line } from '@react-three/drei';
 import * as THREE from 'three';
+import { Group, Mesh } from 'three';
 
-interface OrbitalNodeProps {
+interface ChainNodeProps {
   position: [number, number, number];
-  icon: string;
-  label: string;
   color: string;
-  isCenter?: boolean;
+  label: string;
+  size: number;
 }
 
-const OrbitalNode = ({ position, icon, label, color, isCenter = false }: OrbitalNodeProps) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const texture = useTexture(icon);
+const ChainNode = ({ position, color, label, size }: ChainNodeProps) => {
+  const meshRef = useRef<Mesh>(null!);
 
-  const material = useMemo(() => {
-    return new THREE.MeshStandardMaterial({
-      map: texture,
-      color: isCenter ? '#ffffff' : color,
-      metalness: 0.8,
-      roughness: 0.2,
-      emissive: isCenter ? '#ffffff' : color,
-      emissiveIntensity: isCenter ? 0.5 : 0.2,
-    });
-  }, [texture, color, isCenter]);
-  
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.1;
+  useFrame((state, delta) => {
+    if(meshRef.current){
+      meshRef.current.rotation.y += delta * 0.5;
     }
   });
 
-  const size = isCenter ? 1 : 0.5;
-
   return (
     <group position={position}>
-      <mesh
-        ref={meshRef}
-        geometry={new THREE.SphereGeometry(size, 32, 32)}
-        material={material}
-      />
-      {!isCenter && (
-        <Text
-          position={[0, size + 0.3, 0]}
-          fontSize={0.2}
-          color="white"
-          anchorX="center"
-        >
-          {label}
-        </Text>
-      )}
+      <mesh ref={meshRef}>
+        <sphereGeometry args={[size, 32, 32]} />
+        <meshStandardMaterial
+          color={color}
+          metalness={0.8}
+          roughness={0.2}
+          emissive={color}
+          emissiveIntensity={0.6}
+        />
+      </mesh>
+      <Text
+        position={[0, size * 1.5, 0]}
+        fontSize={0.25}
+        color="white"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {label}
+      </Text>
     </group>
   );
 };
 
-interface ConnectionLineProps {
-  start: THREE.Vector3;
-  end: THREE.Vector3;
-  color: string;
+interface OrbitLineProps {
+    radius: number;
+    color: string;
 }
 
-const ConnectionLine = ({ start, end, color }: ConnectionLineProps) => {
-  const geometry = useMemo(() => {
-    return new THREE.BufferGeometry().setFromPoints([start, end]);
-  }, [start, end]);
-
+const OrbitLine = ({ radius, color }: OrbitLineProps) => {
+  const points = useMemo(() => {
+    const p = [];
+    for (let i = 0; i <= 360; i++) {
+      const rad = THREE.MathUtils.degToRad(i);
+      p.push(new THREE.Vector3(Math.cos(rad) * radius, 0, Math.sin(rad) * radius));
+    }
+    return p;
+  }, [radius]);
+  
   return (
-    <primitive object={new THREE.Line(geometry)}>
-      <lineBasicMaterial color={color} transparent opacity={0.3} />
-    </primitive>
+    <Line
+        points={points}
+        color={color}
+        lineWidth={1}
+        transparent
+        opacity={0.2}
+    />
   );
 };
 
 interface ThreeOrbitalViewProps {
-  data: Array<{
-    chain: string;
-    percentage: number;
-    color: string;
-    icon: string;
-  }>;
-  centerIcon: string;
-  height?: number;
+    data: Array<{
+        category: string;
+        percentage: number;
+        color: string;
+    }>;
 }
 
-export function ThreeOrbitalView({ data, centerIcon, height = 400 }: ThreeOrbitalViewProps) {
-  const { nodes, connections } = useMemo(() => {
-    const radius = 2.5;
-    const center = new THREE.Vector3(0, 0, 0);
+export function ThreeOrbitalView({ data }: ThreeOrbitalViewProps) {
+  const groupRef = useRef<Group>(null!);
 
-    const nodeData = data.map((item, index) => {
-      const angle = (index / data.length) * Math.PI * 2;
-      const position = new THREE.Vector3(
-        Math.cos(angle) * radius,
-        0,
-        Math.sin(angle) * radius
-      );
-      return {
-        ...item,
-        position,
-      };
+  useFrame((state, delta) => {
+    if(groupRef.current) {
+        groupRef.current.rotation.y += delta * 0.1;
+    }
+  });
+
+  const nodes = useMemo(() => {
+    return data.map((item, index) => {
+      const angle = (index / data.length) * 2 * Math.PI;
+      const radius = 2 + (index * 0.8);
+      const x = Math.cos(angle) * radius;
+      const z = Math.sin(angle) * radius;
+      return { ...item, position: [x, 0, z] as [number, number, number], radius };
     });
-
-    const connectionData = nodeData.map(node => ({
-      start: center,
-      end: node.position,
-      color: node.color,
-    }));
-
-    return { nodes: nodeData, connections: connectionData };
   }, [data]);
 
   return (
-    <div style={{ width: '100%', height: `${height}px` }}>
-      <Canvas
-        camera={{ position: [0, 2, 6], fov: 60 }}
-        gl={{ antialias: true, alpha: true }}
-        dpr={[1, 1.5]}
-      >
-        <ambientLight intensity={0.5} />
-        <pointLight position={[0, 5, 5]} intensity={1} />
-        <Stars radius={100} depth={50} count={2000} factor={4} saturation={0} fade speed={1} />
+    <Canvas camera={{ position: [0, 5, 8], fov: 60 }}>
+      <ambientLight intensity={0.3} />
+      <pointLight position={[0, 0, 0]} intensity={2} color="#4a90e2" />
+      <Stars radius={200} depth={50} count={5000} factor={7} saturation={0} fade />
 
-        <OrbitalNode
-          position={[0, 0, 0]}
-          icon={centerIcon}
-          label="Center"
-          color="#ffffff"
-          isCenter
-        />
-        
-        {nodes.map((node, index) => (
-          <OrbitalNode
-            key={index}
-            position={[node.position.x, node.position.y, node.position.z]}
-            icon={node.icon}
-            label={node.chain}
-            color={node.color}
-          />
-        ))}
+      <group ref={groupRef} rotation={[Math.PI / 8, 0, 0]}>
+        {/* Central star */}
+        <mesh>
+          <sphereGeometry args={[0.8, 32, 32]} />
+          <meshStandardMaterial color="#4a90e2" emissive="#4a90e2" emissiveIntensity={1} />
+        </mesh>
+        <Sparkles count={50} scale={2} size={6} speed={0.4} color="#fff" />
+        <Text
+            position={[0, -1.2, 0]}
+            fontSize={0.3}
+            color="#4a90e2"
+            anchorX="center"
+            anchorY="middle"
+          >
+            ITF Core
+        </Text>
 
-        {connections.map((connection, index) => (
-          <ConnectionLine
-            key={index}
-            {...connection}
-          />
+        {/* Orbiting chain nodes */}
+        {nodes.map((node, i) => (
+          <group key={i}>
+             <ChainNode
+                position={node.position}
+                color={node.color}
+                label={`${node.category}: ${node.percentage}%`}
+                size={0.3 + (node.percentage / 100) * 0.5}
+            />
+            <OrbitLine radius={node.radius} color={node.color} />
+          </group>
         ))}
-        
-        <OrbitControls
-          enableZoom={true}
-          enablePan={false}
-          minPolarAngle={Math.PI / 4}
-          maxPolarAngle={Math.PI * (3/4)}
-          autoRotate={true}
-          autoRotateSpeed={0.5}
-        />
-      </Canvas>
-    </div>
+      </group>
+    </Canvas>
   );
 } 
