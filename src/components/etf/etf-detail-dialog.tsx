@@ -222,21 +222,21 @@ export function ITFDetailDialog({ isOpen, onClose, itf }: ITFDetailDialogProps) 
             </TabsContent>
 
             <TabsContent value="performance" forceMount>
-              <Card className="p-6">
+              <Card className="p-6 h-[450px]">
                 <h3 className="text-lg font-semibold mb-4">Historical Performance</h3>
                 <AnalyticsChart selectedTab="performance" timeframe="1m" itfData={itf} />
               </Card>
             </TabsContent>
 
             <TabsContent value="allocation" forceMount>
-              <Card className="p-6">
+              <Card className="p-6 h-[450px]">
                 <h3 className="text-lg font-semibold mb-4">Asset Allocation</h3>
                 <AnalyticsChart selectedTab="allocation" itfData={itf} />
               </Card>
             </TabsContent>
 
             <TabsContent value="chains" forceMount>
-              <Card className="p-6">
+              <Card className="p-6 h-[450px]">
                 <h3 className="text-lg font-semibold mb-4">Chain Distribution</h3>
                 <AnalyticsChart selectedTab="chains" itfData={itf} />
               </Card>
