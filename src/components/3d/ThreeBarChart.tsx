@@ -93,7 +93,6 @@ const Bar = ({ position, height, color, value, date, maxHeight }: BarProps) => {
             renderOrder={1}
             outlineWidth={0.02}
             outlineColor="#000000"
-            font="/fonts/Orbitron-Bold.ttf"
           >
             {`${value}`}
           </Text>

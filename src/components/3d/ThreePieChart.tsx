@@ -136,7 +136,6 @@ const PieChartSegment = ({ startAngle, endAngle, color, radius, isHighlighted, o
             renderOrder={1}
             outlineWidth={0.03}
             outlineColor="#000000"
-            font="/fonts/Orbitron-Bold.ttf"
           >
             {`${percentage}%`}
           </Text>
@@ -297,7 +296,14 @@ export function ThreePieChart({ data, className = '', height = 400 }: ThreePieCh
         <Canvas
           camera={{ position: [0, 0, 5], fov: 45 }}
           style={{ background: 'transparent' }}
-          dpr={[1, 2]}
+          dpr={[1, 1.5]}
+          performance={{ min: 0.8 }}
+          gl={{ 
+            antialias: true,
+            alpha: true,
+            powerPreference: "high-performance",
+            failIfMajorPerformanceCaveat: false
+          }}
         >
           {/* Enhanced lighting */}
           <ambientLight intensity={0.4} color="#001122" />
@@ -308,7 +314,7 @@ export function ThreePieChart({ data, className = '', height = 400 }: ThreePieCh
           <Stars 
             radius={50} 
             depth={30} 
-            count={2000} 
+            count={1500} 
             factor={3} 
             saturation={0} 
             fade 

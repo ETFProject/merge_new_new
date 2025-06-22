@@ -132,7 +132,6 @@ const OrbitalNode = ({ position, icon, label, percentage, color, isCenter = fals
             renderOrder={1}
             outlineWidth={0.03}
             outlineColor="#000000"
-            font="/fonts/Orbitron-Bold.ttf"
           >
             {label}
           </Text>
@@ -369,8 +368,14 @@ export function ThreeOrbitalView({ data, centerIcon, height = 400 }: ThreeOrbita
       
       <Canvas
         camera={{ position: [0, 5, 10], fov: 75 }}
-        dpr={[1, 2]}
-        performance={{ min: 0.5 }}
+        dpr={[1, 1.5]}
+        performance={{ min: 0.8 }}
+        gl={{ 
+          antialias: true,
+          alpha: true,
+          powerPreference: "high-performance",
+          failIfMajorPerformanceCaveat: false
+        }}
       >
         {/* Enhanced lighting */}
         <ambientLight intensity={0.4} color="#001122" />
@@ -382,7 +387,7 @@ export function ThreeOrbitalView({ data, centerIcon, height = 400 }: ThreeOrbita
         <Stars 
           radius={100} 
           depth={50} 
-          count={3000} 
+          count={2000} 
           factor={4} 
           saturation={0} 
           fade 
