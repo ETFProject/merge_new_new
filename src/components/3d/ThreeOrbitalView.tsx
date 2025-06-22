@@ -2,137 +2,113 @@
 
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Sparkles, Stars, Text, Line } from '@react-three/drei';
+import { Text, Grid, Line } from '@react-three/drei';
 import * as THREE from 'three';
-import { Group, Mesh } from 'three';
+import { Group } from 'three';
 
-interface ChainNodeProps {
+const ACCENT_COLOR = '#00ffff'; // Tactical Cyan
+
+interface DataCubeProps {
   position: [number, number, number];
-  color: string;
-  label: string;
   size: number;
+  label: string;
+  percentage: number;
+  highlighted: boolean;
 }
 
-const ChainNode = ({ position, color, label, size }: ChainNodeProps) => {
-  const meshRef = useRef<Mesh>(null!);
+const DataCube = ({ position, size, label, percentage, highlighted }: DataCubeProps) => {
+  const cubeRef = useRef<Group>(null!);
 
-  useFrame((state, delta) => {
-    if(meshRef.current){
-      meshRef.current.rotation.y += delta * 0.5;
+  useFrame((state) => {
+    if (cubeRef.current) {
+      cubeRef.current.rotation.y = state.clock.getElapsedTime() * 0.2;
     }
   });
 
   return (
-    <group position={position}>
-      <mesh ref={meshRef}>
-        <sphereGeometry args={[size, 32, 32]} />
+    <group ref={cubeRef} position={position}>
+      <mesh>
+        <boxGeometry args={[size, size, size]} />
         <meshStandardMaterial
-          color={color}
-          metalness={0.8}
-          roughness={0.2}
-          emissive={color}
-          emissiveIntensity={0.6}
+          color={highlighted ? '#ffffff' : ACCENT_COLOR}
+          emissive={highlighted ? ACCENT_COLOR : '#000000'}
+          emissiveIntensity={2}
+          metalness={0.9}
+          roughness={0.1}
+          transparent
+          opacity={highlighted ? 1.0 : 0.7}
         />
       </mesh>
+      <mesh>
+        <boxGeometry args={[size * 1.05, size * 1.05, size * 1.05]} />
+        <meshBasicMaterial color={ACCENT_COLOR} wireframe toneMapped={false} />
+      </mesh>
       <Text
-        position={[0, size * 1.5, 0]}
-        fontSize={0.25}
-        color="white"
+        position={[0, size * 1.2, 0]}
+        fontSize={0.2}
+        color={highlighted ? 'white' : ACCENT_COLOR}
         anchorX="center"
-        anchorY="middle"
       >
-        {label}
+        {`${label.toUpperCase()} ${percentage}%`}
       </Text>
     </group>
   );
 };
 
-interface OrbitLineProps {
-    radius: number;
-    color: string;
-}
-
-const OrbitLine = ({ radius, color }: OrbitLineProps) => {
-  const points = useMemo(() => {
-    const p = [];
-    for (let i = 0; i <= 360; i++) {
-      const rad = THREE.MathUtils.degToRad(i);
-      p.push(new THREE.Vector3(Math.cos(rad) * radius, 0, Math.sin(rad) * radius));
-    }
-    return p;
-  }, [radius]);
-  
-  return (
-    <Line
-        points={points}
-        color={color}
-        lineWidth={1}
-        transparent
-        opacity={0.2}
-    />
-  );
-};
-
 interface ThreeOrbitalViewProps {
-    data: Array<{
-        category: string;
-        percentage: number;
-        color: string;
-    }>;
+  data: Array<{
+    category: string;
+    percentage: number;
+  }>;
 }
 
 export function ThreeOrbitalView({ data }: ThreeOrbitalViewProps) {
   const groupRef = useRef<Group>(null!);
 
-  useFrame((state, delta) => {
-    if(groupRef.current) {
-        groupRef.current.rotation.y += delta * 0.1;
-    }
-  });
-
   const nodes = useMemo(() => {
-    return data.map((item, index) => {
+    const radius = 3;
+    return data.map((item: { category: string; percentage: number }, index: number) => {
       const angle = (index / data.length) * 2 * Math.PI;
-      const radius = 2 + (index * 0.8);
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
-      return { ...item, position: [x, 0, z] as [number, number, number], radius };
+      return { ...item, position: [x, 0.5, z] as [number, number, number] };
     });
   }, [data]);
 
+  const centerNode: [number, number, number] = [0, 0.5, 0];
+
   return (
-    <Canvas camera={{ position: [0, 5, 8], fov: 60 }}>
-      <ambientLight intensity={0.3} />
-      <pointLight position={[0, 0, 0]} intensity={2} color="#4a90e2" />
-      <Stars radius={200} depth={50} count={5000} factor={7} saturation={0} fade />
+    <Canvas camera={{ position: [0, 5, 7], fov: 60 }} style={{ background: 'transparent' }}>
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[0, 5, 5]} intensity={1.5} color={ACCENT_COLOR} />
 
-      <group ref={groupRef} rotation={[Math.PI / 8, 0, 0]}>
-        {/* Central star */}
-        <mesh>
-          <sphereGeometry args={[0.8, 32, 32]} />
-          <meshStandardMaterial color="#4a90e2" emissive="#4a90e2" emissiveIntensity={1} />
+      <Grid
+        infiniteGrid
+        sectionColor={ACCENT_COLOR}
+        sectionThickness={0.5}
+        cellColor={'#444444'}
+        cellThickness={0.5}
+        fadeDistance={40}
+      />
+
+      <group ref={groupRef}>
+        {/* Center Core */}
+        <mesh position={centerNode}>
+          <octahedronGeometry args={[0.4, 0]} />
+          <meshStandardMaterial color={ACCENT_COLOR} emissive={ACCENT_COLOR} emissiveIntensity={1} metalness={0.9} roughness={0.2} />
         </mesh>
-        <Sparkles count={50} scale={2} size={6} speed={0.4} color="#fff" />
-        <Text
-            position={[0, -1.2, 0]}
-            fontSize={0.3}
-            color="#4a90e2"
-            anchorX="center"
-            anchorY="middle"
-          >
-            ITF Core
-        </Text>
 
-        {/* Orbiting chain nodes */}
-        {nodes.map((node, i) => (
+        {/* Nodes and Links */}
+        {nodes.map((node: any, i: number) => (
           <group key={i}>
-             <ChainNode
-                position={node.position}
-                color={node.color}
-                label={`${node.category}: ${node.percentage}%`}
-                size={0.3 + (node.percentage / 100) * 0.5}
+            <DataCube
+              position={node.position}
+              size={0.4 + (node.percentage / 100) * 0.4}
+              label={node.category}
+              percentage={node.percentage}
+              highlighted={false} // Add highlighting logic if needed
             />
-            <OrbitLine radius={node.radius} color={node.color} />
+            <Line points={[centerNode, node.position]} color={ACCENT_COLOR} lineWidth={1} dashed dashSize={0.2} gapSize={0.1} />
           </group>
         ))}
       </group>
