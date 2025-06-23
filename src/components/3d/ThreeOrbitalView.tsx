@@ -112,7 +112,6 @@ function Scene({ data }: ThreeOrbitalViewProps) {
     <>
       <ambientLight intensity={0.5} />
       <pointLight position={[0, 0, 0]} intensity={8} color="#00aaff" distance={10} />
-      <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade />
       <Bounds fit clip observe margin={1.1}>
         <Content data={data} />
       </Bounds>
