@@ -28,16 +28,16 @@ const ChainNode = ({ position, color, label, size }: ChainNodeProps) => {
         <sphereGeometry args={[size, 32, 32]} />
         <meshStandardMaterial
           color={color}
-          metalness={0.7}
-          roughness={0.2}
+          metalness={0.8}
+          roughness={0.1}
           emissive={color}
-          emissiveIntensity={0.5}
+          emissiveIntensity={0.6}
           toneMapped={false}
         />
       </mesh>
       <Text
-        position={[0, size * 1.5, 0]}
-        fontSize={0.4}
+        position={[0, size * 1.6, 0]}
+        fontSize={0.5}
         color="white"
         anchorX="center"
         anchorY="middle"
@@ -71,7 +71,7 @@ function Scene({ data }: ThreeOrbitalViewProps) {
     const numNodes = data.length;
     return data.map((item, index) => {
       const angle = (index / numNodes) * 2 * Math.PI;
-      const radius = 4.5 + (index % 2) * 0.8;
+      const radius = 5.0 + (index % 2) * 1.0;
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
       return {
@@ -86,13 +86,13 @@ function Scene({ data }: ThreeOrbitalViewProps) {
 
   return (
     <>
-      <ambientLight intensity={0.7} />
-      <pointLight position={centerNodePosition} intensity={10} color="#00aaff" distance={15} />
+      <ambientLight intensity={0.8} />
+      <pointLight position={centerNodePosition} intensity={12} color="#00aaff" distance={20} />
 
       <group ref={groupRef}>
         <mesh position={centerNodePosition}>
-          <sphereGeometry args={[1.2, 32, 32]} />
-          <meshStandardMaterial color="#00aaff" emissive="#00aaff" emissiveIntensity={2} toneMapped={false}/>
+          <sphereGeometry args={[1.5, 32, 32]} />
+          <meshStandardMaterial color="#00aaff" emissive="#00aaff" emissiveIntensity={2.5} toneMapped={false}/>
         </mesh>
 
         {nodes.map((node) => (
@@ -101,9 +101,9 @@ function Scene({ data }: ThreeOrbitalViewProps) {
               position={node.position}
               color={node.color}
               label={`${node.category}: ${node.percentage}%`}
-              size={0.6 + (node.percentage / 100) * 0.8}
+              size={0.7 + (node.percentage / 100) * 1.0}
             />
-            <Line points={[centerNodePosition, node.position]} color={node.color} lineWidth={1.5} transparent opacity={0.4} />
+            <Line points={[centerNodePosition, node.position]} color={node.color} lineWidth={2} transparent opacity={0.5} />
           </group>
         ))}
       </group>
@@ -114,7 +114,7 @@ function Scene({ data }: ThreeOrbitalViewProps) {
 export function ThreeOrbitalView({ data }: ThreeOrbitalViewProps) {
   return (
     <div className="w-full h-full rounded-lg overflow-hidden">
-      <Canvas camera={{ position: [0, 8, 14], fov: 55 }}>
+      <Canvas camera={{ position: [0, 10, 18], fov: 60 }}>
         <Scene data={data} />
       </Canvas>
     </div>
