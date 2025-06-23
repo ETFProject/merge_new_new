@@ -4,7 +4,7 @@ import { ImprovedSidebarNav } from '@/components/dashboard/improved-sidebar-nav'
 import { PageTransition } from '@/components/ui/page-transition';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
-import { useSidebar } from '@/components/RootLayoutContent';
+import { useSidebar } from '@/components/SidebarProvider';
 
 interface DashboardLayoutClientProps {
   children: React.ReactNode;
