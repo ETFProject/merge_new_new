@@ -1,12 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { ImprovedSidebarNav } from '@/components/dashboard/improved-sidebar-nav';
 import { PageTransition } from '@/components/ui/page-transition';
 import { Button } from '@/components/ui/button';
 import { Menu, X } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
 import { useSidebar } from '@/components/RootLayoutContent';
 
 interface DashboardLayoutClientProps {
@@ -15,26 +12,6 @@ interface DashboardLayoutClientProps {
 
 export function DashboardLayoutClient({ children }: DashboardLayoutClientProps) {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
-
-  // Theme toggle logic (sync with RootLayoutContent)
-  const [theme, setTheme] = useState<'light' | 'dark' | 'color-blind'>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('theme') as 'light' | 'dark' | 'color-blind') || 'light';
-    }
-    return 'light';
-  });
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      document.documentElement.classList.remove('light', 'dark', 'color-blind');
-      document.documentElement.classList.add(theme);
-      localStorage.setItem('theme', theme);
-    }
-  }, [theme]);
-
-  const nextTheme = theme === 'light' ? 'dark' : theme === 'dark' ? 'color-blind' : 'light';
-  const themeIcon = theme === 'light' ? '🌞' : theme === 'dark' ? '🌚' : '👁️';
-  const themeLabel = theme === 'light' ? 'Light' : theme === 'dark' ? 'Dark' : 'Color Blind';
 
   return (
     <div className="flex w-full">

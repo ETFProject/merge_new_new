@@ -16,6 +16,8 @@ interface SidebarContextType {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
   setIsSidebarOpen: (open: boolean) => void;
+  theme: 'light' | 'dark' | 'color-blind' | null;
+  setTheme: (theme: 'light' | 'dark' | 'color-blind') => void;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -97,6 +99,8 @@ export function RootLayoutContent({ children }: RootLayoutContentProps) {
     isSidebarOpen,
     toggleSidebar,
     setIsSidebarOpen,
+    theme,
+    setTheme,
   };
 
   return (
