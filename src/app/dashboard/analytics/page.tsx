@@ -64,7 +64,7 @@ export default function AnalyticsPage() {
 
       {/* Analytics content */}
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="col-span-2 flex flex-col min-h-[550px]">
+        <Card className="col-span-2">
           <CardHeader>
             <CardTitle>Portfolio {activeTab === 'performance' ? 'Performance' : 
                             activeTab === 'allocation' ? 'Asset Allocation' : 
@@ -79,7 +79,7 @@ export default function AnalyticsPage() {
               {timeframe === 'all' && 'All time'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-grow">
+          <CardContent className="h-96">
             <AnalyticsChart selectedTab={activeTab} timeframe={timeframe} />
           </CardContent>
         </Card>

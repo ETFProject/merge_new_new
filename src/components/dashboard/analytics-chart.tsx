@@ -146,6 +146,13 @@ export interface AnalyticsChartProps {
 }
 
 export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', itfData }: AnalyticsChartProps) {
+  const [chartType, setChartType] = useState(selectedTab);
+  const [period, setPeriod] = useState(timeframe);
+
+  useEffect(() => {
+    setChartType(selectedTab);
+  }, [selectedTab]);
+  
   // Generate chart data based on ITF data
   const chartData = useMemo(() => {
     if (!itfData) {
@@ -210,11 +217,11 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
   
   // Render different charts based on chartType
   const renderChart = () => {
-    switch (selectedTab) {
+    switch (chartType) {
       case 'performance':
         return (
           <TransitionWrapper transitionType="card-appear">
-            <div className="w-full flex flex-col items-center justify-center p-2" role="img" aria-label={`Performance chart for ${itfData?.name || 'Portfolio'} over ${timeframe} timeframe`}>
+            <div className="w-full flex flex-col items-center justify-center p-2" role="img" aria-label={`Performance chart for ${itfData?.name || 'Portfolio'} over ${period} timeframe`}>
               <div className="w-full max-w-2xl">
                 <div className="mb-4 bg-muted/30 p-4 rounded-lg">
                   <p className="font-medium mb-2 text-center text-sm">
@@ -239,7 +246,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
       case 'chains':
         return (
           <TransitionWrapper transitionType="card-appear">
-            <div className="w-full p-2" role="region" aria-label="Chain Distribution">
+            <div className="w-full p-2 pb-6" role="region" aria-label="Chain Distribution">
               <div className="w-full h-[400px] bg-slate-900/50 rounded-lg">
                 <ThreeOrbitalView data={chartData.chainDistribution} />
               </div>
@@ -280,7 +287,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center">
+    <div className="w-full min-h-[300px] flex items-center justify-center">
       {renderChart()}
     </div>
   );
