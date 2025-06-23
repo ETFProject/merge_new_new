@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, createContext, useContext, useRef } from 'react';
+import { useState, useEffect, createContext, useContext, useRef, Dispatch, SetStateAction } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ interface SidebarContextType {
   toggleSidebar: () => void;
   setIsSidebarOpen: (open: boolean) => void;
   theme: 'light' | 'dark' | 'color-blind' | null;
-  setTheme: (theme: 'light' | 'dark' | 'color-blind') => void;
+  setTheme: Dispatch<SetStateAction<'light' | 'dark' | 'color-blind' | null>>;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
