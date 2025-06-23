@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react';
 import Image from 'next/image';
-import { Canvas } from '@react-three/fiber';
 import { ThreePieChart } from '@/components/3d/ThreePieChart';
 import { ThreeOrbitalView } from '@/components/3d/ThreeOrbitalView';
 import { ThreeBarChart } from '@/components/3d/ThreeBarChart';
@@ -217,9 +216,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
                     {itfData ? `${itfData.name} Performance` : 'Portfolio Performance'}
                   </p>
                   <div className="w-full h-64">
-                    <Canvas>
-                      <ThreeBarChart data={chartData.daily} />
-                    </Canvas>
+                    <ThreeBarChart data={chartData.daily} />
                   </div>
                 </div>
               </div>
@@ -231,9 +228,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
           <TransitionWrapper transitionType="card-appear">
             <div className="w-full p-2" role="region" aria-label="Asset Allocation">
               <div className="w-full h-[400px] bg-slate-900/50 rounded-lg">
-                <Canvas>
-                  <ThreePieChart data={chartData.assetAllocation} />
-                </Canvas>
+                <ThreePieChart data={chartData.assetAllocation} />
               </div>
             </div>
           </TransitionWrapper>
@@ -243,9 +238,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
           <TransitionWrapper transitionType="card-appear">
             <div className="w-full p-2" role="region" aria-label="Chain Distribution">
               <div className="w-full h-[400px] bg-slate-900/50 rounded-lg">
-                <Canvas>
-                  <ThreeOrbitalView data={chartData.chainDistribution} />
-                </Canvas>
+                <ThreeOrbitalView data={chartData.chainDistribution} />
               </div>
             </div>
           </TransitionWrapper>
@@ -271,9 +264,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
           <TransitionWrapper transitionType="card-appear">
             <div className="w-full p-2" role="region" aria-label="Network Flow">
               <div className="w-full h-[400px] bg-slate-900/50 rounded-lg">
-                <Canvas>
-                  <ThreeNetworkGraph nodes={chartData.networkNodes} flows={chartData.networkFlows} />
-                </Canvas>
+                <ThreeNetworkGraph nodes={chartData.networkNodes} flows={chartData.networkFlows} />
               </div>
             </div>
           </TransitionWrapper>
