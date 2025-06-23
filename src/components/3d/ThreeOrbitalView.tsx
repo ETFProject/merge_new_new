@@ -35,7 +35,7 @@ const ChainNode = ({ position, color, label, size }: ChainNodeProps) => {
       </mesh>
       <Text
         position={[0, size * 1.5, 0]}
-        fontSize={0.2}
+        fontSize={0.15}
         color="white"
         anchorX="center"
         anchorY="middle"
@@ -67,7 +67,7 @@ function Scene({ data }: ThreeOrbitalViewProps) {
     const numNodes = data.length;
     return data.map((item, index) => {
       const angle = (index / numNodes) * 2 * Math.PI;
-      const radius = 2.5 + (index % 2) * 0.5; // Staggered radii
+      const radius = 1.8 + (index % 2) * 0.3; // Staggered radii
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
       return {
@@ -113,7 +113,7 @@ function Scene({ data }: ThreeOrbitalViewProps) {
 export function ThreeOrbitalView({ data }: ThreeOrbitalViewProps) {
   return (
     <div className="w-full h-full rounded-lg overflow-hidden">
-      <Canvas camera={{ position: [0, 5, 8], fov: 50 }}>
+      <Canvas camera={{ position: [0, 4, 10], fov: 50 }}>
         <Scene data={data} />
       </Canvas>
     </div>
