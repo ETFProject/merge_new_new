@@ -125,14 +125,16 @@ export function ITFDetailDialog({ isOpen, onClose, itf }: ITFDetailDialogProps) 
 
             {/* Tabs for different views */}
             <Tabs defaultValue="overview" className="w-full" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="flex flex-wrap justify-center w-full mb-6">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="performance">Performance</TabsTrigger>
-                <TabsTrigger value="allocation">Allocation</TabsTrigger>
-                <TabsTrigger value="chains">Chains</TabsTrigger>
-                <TabsTrigger value="deposit">Deposit/Withdraw</TabsTrigger>
-                <TabsTrigger value="vote">Vote</TabsTrigger>
-              </TabsList>
+              <div className="flex justify-center">
+                <TabsList className="flex-wrap">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="performance">Performance</TabsTrigger>
+                  <TabsTrigger value="allocation">Allocation</TabsTrigger>
+                  <TabsTrigger value="chains">Chains</TabsTrigger>
+                  <TabsTrigger value="deposit">Deposit/Withdraw</TabsTrigger>
+                  <TabsTrigger value="vote">Vote</TabsTrigger>
+                </TabsList>
+              </div>
 
               <TabsContent value="overview" className="space-y-6">
                 {/* Bio Section */}

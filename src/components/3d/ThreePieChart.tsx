@@ -88,8 +88,6 @@ const PieSegment = ({ segment, radius, startAngle, endAngle, isHighlighted, onHo
         anchorX="center"
         anchorY="middle"
         fillOpacity={0}
-        outlineWidth={0.01}
-        outlineColor="black"
       >
         {`${segment.percentage.toFixed(1)}%`}
       </Text>
@@ -133,26 +131,24 @@ function Scene({ data }: ThreePieChartProps) {
           />
         ))}
       </group>
-      {data.map((item, index) => (
-        <Text
-          key={item.category}
-          position={[-2.5, 1 - index * 0.25, 0]}
-          fontSize={0.2}
-          color={item.color}
-          anchorX="left"
-          anchorY="middle"
-        >
-          {`${item.category}: ${item.percentage.toFixed(1)}%`}
-        </Text>
-      ))}
     </>
   );
 }
 
 export function ThreePieChart({ data }: ThreePieChartProps) {
   return (
-    <Canvas camera={{ position: [0, 0, 4], fov: 60 }}>
-      <Scene data={data} />
-    </Canvas>
+    <div className="w-full h-full relative">
+      <Canvas camera={{ position: [0, 0, 4], fov: 60 }}>
+        <Scene data={data} />
+      </Canvas>
+      <div className="absolute bottom-4 left-4 flex flex-col gap-2 pointer-events-none">
+        {data.map((item) => (
+          <div key={item.category} className="flex items-center gap-2">
+            <div style={{ backgroundColor: item.color }} className="w-3 h-3 rounded-sm" />
+            <span className="text-white text-xs">{`${item.category}: ${item.percentage.toFixed(1)}%`}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 } 
