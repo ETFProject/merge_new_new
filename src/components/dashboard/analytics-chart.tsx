@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { ThreePieChart } from '@/components/3d/ThreePieChart';
 import { ThreeOrbitalView } from '@/components/3d/ThreeOrbitalView';
@@ -51,9 +51,17 @@ const generatePerformanceData = (itf: ITFData) => {
 const generateAssetAllocationData = (itf: ITFData) => {
   const colors = ['#FF6B9D', '#4ECDC4', '#FFE66D', '#FF6B6B', '#A8E6CF', '#9B59B6', '#3498DB', '#E67E22'];
   
-  return itf.holdings.map((holding, index) => ({
+  let holdings = itf.holdings.map(h => ({ ...h, weight: parseFloat(h.weight) }));
+  const totalWeight = holdings.reduce((sum, h) => sum + h.weight, 0);
+  
+  if (totalWeight > 0 && Math.abs(totalWeight - 100) > 0.01) {
+    const normalizationFactor = 100 / totalWeight;
+    holdings = holdings.map(h => ({ ...h, weight: h.weight * normalizationFactor }));
+  }
+
+  return holdings.map((holding, index) => ({
     category: holding.symbol,
-    percentage: parseFloat(holding.weight),
+    percentage: holding.weight,
     color: colors[index % colors.length],
     icon: `/baevii-logo.png`, // Default icon, could be enhanced with token-specific icons
     index,
@@ -140,6 +148,10 @@ export interface AnalyticsChartProps {
 export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', itfData }: AnalyticsChartProps) {
   const [chartType, setChartType] = useState(selectedTab);
   const [period, setPeriod] = useState(timeframe);
+
+  useEffect(() => {
+    setChartType(selectedTab);
+  }, [selectedTab]);
   
   // Generate chart data based on ITF data
   const chartData = useMemo(() => {
@@ -264,7 +276,10 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
           <TransitionWrapper transitionType="card-appear">
             <div className="w-full p-2" role="region" aria-label="Network Flow">
               <div className="w-full h-[400px] bg-slate-900/50 rounded-lg">
-                <ThreeNetworkGraph nodes={chartData.networkNodes} flows={chartData.networkFlows} />
+                <ThreeNetworkGraph
+                  nodes={chartData.networkNodes}
+                  flows={chartData.networkFlows}
+                />
               </div>
             </div>
           </TransitionWrapper>
