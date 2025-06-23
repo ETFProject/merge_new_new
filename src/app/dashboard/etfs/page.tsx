@@ -38,10 +38,11 @@ const mockUserITFs = {
     aum: '$1.7M',
     performance30D: '+24.7%',
     holdings: [
-      { symbol: 'UNI', weight: '30.0%' },
-      { symbol: 'AAVE', weight: '25.0%' },
-      { symbol: 'MKR', weight: '25.0%' },
-      { symbol: 'SNX', weight: '20.0%' }
+      { symbol: 'UNI', weight: '25.0%' },
+      { symbol: 'AAVE', weight: '20.0%' },
+      { symbol: 'MKR', weight: '20.0%' },
+      { symbol: 'SNX', weight: '20.0%' },
+      { symbol: 'LDO', weight: '15.0%' }
     ],
     status: 'active',
     createdAt: '2024-02-01',

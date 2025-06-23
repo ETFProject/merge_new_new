@@ -55,7 +55,8 @@ const generateAssetAllocationData = (itf: ITFData) => {
     category: holding.symbol,
     percentage: parseFloat(holding.weight),
     color: colors[index % colors.length],
-    icon: `/baevii-logo.png` // Default icon, could be enhanced with token-specific icons
+    icon: `/baevii-logo.png`, // Default icon, could be enhanced with token-specific icons
+    index,
   }));
 };
 
@@ -160,11 +161,11 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
           { date: '2023-04-12', value: 115 },
         ],
         assetAllocation: [
-          { category: 'DeFi', percentage: 35, icon: '/1byone20.jpg', color: '#FF6B9D' },
-          { category: 'Layer 1', percentage: 25, icon: '/tornado.png', color: '#4ECDC4' },
-          { category: 'NFT & Gaming', percentage: 15, icon: '/cactus.png', color: '#FFE66D' },
-          { category: 'Infrastructure', percentage: 15, icon: '/jellowchurch.png', color: '#FF6B6B' },
-          { category: 'Stablecoins', percentage: 10, icon: '/donut.png', color: '#A8E6CF' }
+          { category: 'DeFi', percentage: 35, icon: '/1byone20.jpg', color: '#FF6B9D', index: 0 },
+          { category: 'Layer 1', percentage: 25, icon: '/tornado.png', color: '#4ECDC4', index: 1 },
+          { category: 'NFT & Gaming', percentage: 15, icon: '/cactus.png', color: '#FFE66D', index: 2 },
+          { category: 'Infrastructure', percentage: 15, icon: '/jellowchurch.png', color: '#FF6B6B', index: 3 },
+          { category: 'Stablecoins', percentage: 10, icon: '/donut.png', color: '#A8E6CF', index: 4 }
         ],
         chainDistribution: [
           { category: 'Ethereum', chain: 'Ethereum', percentage: 45, color: '#FF6B6B', icon: '/tornado.png' },
@@ -226,7 +227,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
         return (
           <TransitionWrapper transitionType="card-appear">
             <div className="w-full p-2" role="region" aria-label="Asset Allocation">
-              <div className="w-full h-[400px] bg-slate-900/50 rounded-lg">
+              <div className="w-full h-[400px] rounded-lg">
                 <SimplePieChart data={chartData.assetAllocation} />
               </div>
             </div>
@@ -236,7 +237,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
         return (
           <TransitionWrapper transitionType="card-appear">
             <div className="w-full p-2" role="region" aria-label="Chain Distribution">
-              <div className="w-full h-[400px] bg-slate-900/50 rounded-lg">
+              <div className="w-full h-[400px] rounded-lg">
                 <SimpleDistributionChart data={chartData.chainDistribution} />
               </div>
             </div>
