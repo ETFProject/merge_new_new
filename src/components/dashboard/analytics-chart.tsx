@@ -238,10 +238,8 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
       case 'allocation':
         return (
           <TransitionWrapper transitionType="card-appear">
-            <div className="w-full p-2" role="region" aria-label="Asset Allocation">
-              <div className="w-full h-[400px] bg-slate-900/50 rounded-lg">
-                <ThreePieChart data={chartData.assetAllocation} />
-              </div>
+            <div className="w-full h-full" role="region" aria-label="Asset Allocation">
+              <ThreePieChart data={chartData.assetAllocation} />
             </div>
           </TransitionWrapper>
         );
@@ -264,7 +262,6 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
                   <ThreeNetworkGraph
                     nodes={chartData.networkNodes}
                     flows={chartData.networkFlows}
-                    height={256}
                   />
                 </div>
               </div>
