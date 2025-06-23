@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { WalletConnectButton } from '@/components/WalletConnectButton';
 import { ITFDetailDialog } from '@/components/etf/etf-detail-dialog';
 import Image from 'next/image';
+import { AnalyticsChart } from '@/components/dashboard/analytics-chart';
 
 // Mock ITF data
 const mockITFs = {
@@ -288,6 +289,10 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="pb-6">
+        <AnalyticsChart selectedTab="chains" />
       </div>
 
       {/* Our ITFs Section */}
