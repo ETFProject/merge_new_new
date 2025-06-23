@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useFlareOracle } from '@/hooks';
 import { FEED_CATEGORIES } from '@/app/config/flare-contract';
-import { Search, RefreshCw, TrendingUp, TrendingDown, Edit, Network, Zap, Plus, Trash2, Bot, BarChart3, Shield, Wallet } from 'lucide-react';
+import { Search, RefreshCw, TrendingUp, TrendingDown, Edit, Network, Zap, Plus, Trash2, Bot, BarChart3, Shield, Wallet, Sparkles } from 'lucide-react';
 import { OracleDiagnostic } from '@/components/etf/oracle-diagnostic';
 import { ethers } from 'ethers';
 import ETFVaultJSON from '@/lib/abis/FlowETFVault.json';
@@ -514,7 +514,7 @@ export default function FlowEtfPage() {
       suggestedStrategy = generateStrategy('Balanced') || null;
       
     } else if (command.includes('ai') || command.includes('tech') || command.includes('future') || command.includes('innovation')) {
-      response = '�� For future-focused portfolio management, I recommend AI and technology tokens with strong fundamentals and growth potential.';
+      response = '🤖 For future-focused portfolio management, I recommend AI and technology tokens with strong fundamentals and growth potential.';
       suggestedStrategy = generateStrategy('AI Focus') || null;
       
     } else if (command.includes('rebalance') || command.includes('optimize') || command.includes('improve')) {
@@ -766,7 +766,7 @@ export default function FlowEtfPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-16">
       {/* ETF Header Section with Integrated Privy Wallet */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
@@ -1620,6 +1620,68 @@ export default function FlowEtfPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* AI Assistant Modal */}
+      <SidebarProvider>
+        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+          <DialogTrigger asChild>
+            <div className="fixed bottom-8 right-8">
+              <Button size="lg" className="rounded-full shadow-lg" onClick={() => setIsEditModalOpen(true)}>
+                <Sparkles className="mr-2 h-5 w-5" /> AI Assistant
+              </Button>
+            </div>
+          </DialogTrigger>
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>AI Portfolio Assistant</DialogTitle>
+              <DialogDescription>
+                Use our AI assistant to analyze your portfolio and market data.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-4">
+              <div className="flex flex-col gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">💬</span>
+                      Natural Language Commands
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <Input
+                      value={aiCommand}
+                      onChange={(e) => setAiCommand(e.target.value)}
+                      placeholder="e.g., 'Make it more conservative', 'Aggressive growth portfolio', 'Add more DeFi exposure'..."
+                    />
+                    <Button 
+                      onClick={executeAICommand}
+                      disabled={isExecuting || !aiCommand.trim()}
+                      className="w-full"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      {isExecuting ? 'Executing...' : 'Execute'}
+                    </Button>
+                    <div className="text-xs text-muted-foreground">
+                      💡 Try &quot;Rebalance for optimal growth&quot; or &quot;Make it more conservative&quot;
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="h-[70vh] flex flex-col">
+                <Card className="flex-1 h-full">
+                  <CardHeader>
+                    <CardTitle>AI Chat</CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-full">
+                    <AiAgentChat />
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </SidebarProvider>
     </div>
   );
 } 
