@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Sparkles, Stars, Text, Line, Bounds } from '@react-three/drei';
+import { Text, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { Group } from 'three';
 
@@ -37,7 +37,7 @@ const ChainNode = ({ position, color, label, size }: ChainNodeProps) => {
       </mesh>
       <Text
         position={[0, size * 1.5, 0]}
-        fontSize={0.25}
+        fontSize={0.4}
         color="white"
         anchorX="center"
         anchorY="middle"
@@ -58,7 +58,7 @@ interface ThreeOrbitalViewProps {
     data: OrbitalData[];
 }
 
-function Content({ data }: ThreeOrbitalViewProps) {
+function Scene({ data }: ThreeOrbitalViewProps) {
   const groupRef = useRef<Group>(null!);
 
   useFrame((state, delta) => {
@@ -71,7 +71,7 @@ function Content({ data }: ThreeOrbitalViewProps) {
     const numNodes = data.length;
     return data.map((item, index) => {
       const angle = (index / numNodes) * 2 * Math.PI;
-      const radius = 2.5 + (index % 2) * 0.5;
+      const radius = 4.5 + (index % 2) * 0.8;
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
       return {
@@ -85,12 +85,15 @@ function Content({ data }: ThreeOrbitalViewProps) {
   const centerNodePosition: [number, number, number] = [0, 0, 0];
 
   return (
-    <group ref={groupRef}>
+    <>
+      <ambientLight intensity={0.7} />
+      <pointLight position={centerNodePosition} intensity={10} color="#00aaff" distance={15} />
+
+      <group ref={groupRef}>
         <mesh position={centerNodePosition}>
-          <sphereGeometry args={[0.8, 32, 32]} />
+          <sphereGeometry args={[1.2, 32, 32]} />
           <meshStandardMaterial color="#00aaff" emissive="#00aaff" emissiveIntensity={2} toneMapped={false}/>
         </mesh>
-        <Sparkles count={50} scale={3.5} size={10} speed={0.3} color="#fff" />
 
         {nodes.map((node) => (
           <group key={node.category}>
@@ -98,23 +101,12 @@ function Content({ data }: ThreeOrbitalViewProps) {
               position={node.position}
               color={node.color}
               label={`${node.category}: ${node.percentage}%`}
-              size={0.35 + (node.percentage / 100) * 0.5}
+              size={0.6 + (node.percentage / 100) * 0.8}
             />
-            <Line points={[centerNodePosition, node.position]} color={node.color} lineWidth={1} transparent opacity={0.3} />
+            <Line points={[centerNodePosition, node.position]} color={node.color} lineWidth={1.5} transparent opacity={0.4} />
           </group>
         ))}
       </group>
-  )
-}
-
-function Scene({ data }: ThreeOrbitalViewProps) {
-  return (
-    <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[0, 0, 0]} intensity={8} color="#00aaff" distance={10} />
-      <Bounds fit clip observe margin={1.1}>
-        <Content data={data} />
-      </Bounds>
     </>
   );
 }
@@ -122,7 +114,7 @@ function Scene({ data }: ThreeOrbitalViewProps) {
 export function ThreeOrbitalView({ data }: ThreeOrbitalViewProps) {
   return (
     <div className="w-full h-full rounded-lg overflow-hidden">
-      <Canvas>
+      <Canvas camera={{ position: [0, 8, 14], fov: 55 }}>
         <Scene data={data} />
       </Canvas>
     </div>
