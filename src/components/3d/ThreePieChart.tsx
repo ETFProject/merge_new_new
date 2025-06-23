@@ -88,8 +88,10 @@ const PieSegment = ({ segment, radius, startAngle, endAngle, isHighlighted, onHo
         anchorX="center"
         anchorY="middle"
         fillOpacity={0}
+        outlineWidth={0.01}
+        outlineColor="black"
       >
-        {`${segment.percentage}%`}
+        {`${segment.percentage.toFixed(1)}%`}
       </Text>
     </group>
   );
@@ -131,6 +133,18 @@ function Scene({ data }: ThreePieChartProps) {
           />
         ))}
       </group>
+      {data.map((item, index) => (
+        <Text
+          key={item.category}
+          position={[-2.5, 1 - index * 0.25, 0]}
+          fontSize={0.2}
+          color={item.color}
+          anchorX="left"
+          anchorY="middle"
+        >
+          {`${item.category}: ${item.percentage.toFixed(1)}%`}
+        </Text>
+      ))}
     </>
   );
 }

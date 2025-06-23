@@ -48,10 +48,10 @@ const mockITFs = {
       discord: 'https://discord.gg/baevii'
     },
     holdings: [
-      { symbol: 'UNI', weight: '25.2%' },
-      { symbol: 'AAVE', weight: '22.7%' },
-      { symbol: 'MKR', weight: '20.4%' },
-      { symbol: 'SNX', weight: '15.1%' }
+      { symbol: 'FLOW', weight: '40%' },
+      { symbol: 'BTC', weight: '25%' },
+      { symbol: 'UNI', weight: '20%' },
+      { symbol: 'AAVE', weight: '15%' }
     ]
   },
   aiWeb3: {
