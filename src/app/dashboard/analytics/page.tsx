@@ -79,7 +79,7 @@ export default function AnalyticsPage() {
               {timeframe === 'all' && 'All time'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="h-[900px]">
+          <CardContent className="h-[400px]">
             <AnalyticsChart selectedTab={activeTab} timeframe={timeframe} />
           </CardContent>
         </Card>

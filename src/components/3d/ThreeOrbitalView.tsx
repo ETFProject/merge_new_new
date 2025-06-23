@@ -113,8 +113,8 @@ function Scene({ data }: ThreeOrbitalViewProps) {
 
 export function ThreeOrbitalView({ data }: ThreeOrbitalViewProps) {
   return (
-    <div className="w-full h-full rounded-lg overflow-hidden">
-      <Canvas camera={{ position: [0, 10, 18], fov: 60 }}>
+    <div style={{ width: '100%', height: '100%' }}>
+      <Canvas style={{ width: '100%', height: '100%' }}>
         <Scene data={data} />
       </Canvas>
     </div>
