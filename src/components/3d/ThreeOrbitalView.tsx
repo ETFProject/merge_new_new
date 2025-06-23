@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Sparkles, Stars, Text, Line, Bounds, useBounds } from '@react-three/drei';
+import { Sparkles, Stars, Text, Line, Bounds } from '@react-three/drei';
 import * as THREE from 'three';
 import { Group } from 'three';
 
@@ -17,7 +17,9 @@ const ChainNode = ({ position, color, label, size }: ChainNodeProps) => {
   const meshRef = useRef<THREE.Mesh>(null!);
 
   useFrame((state) => {
-    meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.3;
+    if (meshRef.current) {
+        meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.3;
+    }
   });
 
   return (
@@ -35,7 +37,7 @@ const ChainNode = ({ position, color, label, size }: ChainNodeProps) => {
       </mesh>
       <Text
         position={[0, size * 1.5, 0]}
-        fontSize={0.15}
+        fontSize={0.25}
         color="white"
         anchorX="center"
         anchorY="middle"
@@ -56,13 +58,12 @@ interface ThreeOrbitalViewProps {
     data: OrbitalData[];
 }
 
-// The component that gets scaled
-function ScalableScene({ data }: ThreeOrbitalViewProps) {
+function Content({ data }: ThreeOrbitalViewProps) {
   const groupRef = useRef<Group>(null!);
 
   useFrame((state, delta) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.05;
+        groupRef.current.rotation.y += delta * 0.05;
     }
   });
 
@@ -70,7 +71,7 @@ function ScalableScene({ data }: ThreeOrbitalViewProps) {
     const numNodes = data.length;
     return data.map((item, index) => {
       const angle = (index / numNodes) * 2 * Math.PI;
-      const radius = 2.0 + (index % 2) * 0.4; // Slightly larger base radius
+      const radius = 2.5 + (index % 2) * 0.5;
       const x = Math.cos(angle) * radius;
       const z = Math.sin(angle) * radius;
       return {
@@ -85,35 +86,35 @@ function ScalableScene({ data }: ThreeOrbitalViewProps) {
 
   return (
     <group ref={groupRef}>
-      <mesh position={centerNodePosition}>
-        <sphereGeometry args={[0.6, 32, 32]} />
-        <meshStandardMaterial color="#00aaff" emissive="#00aaff" emissiveIntensity={2} toneMapped={false}/>
-      </mesh>
-      <Sparkles count={50} scale={2.5} size={10} speed={0.3} color="#fff" />
+        <mesh position={centerNodePosition}>
+          <sphereGeometry args={[0.8, 32, 32]} />
+          <meshStandardMaterial color="#00aaff" emissive="#00aaff" emissiveIntensity={2} toneMapped={false}/>
+        </mesh>
+        <Sparkles count={50} scale={3.5} size={10} speed={0.3} color="#fff" />
 
-      {nodes.map((node) => (
-        <group key={node.category}>
-          <ChainNode
-            position={node.position}
-            color={node.color}
-            label={`${node.category}: ${node.percentage}%`}
-            size={0.25 + (node.percentage / 100) * 0.4}
-          />
-          <Line points={[centerNodePosition, node.position]} color={node.color} lineWidth={1} transparent opacity={0.3} />
-        </group>
-      ))}
-    </group>
-  );
+        {nodes.map((node) => (
+          <group key={node.category}>
+            <ChainNode
+              position={node.position}
+              color={node.color}
+              label={`${node.category}: ${node.percentage}%`}
+              size={0.35 + (node.percentage / 100) * 0.5}
+            />
+            <Line points={[centerNodePosition, node.position]} color={node.color} lineWidth={1} transparent opacity={0.3} />
+          </group>
+        ))}
+      </group>
+  )
 }
 
 function Scene({ data }: ThreeOrbitalViewProps) {
   return (
     <>
-      <ambientLight intensity={0.4} />
-      <pointLight position={[0,0,0]} intensity={5} color="#00aaff" distance={10} />
+      <ambientLight intensity={0.5} />
+      <pointLight position={[0, 0, 0]} intensity={8} color="#00aaff" distance={10} />
       <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade />
-      <Bounds fit clip observe margin={1.2}>
-        <ScalableScene data={data} />
+      <Bounds fit clip observe margin={1.1}>
+        <Content data={data} />
       </Bounds>
     </>
   );
@@ -122,9 +123,9 @@ function Scene({ data }: ThreeOrbitalViewProps) {
 export function ThreeOrbitalView({ data }: ThreeOrbitalViewProps) {
   return (
     <div className="w-full h-full rounded-lg overflow-hidden">
-      <Canvas camera={{ position: [0, 0, 10], fov: 45 }}>
+      <Canvas>
         <Scene data={data} />
       </Canvas>
     </div>
   );
-} 
+}
