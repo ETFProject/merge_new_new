@@ -246,10 +246,8 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
       case 'chains':
         return (
           <TransitionWrapper transitionType="card-appear">
-            <div className="w-full p-2" role="region" aria-label="Chain Distribution">
-              <div className="w-full h-[400px] bg-slate-900/50 rounded-lg">
-                <ThreeOrbitalView data={chartData.chainDistribution} />
-              </div>
+            <div className="w-full h-full flex items-center justify-center" role="region" aria-label="Chain Distribution">
+              <ThreeOrbitalView data={chartData.chainDistribution} />
             </div>
           </TransitionWrapper>
         );
@@ -287,7 +285,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
   };
 
   return (
-    <div className="w-full min-h-[300px] flex items-center justify-center">
+    <div className="w-full h-full flex items-center justify-center">
       {renderChart()}
     </div>
   );
