@@ -246,7 +246,7 @@ export function AnalyticsChart({ selectedTab = 'performance', timeframe = '1w', 
       case 'chains':
         return (
           <TransitionWrapper transitionType="card-appear">
-            <div className="w-full p-2 pb-6" role="region" aria-label="Chain Distribution">
+            <div className="w-full p-2" role="region" aria-label="Chain Distribution">
               <div className="w-full h-[400px] bg-slate-900/50 rounded-lg">
                 <ThreeOrbitalView data={chartData.chainDistribution} />
               </div>
