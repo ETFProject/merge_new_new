@@ -99,7 +99,7 @@ interface ThreePieChartProps {
     data: SegmentData[];
 }
 
-export function ThreePieChart({ data }: ThreePieChartProps) {
+function Scene({ data }: ThreePieChartProps) {
   const [highlightedCategory, setHighlightedCategory] = useState<string | null>(null);
 
   const segments = useMemo(() => {
@@ -113,34 +113,32 @@ export function ThreePieChart({ data }: ThreePieChartProps) {
   }, [data]);
 
   return (
-    <div className="w-full h-full relative">
-      <Canvas camera={{ position: [0, 0, 4], fov: 60 }}>
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 5, 5]} intensity={1} />
-        <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade />
+    <>
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[5, 5, 5]} intensity={1} />
+      <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade />
 
-        <group rotation={[Math.PI / 6, 0, 0]}>
-          {segments.map((segment) => (
-            <PieSegment
-              key={segment.category}
-              segment={segment}
-              radius={1.5}
-              startAngle={segment.startAngle}
-              endAngle={segment.endAngle}
-              isHighlighted={highlightedCategory === segment.category || highlightedCategory === null}
-              onHover={setHighlightedCategory}
-            />
-          ))}
-        </group>
-      </Canvas>
-      <div className="absolute bottom-4 left-4 flex flex-col gap-2 pointer-events-none">
-        {data.map((item) => (
-          <div key={item.category} className="flex items-center gap-2">
-            <div style={{ backgroundColor: item.color }} className="w-3 h-3 rounded-sm" />
-            <span className="text-white text-xs">{item.category}</span>
-          </div>
+      <group rotation={[Math.PI / 6, 0, 0]}>
+        {segments.map((segment) => (
+          <PieSegment
+            key={segment.category}
+            segment={segment}
+            radius={1.5}
+            startAngle={segment.startAngle}
+            endAngle={segment.endAngle}
+            isHighlighted={highlightedCategory === segment.category || highlightedCategory === null}
+            onHover={setHighlightedCategory}
+          />
         ))}
-      </div>
-    </div>
+      </group>
+    </>
+  );
+}
+
+export function ThreePieChart({ data }: ThreePieChartProps) {
+  return (
+    <Canvas camera={{ position: [0, 0, 4], fov: 60 }}>
+      <Scene data={data} />
+    </Canvas>
   );
 } 

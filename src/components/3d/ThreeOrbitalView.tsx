@@ -56,7 +56,7 @@ interface ThreeOrbitalViewProps {
     data: OrbitalData[];
 }
 
-export function ThreeOrbitalView({ data }: ThreeOrbitalViewProps) {
+function Scene({ data }: ThreeOrbitalViewProps) {
   const groupRef = useRef<Group>(null!);
 
   useFrame((state, delta) => {
@@ -81,7 +81,7 @@ export function ThreeOrbitalView({ data }: ThreeOrbitalViewProps) {
   const centerNodePosition: [number, number, number] = [0, 0, 0];
 
   return (
-    <Canvas camera={{ position: [0, 4, 7], fov: 60 }}>
+    <>
       <ambientLight intensity={0.4} />
       <pointLight position={centerNodePosition} intensity={5} color="#00aaff" distance={5} />
       <Stars radius={150} depth={50} count={5000} factor={5} saturation={0} fade />
@@ -106,6 +106,14 @@ export function ThreeOrbitalView({ data }: ThreeOrbitalViewProps) {
           </group>
         ))}
       </group>
+    </>
+  );
+}
+
+export function ThreeOrbitalView({ data }: ThreeOrbitalViewProps) {
+  return (
+    <Canvas camera={{ position: [0, 4, 7], fov: 60 }}>
+      <Scene data={data} />
     </Canvas>
   );
 } 

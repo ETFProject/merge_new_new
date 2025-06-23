@@ -118,10 +118,9 @@ interface ThreeNetworkGraphProps {
     to: string;
     color: string;
   }>;
-  height?: number;
 }
 
-export function ThreeNetworkGraph({ nodes, flows, height = 400 }: ThreeNetworkGraphProps) {
+function Scene({ nodes, flows }: ThreeNetworkGraphProps) {
   // Pre-compute node positions and flow data
   const { nodePositions, flowData } = useMemo(() => {
     const positions: { [key: string]: [number, number, number] } = {};
@@ -139,57 +138,63 @@ export function ThreeNetworkGraph({ nodes, flows, height = 400 }: ThreeNetworkGr
   }, [nodes, flows]);
 
   return (
-    <div style={{ width: '100%', height: `${height}px` }}>
-      <Canvas
-        camera={{ position: [0, 4, 8], fov: 75 }}
-        dpr={[1, 2]}
-        performance={{ min: 0.5 }}
-      >
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
-        
-        {/* Nodes */}
-        {nodes.map((node) => (
-          <NetworkNode
-            key={node.id}
-            position={node.position}
-            icon={node.icon}
-            label={node.label}
-            color={node.color}
-          />
-        ))}
-
-        {/* Flow Particles */}
-        {flowData.map((flow, index) => (
-          <group key={`flow-${index}`}>
-            <FlowParticle
-              start={flow.start}
-              end={flow.end}
-              color={flow.color}
-              speed={1 + Math.random() * 0.5}
-            />
-            <primitive object={new THREE.Line3(
-              new THREE.Vector3(...flow.start),
-              new THREE.Vector3(...flow.end)
-            )}>
-              <lineBasicMaterial
-                color={flow.color}
-                transparent
-                opacity={0.2}
-                linewidth={1}
-              />
-            </primitive>
-          </group>
-        ))}
-
-        <OrbitControls
-          enableZoom={false}
-          minPolarAngle={Math.PI / 4}
-          maxPolarAngle={Math.PI * 0.65}
-          enableDamping={false}
-          rotateSpeed={0.5}
+    <>
+      <ambientLight intensity={0.5} />
+      <pointLight position={[10, 10, 10]} intensity={1} />
+      
+      {/* Nodes */}
+      {nodes.map((node) => (
+        <NetworkNode
+          key={node.id}
+          position={node.position}
+          icon={node.icon}
+          label={node.label}
+          color={node.color}
         />
-      </Canvas>
-    </div>
+      ))}
+
+      {/* Flow Particles */}
+      {flowData.map((flow, index) => (
+        <group key={`flow-${index}`}>
+          <FlowParticle
+            start={flow.start}
+            end={flow.end}
+            color={flow.color}
+            speed={1 + Math.random() * 0.5}
+          />
+          <primitive object={new THREE.Line3(
+            new THREE.Vector3(...flow.start),
+            new THREE.Vector3(...flow.end)
+          )}>
+            <lineBasicMaterial
+              color={flow.color}
+              transparent
+              opacity={0.2}
+              linewidth={1}
+            />
+          </primitive>
+        </group>
+      ))}
+
+      <OrbitControls
+        enableZoom={false}
+        minPolarAngle={Math.PI / 4}
+        maxPolarAngle={Math.PI * 0.65}
+        enableDamping={false}
+        rotateSpeed={0.5}
+      />
+    </>
+  );
+}
+
+export function ThreeNetworkGraph({ nodes, flows }: ThreeNetworkGraphProps) {
+  return (
+    <Canvas
+      camera={{ position: [0, 4, 8], fov: 75 }}
+      dpr={[1, 2]}
+      performance={{ min: 0.5 }}
+    >
+      <Scene nodes={nodes} flows={flows} />
+    </Canvas>
   );
 } 

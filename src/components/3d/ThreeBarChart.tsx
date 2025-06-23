@@ -59,7 +59,7 @@ interface ThreeBarChartProps {
     }>;
 }
 
-export function ThreeBarChart({ data }: ThreeBarChartProps) {
+function Scene({ data }: ThreeBarChartProps) {
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
 
   const bars = useMemo(() => {
@@ -78,7 +78,7 @@ export function ThreeBarChart({ data }: ThreeBarChartProps) {
   }, [data]);
 
   return (
-    <Canvas camera={{ position: [0, 2, 8], fov: 50 }} style={{ background: 'transparent' }}>
+    <>
       <ambientLight intensity={0.5} />
       <directionalLight position={[0, 5, 5]} intensity={1.5} color={ACCENT_COLOR} />
       <Grid
@@ -110,6 +110,14 @@ export function ThreeBarChart({ data }: ThreeBarChartProps) {
        <Text position={[0, -0.5, 0]} fontSize={0.2} color="white" anchorX="center">
         30-Day Performance
       </Text>
+    </>
+  );
+}
+
+export function ThreeBarChart({ data }: ThreeBarChartProps) {
+  return (
+    <Canvas camera={{ position: [0, 2, 8], fov: 50 }} style={{ background: 'transparent' }}>
+      <Scene data={data} />
     </Canvas>
   );
 } 
