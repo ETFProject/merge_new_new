@@ -1,0 +1,111 @@
+'use client';
+
+import { useMemo, useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Sparkles, Stars, Text, Line } from '@react-three/drei';
+import * as THREE from 'three';
+import { Group } from 'three';
+
+interface ChainNodeProps {
+    position: [number, number, number];
+    color: string;
+    label: string;
+    size: number;
+}
+
+const ChainNode = ({ position, color, label, size }: ChainNodeProps) => {
+  const meshRef = useRef<THREE.Mesh>(null!);
+
+  useFrame((state) => {
+    meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.3;
+  });
+
+  return (
+    <group position={position}>
+      <mesh ref={meshRef}>
+        <sphereGeometry args={[size, 32, 32]} />
+        <meshStandardMaterial
+          color={color}
+          metalness={0.7}
+          roughness={0.2}
+          emissive={color}
+          emissiveIntensity={0.5}
+          toneMapped={false}
+        />
+      </mesh>
+      <Text
+        position={[0, size * 1.5, 0]}
+        fontSize={0.2}
+        color="white"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {label}
+      </Text>
+    </group>
+  );
+};
+
+interface OrbitalData {
+    category: string;
+    percentage: number;
+    color: string;
+}
+
+interface ThreeOrbitalViewProps {
+    data: OrbitalData[];
+}
+
+export function ThreeOrbitalView({ data }: ThreeOrbitalViewProps) {
+  const groupRef = useRef<Group>(null!);
+
+  useFrame((state, delta) => {
+    groupRef.current.rotation.y += delta * 0.05;
+  });
+
+  const nodes = useMemo(() => {
+    const numNodes = data.length;
+    return data.map((item, index) => {
+      const angle = (index / numNodes) * 2 * Math.PI;
+      const radius = 2.5 + (index % 2) * 0.5; // Staggered radii
+      const x = Math.cos(angle) * radius;
+      const z = Math.sin(angle) * radius;
+      return {
+        ...item,
+        position: [x, 0, z] as [number, number, number],
+        radius: radius,
+      };
+    });
+  }, [data]);
+
+  const centerNodePosition: [number, number, number] = [0, 0, 0];
+
+  return (
+    <Canvas camera={{ position: [0, 4, 7], fov: 60 }}>
+      <ambientLight intensity={0.4} />
+      <pointLight position={centerNodePosition} intensity={5} color="#00aaff" distance={5} />
+      <Stars radius={150} depth={50} count={5000} factor={5} saturation={0} fade />
+
+      <group ref={groupRef}>
+        <mesh position={centerNodePosition}>
+          <sphereGeometry args={[0.5, 32, 32]} />
+          <meshStandardMaterial color="#00aaff" emissive="#00aaff" emissiveIntensity={2} toneMapped={false}/>
+        </mesh>
+        <Sparkles count={40} scale={1.5} size={8} speed={0.3} color="#fff" />
+
+        {nodes.map((node) => (
+          <group key={node.category}>
+            <ChainNode
+              position={node.position}
+              color={node.color}
+              label={`${node.category}: ${node.percentage}%`}
+              size={0.2 + (node.percentage / 100) * 0.3}
+            />
+            {/* Simple line connecting to the center */}
+            <Line points={[centerNodePosition, node.position]} color={node.color} lineWidth={0.5} transparent opacity={0.3} />
+          </group>
+        ))}
+      </group>
+    </Canvas>
+  );
+} 
