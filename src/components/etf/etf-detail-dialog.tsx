@@ -125,7 +125,7 @@ export function ITFDetailDialog({ isOpen, onClose, itf }: ITFDetailDialogProps) 
 
             {/* Tabs for different views */}
             <Tabs defaultValue="overview" className="w-full" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-6 mb-6">
+              <TabsList className="flex flex-wrap justify-center w-full mb-6">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="performance">Performance</TabsTrigger>
                 <TabsTrigger value="allocation">Allocation</TabsTrigger>
