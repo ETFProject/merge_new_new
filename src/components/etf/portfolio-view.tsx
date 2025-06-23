@@ -79,8 +79,21 @@ export function PortfolioView({ itfId }: PortfolioViewProps) {
         const data = await response.json();
         
         if (data.success) {
+          let tokens = data.data.tokens;
+
+          // Normalize weights to ensure they sum to 100 for the pie chart
+          const totalWeight = tokens.reduce((sum: number, token: TokenAllocation) => sum + token.weight, 0);
+
+          if (totalWeight > 0 && Math.abs(totalWeight - 100) > 0.01) {
+            const normalizationFactor = 100 / totalWeight;
+            tokens = tokens.map((token: TokenAllocation) => ({
+              ...token,
+              weight: token.weight * normalizationFactor,
+            }));
+          }
+          
           // Add logo URLs for tokens - in real app these would come from API
-          const tokensWithLogos = data.data.tokens.map((token: TokenAllocation) => {
+          const tokensWithLogos = tokens.map((token: TokenAllocation) => {
             // Map some token symbols to our available images
             let logoUrl = "";
             switch (token.tokenSymbol) {

@@ -56,7 +56,7 @@ export async function GET(
           },
           {
             symbol: 'WETH',
-            percentage: 0.05,
+            percentage: 0.5,
             amount: 5.0,
             valueUSD: 5.0,
             priceUSD: 1.0,
