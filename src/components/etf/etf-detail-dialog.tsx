@@ -16,6 +16,7 @@ import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowUpFromLine, ArrowDownToLine, ThumbsUp, ThumbsDown, Plus, Twitter, Youtube, MessageCircle, Users } from "lucide-react";
 import { SidebarProvider } from '../SidebarProvider';
+import { Slider } from "@/components/ui/slider";
 
 // Mock voting data
 const mockVotingProposals = [
@@ -239,8 +240,8 @@ export function ITFDetailDialog({ isOpen, onClose, itf }: ITFDetailDialogProps) 
                 </Card>
               </TabsContent>
 
-              <TabsContent value="chains">
-                <Card className="p-6 h-[400px]">
+              <TabsContent value="chains" forceRender>
+                <Card className="p-6 h-[500px]">
                   <h3 className="text-lg font-semibold mb-4">Chain Distribution</h3>
                   <AnalyticsChart selectedTab="chains" itfData={itf} />
                 </Card>
@@ -250,38 +251,40 @@ export function ITFDetailDialog({ isOpen, onClose, itf }: ITFDetailDialogProps) 
                 <Card className="p-6">
                   <h3 className="text-lg font-semibold mb-6">Deposit</h3>
                   <div className="space-y-4">
-                    <div className="space-y-2">
+                    <div className="space-y-2 flex items-center gap-2">
                       <Input
                         type="number"
                         value={depositAmount}
                         onChange={(e) => setDepositAmount(e.target.value)}
                         placeholder="0.00"
-                        className="text-lg"
+                        className="text-lg flex-1"
                       />
-                      <p className="text-sm text-muted-foreground">Balance: 1.23 ETH</p>
+                      <span className="text-base font-semibold text-muted-foreground">USDC</span>
                     </div>
+                    <p className="text-sm text-muted-foreground">Balance: 1,000.00 USDC</p>
                     <Button className="w-full" size="lg">
                       <ArrowUpFromLine className="w-4 h-4 mr-2" />
-                      Deposit
+                      Deposit USDC
                     </Button>
                   </div>
                 </Card>
                 <Card className="p-6">
                   <h3 className="text-lg font-semibold mb-6">Withdraw</h3>
                   <div className="space-y-4">
-                    <div className="space-y-2">
+                    <div className="space-y-2 flex items-center gap-2">
                       <Input
                         type="number"
                         value={withdrawAmount}
                         onChange={(e) => setWithdrawAmount(e.target.value)}
                         placeholder="0.00"
-                        className="text-lg"
+                        className="text-lg flex-1"
                       />
-                      <p className="text-sm text-muted-foreground">Your Balance: 100.00 ITF-Tokens</p>
+                      <span className="text-base font-semibold text-muted-foreground">USDC</span>
                     </div>
+                    <p className="text-sm text-muted-foreground">Your Balance: 1,000.00 USDC</p>
                     <Button className="w-full" size="lg" variant="secondary">
                       <ArrowDownToLine className="w-4 h-4 mr-2" />
-                      Withdraw
+                      Withdraw USDC
                     </Button>
                   </div>
                 </Card>
@@ -291,32 +294,47 @@ export function ITFDetailDialog({ isOpen, onClose, itf }: ITFDetailDialogProps) 
                 <Card className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Community Proposals</h3>
                   <div className="space-y-4">
-                    {mockVotingProposals.map((proposal) => (
-                      <Card key={proposal.id} className="p-4 flex justify-between items-center">
-                        <div>
-                          <p className="font-medium">{proposal.description}</p>
-                          <p className="text-sm text-muted-foreground">{proposal.timeLeft} left</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant={userVotes[proposal.id] === 'up' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => handleVote(proposal.id, 'up')}
-                          >
-                            <ThumbsUp className="w-4 h-4 mr-2" />
-                            {proposal.upvotes}
-                          </Button>
-                          <Button
-                            variant={userVotes[proposal.id] === 'down' ? 'destructive' : 'outline'}
-                            size="sm"
-                            onClick={() => handleVote(proposal.id, 'down')}
-                          >
-                            <ThumbsDown className="w-4 h-4 mr-2" />
-                            {proposal.downvotes}
-                          </Button>
-                        </div>
-                      </Card>
-                    ))}
+                    {mockVotingProposals.map((proposal) => {
+                      const totalVotes = proposal.upvotes + proposal.downvotes;
+                      const upPercent = totalVotes ? Math.round((proposal.upvotes / totalVotes) * 100) : 0;
+                      const downPercent = totalVotes ? Math.round((proposal.downvotes / totalVotes) * 100) : 0;
+                      return (
+                        <Card key={proposal.id} className="p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-muted/40 border border-muted-foreground/10 shadow-sm">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`px-2 py-0.5 rounded text-xs font-semibold ${proposal.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>{proposal.status.charAt(0).toUpperCase() + proposal.status.slice(1)}</span>
+                              <span className="text-xs text-muted-foreground">{proposal.timeLeft} left</span>
+                            </div>
+                            <p className="font-medium text-base text-foreground truncate mb-1">{proposal.description}</p>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <span>Up: {upPercent}%</span>
+                              <span>Down: {downPercent}%</span>
+                              <span>Total: {totalVotes}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant={userVotes[proposal.id] === 'up' ? 'default' : 'outline'}
+                              size="sm"
+                              className={`flex items-center gap-1 ${userVotes[proposal.id] === 'up' ? 'bg-green-500 text-white' : ''}`}
+                              onClick={() => handleVote(proposal.id, 'up')}
+                            >
+                              <ThumbsUp className="w-4 h-4" />
+                              {proposal.upvotes}
+                            </Button>
+                            <Button
+                              variant={userVotes[proposal.id] === 'down' ? 'destructive' : 'outline'}
+                              size="sm"
+                              className={`flex items-center gap-1 ${userVotes[proposal.id] === 'down' ? 'bg-red-500 text-white' : ''}`}
+                              onClick={() => handleVote(proposal.id, 'down')}
+                            >
+                              <ThumbsDown className="w-4 h-4" />
+                              {proposal.downvotes}
+                            </Button>
+                          </div>
+                        </Card>
+                      );
+                    })}
                   </div>
                 </Card>
                 <Card className="p-6">
