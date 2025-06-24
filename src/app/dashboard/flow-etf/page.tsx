@@ -251,13 +251,16 @@ export default function FlowEtfPage() {
       const name = await contract.name().catch(() => "Flow Multi-Asset ETF");
       const symbol = await contract.symbol().catch(() => "FMAF");
       const agent = await contract.agentWallet().catch(() => CONTRACT_ADDRESSES.agentWallet);
-      const totalValue = await contract.getTotalValue().catch(() => "0");
+      const totalValueWei = await contract.getTotalValue().catch(() => "0");
+      
+      // Convert wei to ETH for proper display
+      const totalValueEth = ethers.formatEther(totalValueWei);
       
       setEtfInfo({
         name,
         symbol,
         agent,
-        totalValue
+        totalValue: totalValueEth
       });
       
       // Update user's ETF share balance
@@ -842,11 +845,11 @@ export default function FlowEtfPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-1">
                   <div className="text-muted-foreground text-sm">Total Value</div>
-                  <div className="text-xl font-bold">{parseFloat(etfInfo.totalValue).toLocaleString()} ETH</div>
+                  <div className="text-xl font-bold">${parseFloat(etfInfo.totalValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 </div>
                 <div className="space-y-1">
                   <div className="text-muted-foreground text-sm">Your Balance</div>
-                  <div className="text-xl font-bold">{parseFloat(userBalance).toLocaleString()} {etfInfo.symbol}</div>
+                  <div className="text-xl font-bold">{parseFloat(userBalance).toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 })} {etfInfo.symbol}</div>
                 </div>
                 <div className="space-y-1">
                   <div className="text-muted-foreground text-sm">Assets</div>
@@ -901,7 +904,7 @@ export default function FlowEtfPage() {
                           </Button>
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          Your balance: {parseFloat(userBalance).toLocaleString()} {etfInfo.symbol} shares
+                          Your balance: {parseFloat(userBalance).toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 })} {etfInfo.symbol} shares
                         </div>
                       </CardContent>
                     </Card>
@@ -917,7 +920,7 @@ export default function FlowEtfPage() {
       <div className="grid grid-cols-5 gap-4">
         <Card className="text-center">
           <CardContent className="pt-4 pb-4">
-            <div className="text-2xl font-bold">${parseFloat(etfInfo.totalValue).toLocaleString()}</div>
+            <div className="text-2xl font-bold">${parseFloat(etfInfo.totalValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             <div className="text-muted-foreground text-sm">ETF Value</div>
           </CardContent>
         </Card>
