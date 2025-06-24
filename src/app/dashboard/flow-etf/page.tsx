@@ -19,6 +19,8 @@ import FlowUSDCJSON from '@/lib/abis/FlowUSDC.json';
 import FlowWETHJSON from '@/lib/abis/FlowWETH.json';
 import AnkrFlowJSON from '@/lib/abis/AnkrFlow.json';
 import TrumpFlowJSON from '@/lib/abis/TrumpFlow.json';
+import { SidebarProvider } from '@/components/SidebarProvider';
+import { AIAgentChat } from '@/components/dashboard/ai-agent-chat';
 
 // Import centralized contract addresses
 import { CONTRACT_ADDRESSES, ASSET_ADDRESSES, NETWORK_CONFIG } from '@/config/contracts';
@@ -1674,7 +1676,7 @@ export default function FlowEtfPage() {
                     <CardTitle>AI Chat</CardTitle>
                   </CardHeader>
                   <CardContent className="h-full">
-                    <AiAgentChat />
+                    <AIAgentChat />
                   </CardContent>
                 </Card>
               </div>
