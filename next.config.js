@@ -2,6 +2,13 @@
 const nextConfig = {
   reactStrictMode: true,
   
+  // Image optimization configuration
+  images: {
+    unoptimized: false,
+    domains: [],
+    remotePatterns: [],
+  },
+  
   // Completely disable ESLint and TypeScript checking
   eslint: {
     ignoreDuringBuilds: true,

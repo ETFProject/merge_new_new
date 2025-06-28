@@ -1,9 +1,14 @@
-import { Inter } from 'next/font/google'
-import './globals.css';
-import type { Metadata, Viewport } from 'next';
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import "./animations.css";
+import "./modern-card.css";
 import { HydrationFix } from '@/components/HydrationFix';
 import { RootLayoutContent } from '@/components/RootLayoutContent';
 import { MoralisAuthProvider } from "@/components/MoralisAuthProvider";
+import { MoralisProvider } from "@/components/MoralisProvider";
+// import { PrivyWalletProvider } from "@/components/PrivyWalletProvider";
+import { SidebarProvider } from "@/components/SidebarProvider";
 
 // Metadata for the site
 export const metadata: Metadata = {
@@ -54,10 +59,17 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body suppressHydrationWarning>
+      <body className={inter.className}>
         <HydrationFix />
         <MoralisAuthProvider>
-          <RootLayoutContent>{children}</RootLayoutContent>
+          <MoralisProvider>
+            {/* Temporarily disabled to avoid conflicts */}
+            {/* <PrivyWalletProvider> */}
+              <SidebarProvider>
+                <RootLayoutContent>{children}</RootLayoutContent>
+              </SidebarProvider>
+            {/* </PrivyWalletProvider> */}
+          </MoralisProvider>
         </MoralisAuthProvider>
       </body>
     </html>

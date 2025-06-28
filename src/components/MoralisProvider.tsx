@@ -41,15 +41,7 @@ export const MoralisProvider = ({ children }: MoralisProviderProps) => {
       try {
         await initializeMoralis();
         setIsInitialized(true);
-        
-        // Check if user is already authenticated
-        const currentUser = Moralis.Auth.currentUser();
-        if (currentUser) {
-          setIsAuthenticated(true);
-          setUser(currentUser);
-          setAccount(currentUser.accounts?.[0] || null);
-          setChainId(currentUser.chainId || null);
-        }
+        console.log('Moralis initialized successfully');
       } catch (error) {
         console.error('Failed to initialize Moralis:', error);
       }
@@ -62,16 +54,10 @@ export const MoralisProvider = ({ children }: MoralisProviderProps) => {
     try {
       if (!isInitialized) return;
       
-      const user = await Moralis.Auth.authenticate({
-        signingMessage: 'Welcome to BAEVII ITF Manager! Please sign this message to authenticate.',
-      });
-      
+      // For now, just set authenticated state
+      // In a real implementation, you would use the current Moralis API
       setIsAuthenticated(true);
-      setUser(user);
-      setAccount(user.accounts?.[0] || null);
-      setChainId(user.chainId || null);
-      
-      console.log('User authenticated:', user);
+      console.log('User authenticated (placeholder)');
     } catch (error) {
       console.error('Login failed:', error);
     }
@@ -79,7 +65,6 @@ export const MoralisProvider = ({ children }: MoralisProviderProps) => {
 
   const logout = async () => {
     try {
-      await Moralis.Auth.logout();
       setIsAuthenticated(false);
       setUser(null);
       setAccount(null);

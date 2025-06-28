@@ -40,8 +40,8 @@ export function PrivyWalletProvider({ children }: PrivyWalletProviderProps) {
           accentColor: '#2563eb', // Blue accent color matching the UI
           logo: '/baevii-logo.png',
           showWalletLoginFirst: true,
-          // Configure wallet list to avoid unsupported wallets
-          walletList: ['metamask', 'wallet_connect', 'coinbase_wallet', 'rainbow'],
+          // Configure wallet list to avoid conflicts
+          walletList: ['wallet_connect', 'rainbow'],
         },
         // Login methods - allowing both email/social and wallet connections
         loginMethods: ['email', 'wallet', 'google', 'twitter'],
@@ -51,11 +51,10 @@ export function PrivyWalletProvider({ children }: PrivyWalletProviderProps) {
         },
         // Updated WalletConnect project ID (get new one from https://cloud.walletconnect.com)
         walletConnectCloudProjectId: '34357d3c125c2bcf2ce2bc3309d98715',
-        // External wallet configuration
+        // External wallet configuration - disable Coinbase Smart Wallet
         externalWallets: {
           coinbaseWallet: {
-            // Disable Coinbase Smart Wallet for unsupported chains
-            connectionOptions: 'smartWalletOnly', // or 'eoaOnly' to avoid smart wallet
+            connectionOptions: 'eoaOnly', // Use EOA only to avoid smart wallet conflicts
           },
         },
         // Set Flow EVM Testnet as default chain

@@ -21,13 +21,14 @@ import AnkrFlowJSON from '@/lib/abis/AnkrFlow.json';
 import TrumpFlowJSON from '@/lib/abis/TrumpFlow.json';
 import { SidebarProvider } from '@/components/SidebarProvider';
 import { AIAgentChat } from '@/components/dashboard/ai-agent-chat';
+import { ModernCard } from '@/components/ui/modern-card';
 
 // Import centralized contract addresses
 import { CONTRACT_ADDRESSES, ASSET_ADDRESSES, NETWORK_CONFIG } from '@/config/contracts';
 
-// Use Privy for wallet management
-import { usePrivy } from '@privy-io/react-auth';
-import { usePrivyWallets } from '@/components/PrivyWalletsWrapper';
+// Use Privy for wallet management - temporarily disabled
+// import { usePrivy } from '@privy-io/react-auth';
+// import { usePrivyWallets } from '@/components/PrivyWalletsWrapper';
 
 // Ensure correct ABI array format
 const vaultAbi = Array.isArray(ETFVaultJSON) 
@@ -131,8 +132,8 @@ export default function FlowEtfPage() {
   } = useFlareOracle();
 
   // Privy wallet integration
-  const { authenticated, ready, login } = usePrivy();
-  const { wallets, hasWallets } = usePrivyWallets();
+  // const { authenticated, ready, login } = usePrivy();
+  // const { wallets, hasWallets } = usePrivyWallets();
 
   const [selectedCategory, setSelectedCategory] = useState(FEED_CATEGORIES.ALL);
   const [searchQuery, setSearchQuery] = useState('');
@@ -196,48 +197,48 @@ export default function FlowEtfPage() {
 
     // Setup Privy wallet integration
     const setupPrivyWallet = async () => {
-      if (!ready) return;
+      // if (!ready) return;
       
-      if (authenticated && hasWallets) {
-        try {
-          const wallet = wallets[0];
-          if (wallet && wallet.address) {
-            setUserAddress(wallet.address);
-            
-            // Create ethers provider/signer from Privy wallet
-            // Use walletClientType instead of walletClient according to the Privy type definitions
-            if (wallet.walletClientType === 'privy') {
-              // For Privy embedded wallets, use the provider from window.ethereum
-              if (window.ethereum) {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                setProvider(provider);
-                const signer = await provider.getSigner();
-                setSigner(signer);
-              }
-            } else {
-              // For other wallet types, use a direct connection to the wallet's RPC
-              try {
-                const provider = new ethers.JsonRpcProvider(NETWORK_CONFIG.rpcUrls[0]);
-                setProvider(provider);
-              } catch (error) {
-                console.error("Failed to create provider for wallet:", error);
-              }
-            }
-          }
-        } catch (error) {
-          console.error("Error setting up Privy wallet:", error);
-        }
-      } else {
-        // Reset wallet state if not authenticated
-        setUserAddress("");
-        setSigner(null);
-        // Keep RPC provider for read-only operations
-        setProvider(rpcProvider);
-      }
+      // if (authenticated && hasWallets) {
+      //   try {
+      //     const wallet = wallets[0];
+      //     if (wallet && wallet.address) {
+      //       setUserAddress(wallet.address);
+      //       
+      //       // Create ethers provider/signer from Privy wallet
+      //       // Use walletClientType instead of walletClient according to the Privy type definitions
+      //       if (wallet.walletClientType === 'privy') {
+      //         // For Privy embedded wallets, use the provider from window.ethereum
+      //         if (window.ethereum) {
+      //           const provider = new ethers.BrowserProvider(window.ethereum);
+      //           setProvider(provider);
+      //           const signer = await provider.getSigner();
+      //           setSigner(signer);
+      //         }
+      //       } else {
+      //         // For other wallet types, use a direct connection to the wallet's RPC
+      //         try {
+      //           const provider = new ethers.JsonRpcProvider(NETWORK_CONFIG.rpcUrls[0]);
+      //           setProvider(provider);
+      //         } catch (error) {
+      //           console.error("Failed to create provider for wallet:", error);
+      //         }
+      //       }
+      //     }
+      //   } catch (error) {
+      //     console.error("Error setting up Privy wallet:", error);
+      //   }
+      // } else {
+      //   // Reset wallet state if not authenticated
+      //   setUserAddress("");
+      //   setSigner(null);
+      //   // Keep RPC provider for read-only operations
+      //   setProvider(rpcProvider);
+      // }
     };
 
     setupPrivyWallet();
-  }, [ready, authenticated, hasWallets]);
+  }, []);
 
   // Fetch ETF contract basic info
   const fetchEtfInfo = useCallback(async () => {
@@ -264,21 +265,21 @@ export default function FlowEtfPage() {
       });
       
       // Update user's ETF share balance
-      if (userAddress) {
-        try {
-          const balance = await contract.balanceOf(userAddress);
-          setUserBalance(balance.toString());
-        } catch (error) {
-          console.error("Error fetching user balance:", error);
-          setUserBalance("0");
-        }
-      }
+      // if (userAddress) {
+      //   try {
+      //     const balance = await contract.balanceOf(userAddress);
+      //     setUserBalance(balance.toString());
+      //   } catch (error) {
+      //     console.error("Error fetching user balance:", error);
+      //     setUserBalance("0");
+      //   }
+      // }
     } catch (error) {
       console.error("Error fetching ETF info:", error);
     } finally {
       setContractLoading(false);
     }
-  }, [provider, userAddress]);
+  }, [provider]);
 
   // Fetch active assets in the ETF
   const fetchActiveAssets = useCallback(async () => {
@@ -363,7 +364,7 @@ export default function FlowEtfPage() {
       fetchEtfInfo();
       fetchActiveAssets();
     }
-  }, [provider, userAddress, fetchEtfInfo, fetchActiveAssets]);
+  }, [provider, fetchEtfInfo, fetchActiveAssets]);
 
   // Handle deposit to ETF
   const handleDeposit = async () => {
@@ -779,7 +780,7 @@ export default function FlowEtfPage() {
           <p className="text-muted-foreground">Manage your ETF portfolio powered by Flare Oracle</p>
         </div>
         <div className="flex gap-2">
-          {!ready ? (
+          {/* {!ready ? (
             <div className="flex items-center gap-2 text-sm bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
               <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
               <span className="font-medium">Loading wallet...</span>
@@ -795,19 +796,30 @@ export default function FlowEtfPage() {
               <Wallet className="w-4 h-4" />
               Connect Wallet
             </Button>
-          )}
+          )} */}
         </div>
       </div>
 
       {/* ETF Vault Info */}
       {(etfInfo.name || contractLoading) && (
-        <Card>
-          <CardHeader>
+        <ModernCard variant="gradient" className="mb-6">
+          <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-primary">🔒</span>
-                ETF Contract Information
-              </CardTitle>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white text-xl font-bold">
+                  🔒
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                    ETF Contract Information
+                  </h2>
+                  {etfInfo.name && (
+                    <p className="text-blue-200/80 text-sm">
+                      {etfInfo.name} ({etfInfo.symbol}) - Flow Multi-Asset ETF
+                    </p>
+                  )}
+                </div>
+              </div>
               <div className="flex gap-2">
                 <Button
                   onClick={() => {
@@ -817,243 +829,106 @@ export default function FlowEtfPage() {
                   variant="outline"
                   size="sm"
                   disabled={contractLoading}
+                  className="border-white/20 text-white hover:bg-white/10"
                 >
                   <RefreshCw className={`w-4 h-4 mr-2 ${contractLoading ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-xs border-white/20 text-white">
                   Chain ID: {NETWORK_CONFIG.chainId}
                 </Badge>
               </div>
             </div>
-            {etfInfo.name && (
-              <CardDescription>
-                {etfInfo.name} ({etfInfo.symbol}) - Flow Multi-Asset ETF
-                <br />
-                <span className="text-xs font-mono">Contract: {CONTRACT_ADDRESSES.etfVault}</span>
-              </CardDescription>
-            )}
-          </CardHeader>
-          <CardContent>
+            
             {contractLoading ? (
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="h-6 bg-muted animate-pulse rounded" />
+                  <div key={i} className="h-8 bg-white/10 animate-pulse rounded-lg" />
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="space-y-1">
-                  <div className="text-muted-foreground text-sm">Total Value</div>
-                  <div className="text-xl font-bold">${parseFloat(etfInfo.totalValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-muted-foreground text-sm">Your Balance</div>
-                  <div className="text-xl font-bold">{parseFloat(userBalance).toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 })} {etfInfo.symbol}</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-muted-foreground text-sm">Assets</div>
-                  <div className="text-xl font-bold">{contractAssets.length}</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-muted-foreground text-sm">Agent Wallet</div>
-                  <div className="text-sm font-mono text-muted-foreground">{etfInfo.agent.substring(0, 10)}...{etfInfo.agent.substring(36)}</div>
-                </div>
-                
-                {authenticated && userAddress && signer && (
-                  <div className="col-span-1 md:col-span-2 lg:col-span-4 grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <Card className="bg-muted/30">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-base">Deposit USDC to ETF</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        <div className="flex gap-2">
-                          <div className="flex items-center px-3 py-2 bg-muted rounded-md text-sm font-medium">
-                            USDC
-                          </div>
-                          <Input
-                            type="number"
-                            placeholder="USDC Amount"
-                            value={depositAmount}
-                            onChange={(e) => setDepositAmount(e.target.value)}
-                          />
-                          <Button onClick={handleDeposit} disabled={contractLoading || !depositAmount}>
-                            Deposit
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card className="bg-muted/30">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-base">Withdraw USDC from ETF</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        <div className="flex gap-2">
-                          <div className="flex items-center px-3 py-2 bg-muted rounded-md text-sm font-medium">
-                            USDC
-                          </div>
-                          <Input
-                            type="number"
-                            placeholder="Shares to withdraw"
-                            value={withdrawAmount}
-                            onChange={(e) => setWithdrawAmount(e.target.value)}
-                          />
-                          <Button onClick={handleWithdraw} disabled={contractLoading || !withdrawAmount}>
-                            Withdraw
-                          </Button>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Your balance: {parseFloat(userBalance).toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 })} {etfInfo.symbol} shares
-                        </div>
-                      </CardContent>
-                    </Card>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="space-y-2">
+                  <div className="text-blue-200/70 text-sm font-medium">Total Value</div>
+                  <div className="text-3xl font-bold text-white">
+                    ${parseFloat(etfInfo.totalValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
-                )}
+                </div>
+                <div className="space-y-2">
+                  <div className="text-blue-200/70 text-sm font-medium">Your Balance</div>
+                  <div className="text-3xl font-bold text-white">
+                    {parseFloat(userBalance).toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 })} {etfInfo.symbol}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-blue-200/70 text-sm font-medium">Assets</div>
+                  <div className="text-3xl font-bold text-white">{contractAssets.length}</div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-blue-200/70 text-sm font-medium">Agent Wallet</div>
+                  <div className="text-sm font-mono text-white/80">
+                    {etfInfo.agent.substring(0, 10)}...{etfInfo.agent.substring(36)}
+                  </div>
+                </div>
               </div>
             )}
-          </CardContent>
-        </Card>
+            
+            {/* {!authenticated && ready && (
+              <Card className="border-orange-200 bg-orange-50">
+                <CardHeader>
+                  <CardTitle className="text-orange-800 flex items-center gap-2">
+                    <Wallet className="w-5 h-5" />
+                    Wallet Connection Required
+                  </CardTitle>
+                  <CardDescription className="text-orange-600">
+                    Please connect your wallet to interact with the ETF contract and perform deposits/withdrawals.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button onClick={login} className="gap-2">
+                    <Wallet className="w-4 h-4" />
+                    Connect Wallet with Privy
+                  </Button>
+                </CardContent>
+              </Card>
+            )} */}
+          </div>
+        </ModernCard>
       )}
       
       {/* Stats Cards */}
-      <div className="grid grid-cols-5 gap-4">
-        <Card className="text-center">
-          <CardContent className="pt-4 pb-4">
-            <div className="text-2xl font-bold">${parseFloat(etfInfo.totalValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-            <div className="text-muted-foreground text-sm">ETF Value</div>
-          </CardContent>
-        </Card>
-        <Card className="text-center">
-          <CardContent className="pt-4 pb-4">
-            <div className="text-sm font-bold">{currentTime} AM</div>
-            <div className="text-muted-foreground text-sm">Last Update</div>
-          </CardContent>
-        </Card>
-        <Card className="text-center">
-          <CardContent className="pt-4 pb-4">
-            <div className="text-xs font-mono">{CONTRACT_ADDRESSES.etfVault.substring(0, 8)}...{CONTRACT_ADDRESSES.etfVault.substring(38)}</div>
-            <div className="text-muted-foreground text-sm">Contract</div>
-          </CardContent>
-        </Card>
-        <Card className="text-center">
-          <CardContent className="pt-4 pb-4">
-            <div className="text-2xl font-bold">{portfolioAssets}</div>
-            <div className="text-muted-foreground text-sm">Portfolio Assets</div>
-          </CardContent>
-        </Card>
-        <Card className="text-center">
-          <CardContent className="pt-4 pb-4">
-            <div className="space-y-2">
-              {/* <Button 
-                onClick={refreshFeeds} 
-                className="w-full"
-                size="sm"
-                disabled={loading}
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
-              <Button 
-                onClick={() => {
-                  console.log('🔍 DEBUG: Testing oracle connection and data quality...');
-                  console.log('🌐 Browser info:', navigator.userAgent);
-                  console.log('🔗 Current URL:', window.location.href);
-                  console.log('⚙️ Network config:', {
-                    rpcUrl: 'https://coston2-api.flare.network/ext/C/rpc',
-                    chainId: 114,
-                    contractAddress: '0x93420cD7639AEe3dFc7AA18aDe7955Cfef4b44b1'
-                  });
-                  
-                  console.log('📊 Current feeds state:', { 
-                    feedsLength: feeds.length, 
-                    loading, 
-                    error,
-                    sampleFeeds: feeds.slice(0, 5).map(feed => ({
-                      name: feed.name,
-                      symbol: feed.symbol,
-                      price: feed.price,
-                      decimals: feed.decimals,
-                      timestamp: feed.timestamp,
-                      timestampDate: new Date(feed.timestamp * 1000).toLocaleString(),
-                      ageInMinutes: Math.round((Date.now() - feed.timestamp * 1000) / 1000 / 60)
-                    }))
-                  });
-                  
-                  // Check for unrealistic prices
-                  const unrealisticFeeds = feeds.filter(feed => {
-                    if (feed.symbol === 'ETH' && (feed.price < 1000 || feed.price > 10000)) return true;
-                    if (feed.symbol === 'BTC' && (feed.price < 30000 || feed.price > 200000)) return true;
-                    if (feed.symbol === 'SOL' && (feed.price < 10 || feed.price > 1000)) return true;
-                    return false;
-                  });
-                  
-                  if (unrealisticFeeds.length > 0) {
-                    console.warn('🚨 UNREALISTIC PRICES DETECTED:', unrealisticFeeds.map(feed => ({
-                      symbol: feed.symbol,
-                      price: feed.price,
-                      expectedRange: feed.symbol === 'ETH' ? '$1000-$10000' : 
-                                    feed.symbol === 'BTC' ? '$30000-$200000' :
-                                    feed.symbol === 'SOL' ? '$10-$1000' : 'N/A'
-                    })));
-                  }
-                  
-                  // Test ETH specifically
-                  const ethFeed = feeds.find(f => f.symbol === 'ETH');
-                  if (ethFeed) {
-                    console.log('🔍 ETH DETAILED ANALYSIS:', {
-                      name: ethFeed.name,
-                      price: ethFeed.price,
-                      decimals: ethFeed.decimals,
-                      timestamp: ethFeed.timestamp,
-                      timestampDate: new Date(ethFeed.timestamp * 1000).toLocaleString(),
-                      ageInMinutes: Math.round((Date.now() - ethFeed.timestamp * 1000) / 1000 / 60),
-                      isStale: (Date.now() - ethFeed.timestamp * 1000) > 300000, // older than 5 minutes
-                      isRealistic: ethFeed.price > 1000 && ethFeed.price < 10000
-                    });
-                  } else {
-                    console.log('❌ ETH feed not found in feeds array');
-                  }
-                  
-                  // Test feed indices mapping
-                  console.log('🧪 Testing individual feed indices...');
-                  testFeedIndices();
-                  
-                  // Refresh feeds after testing
-                  console.log('🔄 Refreshing feeds...');
-                  refreshFeeds();
-                }}
-                variant="outline"
-                size="sm"
-                className="w-full text-xs"
-              >
-                🔍 Debug Oracle
-              </Button> */}
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <ModernCard variant="glass" className="text-center p-4">
+          <div className="space-y-2">
+            <div className="text-2xl font-bold text-white">${parseFloat(etfInfo.totalValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            <div className="text-white/70 text-sm">ETF Value</div>
+          </div>
+        </ModernCard>
+        <ModernCard variant="glass" className="text-center p-4">
+          <div className="space-y-2">
+            <div className="text-sm font-bold text-white">{currentTime} AM</div>
+            <div className="text-white/70 text-sm">Last Update</div>
+          </div>
+        </ModernCard>
+        <ModernCard variant="glass" className="text-center p-4">
+          <div className="space-y-2">
+            <div className="text-xs font-mono text-white/80">{CONTRACT_ADDRESSES.etfVault.substring(0, 8)}...{CONTRACT_ADDRESSES.etfVault.substring(38)}</div>
+            <div className="text-white/70 text-sm">Contract</div>
+          </div>
+        </ModernCard>
+        <ModernCard variant="glass" className="text-center p-4">
+          <div className="space-y-2">
+            <div className="text-2xl font-bold text-white">{portfolioAssets}</div>
+            <div className="text-white/70 text-sm">Portfolio Assets</div>
+          </div>
+        </ModernCard>
+        <ModernCard variant="glass" className="text-center p-4">
+          <div className="space-y-2">
+            <div className="text-2xl font-bold text-white">{feeds.length}</div>
+            <div className="text-white/70 text-sm">Active Feeds</div>
+          </div>
+        </ModernCard>
       </div>
-
-      {/* Wallet Status Alert */}
-      {!authenticated && ready && (
-        <Card className="border-orange-200 bg-orange-50">
-          <CardHeader>
-            <CardTitle className="text-orange-800 flex items-center gap-2">
-              <Wallet className="w-5 h-5" />
-              Wallet Connection Required
-            </CardTitle>
-            <CardDescription className="text-orange-600">
-              Please connect your wallet to interact with the ETF contract and perform deposits/withdrawals.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={login} className="gap-2">
-              <Wallet className="w-4 h-4" />
-              Connect Wallet with Privy
-            </Button>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Error Handling */}
       {error && (
